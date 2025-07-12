@@ -10,18 +10,6 @@ body {
 	overflow-x: hidden;
 }
 
-/* Footer */
-.footer {
-	background-color: #aa1818;
-	color: white;
-	text-align: center;
-	padding: 1rem 0;
-	width: 100vw;
-	margin: 0;
-	position: relative;
-	left: 0;
-}
-
 .main-title {
 	color: #a61c1c;
 	border-bottom: 1px solid #ddd;

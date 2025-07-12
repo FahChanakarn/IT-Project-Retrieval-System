@@ -5,6 +5,10 @@
 	padding-top: 100px;
 }
 
+.fix-import-student-content {
+	height: calc(100vh - 157px);
+}
+
 /* ✅ สีหัวเรื่อง */
 h5 {
 	color: #aa1818;

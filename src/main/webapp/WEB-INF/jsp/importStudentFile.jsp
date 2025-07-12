@@ -25,7 +25,7 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4 pt-4">
+	<div class="container mt-4 pt-4 fix-import-student-content">
 		<div class="mx-auto" style="max-width: 600px;">
 			<h5>
 				<strong>ข้อมูลนักศึกษา / Import Excel File</strong>
@@ -62,5 +62,6 @@
 			</form>
 		</div>
 	</div>
+	<jsp:include page="/WEB-INF/jsp/includes/footer.jsp" />
 </body>
 </html>

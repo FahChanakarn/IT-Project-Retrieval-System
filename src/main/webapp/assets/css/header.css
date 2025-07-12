@@ -61,9 +61,6 @@ body {
 	text-align: center;
 	padding: 1rem 0;
 	width: 100vw;
-	margin: 0;
-	position: fixed;
-	left: 0;
 }
 
 /* ✅ Responsive Header */

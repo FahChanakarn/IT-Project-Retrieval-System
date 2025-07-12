@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Information Technology - MJU</title>
-
+<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <!-- Google Fonts: Kanit -->
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
@@ -190,7 +190,6 @@
 				</div>
 			</div>
 		</div>
-	</div>
 	</div>
 	<jsp:include page="/WEB-INF/jsp/includes/footer.jsp" />
 

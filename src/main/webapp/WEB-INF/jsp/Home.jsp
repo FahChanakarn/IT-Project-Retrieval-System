@@ -134,7 +134,7 @@
 			<!-- Main -->
 			<div class="col-md-9">
 				<div class="search-container">
-					<h3 class="mb-4">ค้นหาโครงงาน123</h3>
+					<h3 class="mb-4">ค้นหาโครงงาน</h3>
 					<form id="searchForm"
 						action="${pageContext.request.contextPath}/searchProjects"
 						method="get">

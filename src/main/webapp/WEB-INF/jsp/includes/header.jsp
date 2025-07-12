@@ -19,7 +19,7 @@
 				<c:choose>
 
 					<c:when test="${not empty sessionScope.student}">
-						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก123</a>
+						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
 
 						<div class="dropdown">
 							<a class="nav-link dropdown-toggle" href="#" role="button"
@@ -57,7 +57,7 @@
 
 					<c:when test="${not empty sessionScope.admin}">
 						<a href="${pageContext.request.contextPath}/"
-							class="nav-link text-white">หน้าหลัก123</a>
+							class="nav-link text-white">หน้าหลัก</a>
 
 						<ul class="nav d-flex flex-wrap align-items-center gap-3 mb-0">
 							<li class="nav-item dropdown"><a
@@ -100,7 +100,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก123</a>
+						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
 
 						<div class="dropdown">
 							<a class="nav-link dropdown-toggle" href="#" role="button"

@@ -1,0 +1,90 @@
+body {
+	font-family: 'Kanit', sans-serif;
+}
+/* ✅ Title */
+h5 {
+	color: #aa1818;
+	margin-bottom: 1.5rem;
+	font-weight: bold;
+}
+
+/* ✅ เส้นแบ่งหัวเรื่อง */
+hr {
+	border-top: 2px solid;
+	margin-bottom: 2rem;
+}
+
+/* ✅ ปุ่มเพิ่มข้อมูล */
+.btn-primary {
+	background-color: #007bff;
+	border-color: #007bff;
+	font-weight: 500;
+	margin-bottom: 1rem;
+}
+
+/* ✅ Table */
+.table th {
+	background-color: #e1f0fa;
+	color: #333;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.table td {
+	vertical-align: middle;
+	text-align: center;
+}
+
+/* ✅ ปุ่มสถานะ */
+.status-btn {
+	border: none;
+	padding: 0.3rem 0.8rem;
+	border-radius: 0.4rem;
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+.status-active {
+	background-color: #28a745;
+	color: white;
+}
+
+.status-inactive {
+	background-color: #dc3545;
+	color: white;
+}
+
+/* ✅ ปุ่มไอคอนแก้ไข */
+.edit-btn {
+	background-color: #28a745;
+	border: none;
+	padding: 0.4rem 0.6rem;
+	border-radius: 0.4rem;
+	color: white;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+/* ✅ Pagination */
+.pagination {
+	margin-top: 1.5rem;
+	justify-content: center;
+}
+
+.page-link {
+	color: #007bff;
+	border-radius: 0.3rem !important;
+}
+
+.page-item.active .page-link {
+	background-color: #007bff;
+	border-color: #007bff;
+	color: white;
+}
+
+/* ✅ Responsive */
+@media ( max-width : 768px) {
+	.table-responsive {
+		overflow-x: auto;
+	}
+}

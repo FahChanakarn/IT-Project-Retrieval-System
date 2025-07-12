@@ -1,0 +1,219 @@
+package com.springmvc.manager;
+
+import com.springmvc.model.HibernateConnection;
+import com.springmvc.model.Project;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+import java.util.List;
+
+public class ProjectManager {
+
+	public List<String> getAllProjectTypes() {
+		List<String> projectTypes = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT DISTINCT projectType FROM Project";
+			projectTypes = session.createQuery(hql, String.class).getResultList();
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+		return projectTypes;
+	}
+
+	public List<String> getAllSemesters() {
+		List<String> semesters = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT DISTINCT semester FROM Project ORDER BY semester DESC";
+			semesters = session.createQuery(hql, String.class).getResultList();
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+		return semesters;
+	}
+
+	public List<Project> searchProjects(String keyword) {
+		List<Project> projects = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s s "
+					+ "LEFT JOIN FETCH p.advisor a " + "WHERE " + "LOWER(p.proj_NameTh) LIKE :kw "
+					+ "OR LOWER(p.proj_NameEn) LIKE :kw " + "OR LOWER(p.keywordTh) LIKE :kw "
+					+ "OR LOWER(p.keywordEn) LIKE :kw "
+					+ "OR LOWER(CONCAT(a.adv_prefix, ' ', a.adv_firstName, ' ', a.adv_lastName)) LIKE :kw "
+					+ "OR LOWER(CONCAT(s.stu_prefix, ' ', s.stu_firstName, ' ', s.stu_lastName)) LIKE :kw";
+
+			var query = session.createQuery(hql, Project.class);
+			query.setParameter("kw", "%" + keyword.toLowerCase().trim() + "%");
+
+			projects = query.getResultList();
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return projects;
+	}
+
+	public List<Project> filterProjects(String projectType, List<String> advisorIds, List<String> semesters,
+			List<Integer> typeDBIds, List<String> languages, String testingStatus) {
+
+		List<Project> projects = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			StringBuilder hql = new StringBuilder("SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
+					+ "LEFT JOIN p.projectLangDetails pld " + "LEFT JOIN pld.programmingLang lang " + "WHERE 1=1");
+
+			if (projectType != null && !projectType.isEmpty()) {
+				hql.append(" AND p.projectType = :projectType");
+			}
+			if (advisorIds != null && !advisorIds.isEmpty()) {
+				hql.append(" AND p.advisor.advisorId IN (:advisorIds)");
+			}
+			if (semesters != null && !semesters.isEmpty()) {
+				hql.append(" AND p.semester IN (:semesters)");
+			}
+			if (typeDBIds != null && !typeDBIds.isEmpty()) {
+				hql.append(" AND p.typeDB.typeId IN (:typeDBIds)");
+			}
+			if (languages != null && !languages.isEmpty()) {
+				hql.append(" AND lang.langName IN (:languages)");
+			}
+			if (testingStatus != null && !testingStatus.isEmpty()) {
+				hql.append(" AND p.testing_status = :testingStatus");
+			}
+
+			var query = session.createQuery(hql.toString(), Project.class);
+
+			if (projectType != null && !projectType.isEmpty()) {
+				query.setParameter("projectType", projectType);
+			}
+			if (advisorIds != null && !advisorIds.isEmpty()) {
+				query.setParameter("advisorIds", advisorIds);
+			}
+			if (semesters != null && !semesters.isEmpty()) {
+				query.setParameterList("semesters", semesters);
+			}
+			if (typeDBIds != null && !typeDBIds.isEmpty()) {
+				query.setParameter("typeDBIds", typeDBIds);
+			}
+			if (languages != null && !languages.isEmpty()) {
+				query.setParameter("languages", languages);
+			}
+			if (testingStatus != null && !testingStatus.isEmpty()) {
+				query.setParameter("testingStatus", testingStatus);
+			}
+
+			projects = query.getResultList();
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return projects;
+	}
+
+	public Project findProjectById(int projectId) {
+		Project project = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
+					+ "WHERE p.projectId = :projectId";
+			project = session.createQuery(hql, Project.class).setParameter("projectId", projectId).uniqueResult();
+
+			if (project != null) {
+				project.getProjectLangDetails().size(); // force load
+			}
+
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+		return project;
+	}
+
+	public void updateProject(Project project) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+			session.update(project);
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+}

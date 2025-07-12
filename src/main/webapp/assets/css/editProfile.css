@@ -1,0 +1,55 @@
+.path-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #aa1818;
+	margin-bottom: 20px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #ccc; /* เปลี่ยนให้เหมือน section-title */
+	display: block; /* ให้เส้นยาวเต็ม */
+	width: 100%;
+}
+
+.edit-profile-box {
+	border: 2px solid #aa1818;
+	padding: 40px;
+	border-radius: 20px;
+	background-color: #fff;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.profile-section {
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-start;
+	gap: 30px;
+	margin-bottom: 30px;
+	margin-left: 100px; /* ขยับทั้งหมดไปทางขวาเล็กน้อย */
+}
+
+.profile-img {
+	width: 150px;
+	height: 150px;
+	object-fit: cover;
+	border-radius: 50%;
+	border: 2px solid #ccc;
+}
+
+.upload-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.upload-wrapper input[type="file"] {
+	margin-bottom: 8px;
+}
+
+.section-title {
+	font-weight: bold;
+	color: #aa1818;
+	text-align: left;
+	border-bottom: 2px solid #ccc;
+	padding-bottom: 5px;
+	margin-bottom: 20px;
+}

@@ -1,0 +1,84 @@
+@import
+	url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+
+body {
+	font-family: 'Kanit', sans-serif;
+	margin: 0;
+	padding-top: 80px; /* ปรับตามความสูง header จริง */
+	overflow-x: hidden;
+}
+
+.header {
+	background-color: #aa1818;
+	color: white;
+	padding: 15px 0;
+	position: fixed;
+	top: 0;
+	width: 100vw;
+	left: 0;
+	z-index: 1020;
+}
+
+.logo-img {
+	width: 240px;
+	height: auto;
+	max-width: 100%;
+}
+
+.faculty-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	line-height: 1.2;
+}
+
+.university-title {
+	font-size: 0.9rem;
+}
+
+.nav-link {
+	color: white;
+	transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+	color: #e6af30;
+}
+
+.dropdown-toggle::after {
+	vertical-align: middle;
+}
+
+.header .nav.d-inline-flex {
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 1rem;
+}
+
+/* ✅ Footer (ถ้าจะใช้ซ้ำได้ด้วย) */
+.footer {
+	background-color: #aa1818;
+	color: white;
+	text-align: center;
+	padding: 1rem 0;
+	width: 100vw;
+	margin: 0;
+	position: fixed;
+	left: 0;
+}
+
+/* ✅ Responsive Header */
+@media ( max-width : 768px) {
+	.faculty-title {
+		font-size: 1rem;
+	}
+	.university-title {
+		font-size: 0.8rem;
+	}
+	.nav-link {
+		display: block;
+		margin-bottom: 10px;
+	}
+	.dropdown-menu {
+		width: 100%;
+	}
+}

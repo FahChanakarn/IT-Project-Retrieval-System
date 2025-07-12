@@ -1,0 +1,76 @@
+@charset "UTF-8";
+
+/* ฟอนต์และพื้นหลัง */
+body {
+	font-family: 'Kanit', sans-serif;
+	background-color: #fff;
+}
+
+/* หัวข้อเส้นเขียวด้านซ้าย */
+.path-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #aa1818;
+	margin-bottom: 20px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #ccc; /* เปลี่ยนให้เหมือน section-title */
+	display: block; /* ให้เส้นยาวเต็ม */
+	width: 100%;
+}
+
+/* Label ชื่อฟิลด์ */
+.form-label {
+	font-weight: 600;
+	color: #212529;
+}
+
+/* จัดสไตล์กล่องข้อความ */
+textarea.form-control {
+	resize: vertical;
+	min-height: 140px;
+}
+
+/* Input ไม่ให้ปรับสีเวลา disabled */
+input[readonly], select:disabled {
+	background-color: #e9ecef;
+	color: #495057;
+}
+
+/* Checkbox / Radio */
+.form-check {
+	margin-right: 10px;
+}
+
+/* ข้อความเตือนด้านล่าง */
+.form-text.text-danger {
+	font-size: 0.9rem;
+	margin-top: 5px;
+}
+
+/* ปุ่ม */
+.btn {
+	min-width: 100px;
+	font-weight: 500;
+	padding: 8px 20px;
+	margin: 8px;
+}
+
+/* ปุ่มเขียว */
+.btn-success {
+	background-color: #28a745;
+	border: none;
+}
+
+/* ปุ่มแดง */
+.btn-danger {
+	background-color: #dc3545;
+	border: none;
+}
+
+/* ลิงก์คำแนะนำ */
+a.help-link {
+	font-size: 0.9rem;
+	margin-left: 10px;
+	text-decoration: underline;
+	color: #0066cc;
+}

@@ -1,0 +1,38 @@
+/* addAdvisor.css */
+body {
+	font-family: 'Kanit', sans-serif;
+}
+/* ✅ Title */
+h5 {
+	color: #aa1818;
+	margin-bottom: 1.5rem;
+	font-weight: bold;
+}
+
+/* ✅ เส้นแบ่งหัวเรื่อง */
+hr {
+	border-top: 2px solid;
+	margin-bottom: 2rem;
+}
+
+label {
+	font-weight: bold;
+}
+
+.form-label {
+	margin-top: 15px;
+}
+
+.form-control, .form-select {
+	max-width: 300px;
+}
+
+.btn-group {
+	margin-top: 30px;
+}
+
+.btn-group .btn {
+	margin-right: 15px;
+	padding: 8px 25px;
+	font-size: 16px;
+}

@@ -1,0 +1,58 @@
+.container {
+	max-width: 700px;
+	margin: auto;
+	padding: 2rem 1rem;
+	padding-top: 100px;
+}
+
+/* ✅ สีหัวเรื่อง */
+h5 {
+	color: #aa1818;
+	margin-bottom: 1.5rem;
+	font-weight: 600;
+}
+
+/* ✅ เส้นแบ่งหัวเรื่อง */
+hr {
+	border-top: 2px solid
+}
+
+/* ✅ ปรับ label ให้ดูเด่น */
+label {
+	color: #333;
+	font-weight: 500;
+}
+
+/* ✅ ปรับอินพุตให้ดูดีขึ้น */
+input[type="text"], input[type="file"] {
+	font-size: 1rem;
+}
+
+/* ✅ ปรับปุ่มให้สวยขึ้น */
+button.btn {
+	padding: 0.5rem 1.5rem;
+	font-weight: 500;
+}
+
+/* ✅ ปรับเอฟเฟกต์ disabled */
+input[disabled], button[disabled] {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+/* ✅ จัดกลางปุ่ม */
+.text-center .btn {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+
+/* ✅ Responsive เพิ่มเติม */
+@media ( max-width : 576px) {
+	.container {
+		padding: 1rem;
+	}
+	button.btn {
+		width: 100%;
+		margin-top: 0.5rem;
+	}
+}

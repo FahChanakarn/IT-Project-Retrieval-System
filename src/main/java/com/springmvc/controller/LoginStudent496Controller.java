@@ -33,12 +33,14 @@ public class LoginStudent496Controller {
 		Student496 student = manager.findByStuIdAndPassword(stuId, password);
 
 		if (student != null) {
-			// ✅ ตั้งค่า session เมื่อ login สำเร็จ
-			HttpSession session = request.getSession();
-			session.setAttribute("student", student);
+		    HttpSession session = request.getSession();
+		    session.setAttribute("student", student);
 
-			// 🔄 Redirect ไปหน้า Home
-			return new ModelAndView("redirect:/searchProjects");
+		    // ✅ ตั้ง projectId จาก student.getProject()
+		    if (student.getProject() != null) {
+		        session.setAttribute("projectId", student.getProject().getProjectId());
+		    }
+		    return new ModelAndView("redirect:/searchProjects");
 		} else {
 			ModelAndView mav = new ModelAndView("loginStudent496");
 			mav.addObject("error", "รหัสผ่านไม่ถูกต้อง");

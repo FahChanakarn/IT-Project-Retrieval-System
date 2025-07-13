@@ -27,7 +27,7 @@
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/editAbstract">แก้ไขบทคัดย่อ</a></li>
-								<li><a class="dropdown-item" href="#">อัปโหลดไฟล์</a></li>
+								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/student496/upload">อัปโหลดไฟล์</a></li>
 							</ul>
 						</div>
 
@@ -64,7 +64,8 @@
 								class="nav-link dropdown-toggle text-white" href="#"
 								role="button" data-bs-toggle="dropdown">จัดการโครงงาน</a>
 								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="#">รายการโครงงาน</a></li>
+									<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/listStudentProjects">รายการโครงงานทั้งหมด</a></li>
+									<li><a class="dropdown-item" href="#">รายการโครงงานของนักศึกษาในที่ปรึกษา</a></li>
 								</ul></li>
 
 							<li class="nav-item dropdown"><a

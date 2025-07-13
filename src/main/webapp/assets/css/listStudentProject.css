@@ -1,0 +1,70 @@
+@charset "UTF-8";
+
+body {
+	font-family: 'Kanit', sans-serif;
+}
+
+h5 {
+	color: #aa1818;
+	font-weight: bold;
+	margin-bottom: 1.5rem;
+}
+
+hr {
+	border-top: 2px solid;
+	margin-bottom: 2rem;
+}
+
+.form-label {
+	font-weight: bold;
+	margin-right: 10px;
+}
+
+select.form-select {
+	display: inline-block;
+	width: auto;
+	padding: 5px 12px;
+}
+
+.table th, .table td {
+	vertical-align: middle !important;
+	text-align: center;
+}
+
+.table th {
+	background-color: #f0f8ff;
+	font-weight: bold;
+}
+
+.btn {
+	font-size: 14px;
+	padding: 6px 16px;
+	border-radius: 8px;
+}
+
+.btn-primary {
+	background-color: #007bff;
+	border-color: #007bff;
+}
+
+.btn-success {
+	background-color: #28a745;
+	border-color: #28a745;
+}
+
+.btn[disabled] {
+	background-color: #6c757d !important;
+	border-color: #6c757d !important;
+	cursor: default;
+}
+
+.pagination .page-link {
+	color: #000;
+}
+
+.pagination .page-item.active .page-link {
+	background-color: #007bff;
+	border-color: #007bff;
+	color: #fff;
+	font-weight: bold;
+}

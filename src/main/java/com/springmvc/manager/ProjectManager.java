@@ -4,7 +4,9 @@ import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.Project;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectManager {
@@ -216,4 +218,41 @@ public class ProjectManager {
 			}
 		}
 	}
+
+	public List<Project> getProjectsBySemester(String semester) {
+		List<Project> projectList = new ArrayList<>();
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			Query<Project> query = session.createQuery("FROM Project WHERE semester = :semester", Project.class);
+			query.setParameter("semester", semester);
+			projectList = query.list();
+
+			session.getTransaction().commit();
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return projectList;
+	}
+
+	public String getLatestSemester() {
+		String latestSemester = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+
+			latestSemester = (String) session
+					.createQuery("SELECT DISTINCT semester FROM Project ORDER BY semester DESC").setMaxResults(1)
+					.uniqueResult();
+
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return latestSemester != null ? latestSemester : "2/2567"; // fallback เผื่อว่าง
+	}
+
 }

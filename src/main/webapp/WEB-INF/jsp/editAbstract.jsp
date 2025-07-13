@@ -6,6 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>แก้ไขบทคัดย่อ</title>
+<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
 	rel="stylesheet">

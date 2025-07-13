@@ -6,6 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>เพิ่มข้อมูลอาจารย์</title>
+<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"

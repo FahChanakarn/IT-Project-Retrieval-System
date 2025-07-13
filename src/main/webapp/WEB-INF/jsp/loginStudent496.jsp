@@ -4,6 +4,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<title>Login - นักศึกษา 496</title>
+<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/Header.css">
 <head>

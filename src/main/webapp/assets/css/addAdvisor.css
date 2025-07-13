@@ -1,7 +1,9 @@
-/* addAdvisor.css */
+@charset "UTF-8";
+
 body {
 	font-family: 'Kanit', sans-serif;
 }
+
 /* ✅ Title */
 h5 {
 	color: #aa1818;
@@ -24,7 +26,24 @@ label {
 }
 
 .form-control, .form-select {
-	max-width: 300px;
+	max-width: 400px;
+	border-radius: 0.5rem;
+	box-shadow: none;
+	border: 1px solid #ced4da;
+	transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+	border-color: #86b7fe;
+	box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group {
+	max-width: 400px;
+}
+
+.input-group-text {
+	cursor: pointer;
 }
 
 .btn-group {
@@ -35,4 +54,11 @@ label {
 	margin-right: 15px;
 	padding: 8px 25px;
 	font-size: 16px;
+	border-radius: 0.5rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-group .btn:hover {
+	transform: translateY(-1px);
 }

@@ -5,7 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Login - Admin</title>
-
+<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <!-- Google Fonts: Kanit -->
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">

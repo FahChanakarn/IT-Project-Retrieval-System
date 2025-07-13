@@ -18,7 +18,8 @@ public class AdvisorManager {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
 
-			String prefix = advisor.getAdv_position().equals("อาจารย์ที่ปรึกษา") ? "T" : "A";
+			// ใช้ prefix เดียว T เสมอ
+			String prefix = "T";
 			String lastId = getLastAdvisorIdWithPrefix(prefix);
 			int nextNumber = 1;
 
@@ -26,15 +27,16 @@ public class AdvisorManager {
 				try {
 					nextNumber = Integer.parseInt(lastId.substring(1)) + 1;
 				} catch (NumberFormatException e) {
-					e.printStackTrace(); // เผื่อกรณี prefix ผิดรูปแบบ
+					e.printStackTrace(); // ป้องกันเลขผิดรูปแบบ
 				}
 			}
 
-			String newId = prefix + nextNumber; // ❌ ไม่ใช้ %03d แล้ว
-
+			String newId = prefix + nextNumber;
 			advisor.setAdvisorId(newId);
 
-			advisor.setAdv_status("ปฏิบัติราชการ"); // default status ถ้ายังไม่ได้ตั้ง
+			// ตั้งค่า default
+			advisor.setAdv_status("ปฏิบัติราชการ");
+			advisor.setAdv_position("อาจารย์ที่ปรึกษา");
 
 			session.save(advisor);
 			session.getTransaction().commit();
@@ -118,7 +120,7 @@ public class AdvisorManager {
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
 
-			String hql = "FROM Advisor WHERE adv_status = 'ปฏิบัติราชการ' AND adv_position = 'อาจารย์ที่ปรึกษา'";
+			String hql = "FROM Advisor WHERE adv_status = 'ปฏิบัติราชการ'";
 			advisors = session.createQuery(hql, Advisor.class).getResultList();
 
 			session.getTransaction().commit();

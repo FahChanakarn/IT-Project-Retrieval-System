@@ -25,8 +25,8 @@ public class LoginAdminController {
 		AdvisorManager advisorManager = new AdvisorManager();
 		Advisor admin = advisorManager.findByEmailAndPassword(email, password);
 
-		if (admin != null && admin.getAdvisorId() != null && admin.getAdvisorId().startsWith("A")) {
-			// ✅ ตรวจสอบว่าเป็น admin จริง
+		if (admin != null && "อาจารย์ประสานงาน".equals(admin.getAdv_position())) {
+			// ✅ ตรวจสอบว่าเป็น admin จริงตาม position
 			HttpSession session = request.getSession();
 			session.setAttribute("admin", admin); // เก็บใน session เป็น admin
 

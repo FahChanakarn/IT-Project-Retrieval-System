@@ -55,7 +55,7 @@
 								action="${pageContext.request.contextPath}/admin/toggleStatus">
 								<input type="hidden" name="adv_id" value="${advisor.advisorId}" />
 								<button type="submit"
-									class="status-btn ${advisor.adv_status == 'ปฏิบัติราชการ' ? 'bg-success' : 'bg-danger'}">
+									class="status-btn text-white ${advisor.adv_status == 'ปฏิบัติราชการ' ? 'bg-success' : 'bg-danger'}">
 									${advisor.adv_status}</button>
 							</form>
 						</td>

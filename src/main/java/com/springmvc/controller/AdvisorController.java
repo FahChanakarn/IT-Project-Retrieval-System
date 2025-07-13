@@ -38,13 +38,8 @@ public class AdvisorController {
 	@RequestMapping(value = "/addAdvisor", method = RequestMethod.POST)
 	public ModelAndView addAdvisor(Advisor advisor) {
 		AdvisorManager advisorManager = new AdvisorManager();
-
-		// กำหนดรหัสอาจารย์ตามตำแหน่ง
-		String prefix = advisor.getAdv_position().equals("อาจารย์ที่ปรึกษา") ? "T" : "A";
-		String newId = advisorManager.generateNextAdvisorId(prefix);
-		advisor.setAdvisorId(newId);
-
-		advisorManager.addAdvisor(advisor);
+		
+		advisorManager.addAdvisor(advisor); 
 		return new ModelAndView("redirect:/admin/listAdvisors");
 	}
 

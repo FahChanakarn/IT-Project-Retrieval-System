@@ -10,7 +10,6 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<!-- Bootstrap JS -->
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet"
@@ -41,14 +40,7 @@
 				<label class="form-label">นามสกุล :</label> <input type="text"
 					name="adv_lastName" class="form-control" required>
 			</div>
-			<div class="mb-3">
-				<label class="form-label">ตำแหน่ง :</label> <select
-					name="adv_position" class="form-select" required>
-					<option value="">เลือกตำแหน่ง</option>
-					<option value="อาจารย์ที่ปรึกษา">อาจารย์ที่ปรึกษา</option>
-					<option value="อาจารย์ประสานงาน">อาจารย์ประสานงาน</option>
-				</select>
-			</div>
+
 			<div class="mb-3">
 				<label class="form-label">Email :</label> <input type="email"
 					name="adv_email" class="form-control" required>

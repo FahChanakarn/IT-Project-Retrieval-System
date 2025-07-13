@@ -60,7 +60,7 @@
 							</form>
 						</td>
 						<td><a
-							href="${pageContext.request.contextPath}/admin/editAdvisor?adv_id=${advisor.advisorId}"
+							href="${pageContext.request.contextPath}/admin/editAdvisorForm/${advisor.advisorId}"
 							class="btn btn-success"> <i class="bi bi-pencil-square"></i>
 						</a></td>
 					</tr>

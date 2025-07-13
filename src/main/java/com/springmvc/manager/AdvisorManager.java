@@ -80,16 +80,30 @@ public class AdvisorManager {
 
 	public boolean updateAdvisor(Advisor advisor) {
 		boolean isSuccess = false;
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
-			session.update(advisor); // อัปเดตข้อมูลในฐานข้อมูล
-			session.getTransaction().commit();
-			session.close();
-			isSuccess = true;
+
+			Advisor existing = session.get(Advisor.class, advisor.getAdvisorId());
+			if (existing != null) {
+				existing.setAdv_prefix(advisor.getAdv_prefix());
+				existing.setAdv_firstName(advisor.getAdv_firstName());
+				existing.setAdv_lastName(advisor.getAdv_lastName());
+				existing.setAdv_position(advisor.getAdv_position());
+				existing.setAdv_email(advisor.getAdv_email());
+				existing.setAdv_password(advisor.getAdv_password());
+
+				session.update(existing);
+				session.getTransaction().commit();
+				isSuccess = true;
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		} finally {
+			if (session != null)
+				session.close();
 		}
 		return isSuccess;
 	}

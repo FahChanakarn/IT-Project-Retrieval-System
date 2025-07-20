@@ -6,7 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>แก้ไขข้อมูลอาจารย์</title>
-<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
+<link rel="icon" type="image/png"
+	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -34,19 +35,22 @@
 				<label class="form-label">คำนำหน้า :</label> <input type="text"
 					name="adv_prefix" class="form-control mb-2"
 					value="${advisor.adv_prefix}" required>
-				<div class="mb-3">
-					<label class="form-label">ชื่อ :</label> <input type="text"
-						name="adv_firstName" class="form-control" placeholder="ชื่อจริง"
-						value="${advisor.adv_firstName}" required>
-				</div>
 
-				<div class="mb-3">
-					<label class="form-label">นามสกุล :</label> <input type="text"
-						name="adv_lastName" class="form-control" placeholder="นามสกุล"
-						value="${advisor.adv_lastName}" required>
+				<div class="row">
+					<div class="col-md-5 mb-2">
+						<label class="form-label">ชื่อ :</label> <input type="text"
+							name="adv_firstName" class="form-control"
+							value="${advisor.adv_firstName}" required>
+					</div>
+					<div class="col-md-5 mb-2">
+						<label class="form-label">นามสกุล :</label> <input type="text"
+							name="adv_lastName" class="form-control"
+							value="${advisor.adv_lastName}" required>
+					</div>
 				</div>
 			</div>
-			
+
+
 			<!-- Email -->
 			<div class="mb-3">
 				<label class="form-label">Email :</label> <input type="email"
@@ -54,34 +58,40 @@
 					required>
 			</div>
 
-			<!-- Password -->
-			<div class="mb-3">
-				<label class="form-label">รหัสผ่าน :</label>
-				<div class="input-group">
-					<input type="password" name="adv_password" class="form-control"
-						value="${advisor.adv_password}" required> <span
-						class="input-group-text"><i class="bi bi-eye-slash"
-						onclick="togglePassword(this, 'adv_password')"></i></span>
+			<div class="row">
+				<!-- รหัสผ่าน -->
+				<div class="col-md-5 mb-2 pe-md-2">
+					<label class="form-label">รหัสผ่าน :</label>
+					<div class="input-group">
+						<input type="password" name="adv_password" id="adv_password"
+							class="form-control" value="${advisor.adv_password}" required>
+						<span class="input-group-text"> <i class="bi bi-eye-slash"
+							onclick="togglePassword(this, 'adv_password')"></i>
+						</span>
+					</div>
 				</div>
-			</div>
 
-			<!-- ยืนยันรหัสผ่าน -->
-			<div class="mb-3">
-				<label class="form-label">ยืนยันรหัสผ่าน :</label>
-				<div class="input-group">
-					<input type="password" class="form-control" name="confirm_password"
-						value="${advisor.adv_password}" required> <span
-						class="input-group-text"><i class="bi bi-eye-slash"
-						onclick="togglePassword(this, 'confirm_password')"></i></span>
+				<!-- ยืนยันรหัสผ่าน -->
+				<div class="col-md-5 mb-2 ps-md-2">
+					<label class="form-label">ยืนยันรหัสผ่าน :</label>
+					<div class="input-group">
+						<input type="password" name="confirm_password"
+							id="confirm_password" class="form-control"
+							value="${advisor.adv_password}" required> <span
+							class="input-group-text"> <i class="bi bi-eye-slash"
+							onclick="togglePassword(this, 'confirm_password')"></i>
+						</span>
+					</div>
 				</div>
 			</div>
 
 			<!-- ปุ่ม -->
 			<div class="btn-group">
-				<button type="submit" class="btn btn-success">แก้ไข</button>
+				<button type="submit" class="btn btn-success rounded">แก้ไข</button>
 				<a href="${pageContext.request.contextPath}/admin/listAdvisors"
-					class="btn btn-danger">ยกเลิก</a>
+					class="btn btn-danger rounded">ยกเลิก</a>
 			</div>
+
 
 			<!-- รหัสอาจารย์ (ซ่อน) -->
 			<input type="hidden" name="advisorId" value="${advisor.advisorId}">
@@ -89,8 +99,8 @@
 	</div>
 
 	<script>
-		function togglePassword(icon, fieldName) {
-			const input = document.getElementsByName(fieldName)[0];
+		function togglePassword(icon, fieldId) {
+			const input = document.getElementById(fieldId);
 			if (input.type === "password") {
 				input.type = "text";
 				icon.classList.remove("bi-eye-slash");
@@ -102,6 +112,5 @@
 			}
 		}
 	</script>
-
 </body>
 </html>

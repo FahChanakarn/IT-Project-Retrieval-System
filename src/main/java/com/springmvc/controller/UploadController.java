@@ -1,7 +1,9 @@
 package com.springmvc.controller;
 
+import com.springmvc.manager.ProjectManager;
 import com.springmvc.manager.UploadManager;
 import com.springmvc.model.DocumentFile;
+import com.springmvc.model.Project;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,11 +27,14 @@ public class UploadController {
 	public ModelAndView showUploadPage(HttpSession session) {
 		Integer projectId = (Integer) session.getAttribute("projectId");
 		UploadManager manager = new UploadManager();
+		ProjectManager proj = new ProjectManager();
+		Project project = proj.findProjectById(projectId);
 
 		List<DocumentFile> files = manager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("uploadFileAndVideo");
 		mav.addObject("uploadList", files); // เปลี่ยนให้ตรงกับ JSP ที่ใช้ ${uploadList}
+		mav.addObject("project", project);
 		return mav;
 	}
 

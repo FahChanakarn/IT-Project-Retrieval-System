@@ -99,7 +99,7 @@ public class ProjectManager {
 	}
 
 	public List<Project> filterProjects(String projectType, List<String> advisorIds, List<String> semesters,
-			List<Integer> typeDBIds, List<String> languages, String testingStatus) {
+			List<Integer> typeDBIds, List<String> languages, String testingStatus, String startYear, String endYear) {
 
 		List<Project> projects = null;
 		Session session = null;
@@ -130,6 +130,10 @@ public class ProjectManager {
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				hql.append(" AND p.testing_status = :testingStatus");
 			}
+			if (startYear != null && !startYear.isEmpty() && endYear != null && !endYear.isEmpty()) {
+				hql.append(
+						" AND FUNCTION('substring', p.semester, LOCATE('/', p.semester) + 1) BETWEEN :startYear AND :endYear");
+			}
 
 			var query = session.createQuery(hql.toString(), Project.class);
 
@@ -150,6 +154,11 @@ public class ProjectManager {
 			}
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				query.setParameter("testingStatus", testingStatus);
+			}
+
+			if (startYear != null && !startYear.isEmpty() && endYear != null && !endYear.isEmpty()) {
+				query.setParameter("startYear", startYear);
+				query.setParameter("endYear", endYear);
 			}
 
 			projects = query.getResultList();

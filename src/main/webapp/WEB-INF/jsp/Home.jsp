@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="java.util.Calendar"%>
+<%
+int thisYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+request.setAttribute("currentYear", thisYear);
+%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="th">
@@ -7,7 +12,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Information Technology - MJU</title>
-<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
+<link rel="icon" type="image/png"
+	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <!-- Google Fonts: Kanit -->
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
@@ -75,17 +81,29 @@
 					</div>
 
 					<div class="filter-section">
-						<div class="filter-title">ภาคเรียน</div>
-						<c:forEach var="semester" items="${semesters}">
-							<div class="form-check">
-								<input class="form-check-input filter-input" type="checkbox"
-									name="semesters" value="${semester}" id="sem_${semester}"
-									<c:if test="${not empty selectedSemesters && selectedSemesters.contains(semester)}">checked</c:if> />
-								<label class="form-check-label" for="sem_${semester}">
-									${semester} </label>
+						<div class="filter-title">ช่วงปีการศึกษา</div>
+						<div class="row">
+							<div class="col-6">
+								<select class="form-select filter-input" name="startYear">
+									<option value="">ปีเริ่มต้น</option>
+									<c:forEach var="year" begin="2562" end="${currentYear}">
+										<option value="${year}"
+											<c:if test="${year == selectedStartYear}">selected</c:if>>${year}</option>
+									</c:forEach>
+								</select>
 							</div>
-						</c:forEach>
+							<div class="col-6">
+								<select class="form-select filter-input" name="endYear">
+									<option value="">ปีสิ้นสุด</option>
+									<c:forEach var="year" begin="2562" end="${currentYear}">
+										<option value="${year}"
+											<c:if test="${year == selectedEndYear}">selected</c:if>>${year}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
 					</div>
+
 
 
 					<div class="filter-section">

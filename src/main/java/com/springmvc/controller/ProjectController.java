@@ -51,14 +51,16 @@ public class ProjectController {
 	@RequestMapping(value = "/filterProjects", method = RequestMethod.GET)
 	public ModelAndView filterProjects(@RequestParam(value = "projectType", required = false) String projectType,
 			@RequestParam(value = "advisorIds", required = false) List<String> advisorIds,
-			@RequestParam(value = "semesters", required = false) List<String> semesters, // ✅ เปลี่ยนตรงนี้
+			@RequestParam(value = "semesters", required = false) List<String> semesters,
 			@RequestParam(value = "typeDBIds", required = false) List<Integer> typeDBIds,
 			@RequestParam(value = "languages", required = false) List<String> languages,
-			@RequestParam(value = "testingStatus", required = false) String testingStatus) {
+			@RequestParam(value = "testingStatus", required = false) String testingStatus,
+			@RequestParam(value = "startYear", required = false) String startYear,
+			@RequestParam(value = "endYear", required = false) String endYear) {
 
 		ProjectManager projectManager = new ProjectManager();
 		List<Project> projects = projectManager.filterProjects(projectType, advisorIds, semesters, typeDBIds, languages,
-				testingStatus); // ✅ ส่ง List<String> ไปแทน
+				testingStatus, startYear, endYear);
 
 		// โหลดข้อมูลแถบด้านซ้าย
 		AdvisorManager advisorManager = new AdvisorManager();
@@ -75,17 +77,19 @@ public class ProjectController {
 		mav.addObject("projects", projects);
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
-		mav.addObject("semesters", allSemesters); // ✅ ส่ง list ทั้งหมดกลับ
+		mav.addObject("semesters", allSemesters);
 		mav.addObject("programmingLangs", programmingLangs);
 		mav.addObject("typeDBs", typeDBs);
 
-		// ✅ ส่งค่าที่เลือกกลับไป JSP
+		// ส่งค่าที่เลือกกลับไป JSP เพื่อให้ dropdown คงสถานะ
 		mav.addObject("selectedProjectType", projectType);
 		mav.addObject("selectedAdvisorIds", advisorIds);
-		mav.addObject("selectedSemesters", semesters); // ✅ ชื่อใหม่
+		mav.addObject("selectedSemesters", semesters);
 		mav.addObject("selectedTypeDBIds", typeDBIds);
 		mav.addObject("selectedLanguages", languages);
 		mav.addObject("selectedTestingStatus", testingStatus);
+		mav.addObject("selectedStartYear", startYear);
+		mav.addObject("selectedEndYear", endYear);
 
 		return mav;
 	}

@@ -83,18 +83,18 @@
 					placeholder="https://example.com" pattern="https?://.+" />
 			</div>
 
-			<div class="btn-group">
-				<button type="submit" class="btn btn-success">อัปโหลด</button>
-				<a href="#" class="btn btn-danger">ยกเลิก</a>
+			<div class="d-flex gap-2">
+				<button type="submit" class="btn btn-success rounded">อัปโหลด</button>
+				<a href="#" class="btn btn-danger rounded">ยกเลิก</a>
 			</div>
 		</form>
 
 		<br>
-		<h5 class="text-danger fw-bold">อัปโหลด</h5>
-		<hr class="mt-5">
+		<h5 class="fw-bold text-danger">อัปโหลดไฟล์เอกสาร</h5>
+		<hr class="mb-4 mt-2">
 
 		<table class="table table-bordered text-center align-middle">
-			<thead class="table-light">
+			<thead class="table-info">
 				<tr>
 					<th>ลำดับ</th>
 					<th>ชื่อไฟล์</th>

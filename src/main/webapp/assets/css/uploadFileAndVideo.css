@@ -37,8 +37,17 @@ label {
 	font-size: 16px;
 }
 
-.table th, .table td {
-	vertical-align: middle !important;
+/* ✅ Table */
+.table th {
+	background-color: #e1f0fa;
+	color: #333;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.table td {
+	vertical-align: middle;
+	text-align: center;
 }
 
 .table a.btn {

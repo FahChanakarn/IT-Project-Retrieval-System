@@ -91,7 +91,6 @@ public class AdvisorManager {
 				existing.setAdv_prefix(advisor.getAdv_prefix());
 				existing.setAdv_firstName(advisor.getAdv_firstName());
 				existing.setAdv_lastName(advisor.getAdv_lastName());
-				existing.setAdv_position(advisor.getAdv_position());
 				existing.setAdv_email(advisor.getAdv_email());
 				existing.setAdv_password(advisor.getAdv_password());
 
@@ -184,6 +183,27 @@ public class AdvisorManager {
 				String currentStatus = advisor.getAdv_status();
 				String newStatus = currentStatus.equals("ปฏิบัติราชการ") ? "ลาศึกษาต่อ" : "ปฏิบัติราชการ";
 				advisor.setAdv_status(newStatus);
+				session.update(advisor);
+			}
+
+			session.getTransaction().commit();
+			session.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void togglePosition(String advisorId) {
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			Advisor advisor = session.get(Advisor.class, advisorId);
+			if (advisor != null) {
+				String currentPosition = advisor.getAdv_position();
+				String newPosition = currentPosition.equals("อาจารย์ที่ปรึกษา") ? "อาจารย์ประสานงาน" : "อาจารย์ที่ปรึกษา";
+				advisor.setAdv_position(newPosition);;
 				session.update(advisor);
 			}
 

@@ -6,7 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>รายชื่ออาจารย์</title>
-<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
+<link rel="icon" type="image/png"
+	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <!-- Bootstrap CSS -->
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -50,7 +51,13 @@
 						<td>${advisor.adv_prefix}${advisor.adv_firstName}
 							${advisor.adv_lastName}</td>
 						<td>${advisor.adv_email}</td>
-						<td>${advisor.adv_position}</td>
+						<td><form method="post"
+								action="${pageContext.request.contextPath}/admin/togglePosition">
+								<input type="hidden" name="adv_id" value="${advisor.advisorId}" />
+								<button type="submit"
+									class="status-btn text-white ${advisor.adv_position == 'อาจารย์ที่ปรึกษา' ? 'bg-primary' : 'bg-warning'}">
+									${advisor.adv_position}</button>
+							</form></td>
 						<td>
 							<form method="post"
 								action="${pageContext.request.contextPath}/admin/toggleStatus">

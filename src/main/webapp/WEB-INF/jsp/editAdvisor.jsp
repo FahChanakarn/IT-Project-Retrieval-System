@@ -46,18 +46,7 @@
 						value="${advisor.adv_lastName}" required>
 				</div>
 			</div>
-
-			<!-- ตำแหน่ง -->
-			<div class="mb-3">
-				<label class="form-label">ตำแหน่ง :</label> <select
-					name="adv_position" class="form-select" required>
-					<option value="อาจารย์ที่ปรึกษา"
-						${advisor.adv_position == 'อาจารย์ที่ปรึกษา' ? 'selected' : ''}>อาจารย์ที่ปรึกษา</option>
-					<option value="อาจารย์ประสานงาน"
-						${advisor.adv_position == 'อาจารย์ประสานงาน' ? 'selected' : ''}>อาจารย์ประสานงาน</option>
-				</select>
-			</div>
-
+			
 			<!-- Email -->
 			<div class="mb-3">
 				<label class="form-label">Email :</label> <input type="email"

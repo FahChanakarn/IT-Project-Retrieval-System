@@ -81,5 +81,18 @@ public class AdvisorController {
 
 		return new ModelAndView("redirect:/admin/listAdvisors");
 	}
+	
+	@RequestMapping(value = "/togglePosition", method = RequestMethod.POST)
+	public ModelAndView togglePosition(String adv_id, HttpSession session) {
+		AdvisorManager advisorManager = new AdvisorManager();
+		advisorManager.togglePosition(adv_id);
+
+		Object admin = session.getAttribute("admin");
+		if (admin == null) {
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		return new ModelAndView("redirect:/admin/listAdvisors");
+	}
 
 }

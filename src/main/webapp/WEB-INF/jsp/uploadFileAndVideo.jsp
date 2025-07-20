@@ -26,15 +26,21 @@
 		const fileGroup = document.getElementById("fileGroup");
 		const videoGroup = document.getElementById("videoGroup");
 		const labelName = document.getElementById("fileNameLabel");
+		const fileInput = document.querySelector('input[name="file"]');
+		const fileNameInput = document.querySelector('input[name="fileName"]'); // ✅ input ชื่อไฟล์
 
 		if (type === "video") {
 			fileGroup.style.display = "none";
 			videoGroup.style.display = "block";
 			labelName.innerText = "ชื่อวิดีโอ :";
+			fileInput.removeAttribute("required");
+			fileNameInput.placeholder = "ตัวอย่างการใช้งานโปรแกรม"; // ✅ เปลี่ยน placeholder
 		} else {
 			fileGroup.style.display = "block";
 			videoGroup.style.display = "none";
 			labelName.innerText = "ชื่อไฟล์ :";
+			fileInput.setAttribute("required", "true");
+			fileNameInput.placeholder = "เช่น บทที่ 1 บทนำ"; // ✅ คืนค่าเดิม
 		}
 	}
 </script>
@@ -82,7 +88,7 @@
 				<a href="#" class="btn btn-danger">ยกเลิก</a>
 			</div>
 		</form>
-		
+
 		<br>
 		<h5 class="text-danger fw-bold">อัปโหลด</h5>
 		<hr class="mt-5">
@@ -101,21 +107,23 @@
 				<c:forEach var="item" items="${uploadList}" varStatus="loop">
 					<tr>
 						<td>${loop.index + 1}</td>
-						<td>${item.fileName}</td>
+						<td>${item.filename}</td>
+						<!-- ✅ แก้ตรงนี้ -->
 						<td><c:choose>
-								<c:when test="${item.type == 'file'}">
+								<c:when test="${item.filetype == 'file'}">
 									<a class="btn btn-primary btn-sm"
-										href="${pageContext.request.contextPath}/uploads/${item.filePath}"
+										href="${pageContext.request.contextPath}/${item.filepath}"
 										target="_blank">ดูเอกสาร</a>
 								</c:when>
 								<c:otherwise>
-									<a class="btn btn-primary btn-sm" href="${item.videoLink}"
+									<a class="btn btn-primary btn-sm" href="${item.filepath}"
 										target="_blank">ดูวิดีโอ</a>
 								</c:otherwise>
 							</c:choose></td>
-						<td class="text-success fw-bold">อัปโหลดสำเร็จ</td>
+						<td class="text-success fw-bold">${item.status}</td>
+						<!-- ✅ สถานะจาก Model -->
 						<td><a
-							href="${pageContext.request.contextPath}/student/editUpload/${item.id}"
+							href="${pageContext.request.contextPath}/student496/editFile/${item.fileId}"
 							class="btn btn-success btn-sm"> <i
 								class="bi bi-pencil-square"></i>
 						</a></td>
@@ -123,6 +131,7 @@
 				</c:forEach>
 			</tbody>
 		</table>
+
 	</div>
 </body>
 </html>

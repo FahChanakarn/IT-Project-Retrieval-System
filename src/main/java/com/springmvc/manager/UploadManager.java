@@ -50,30 +50,33 @@ public class UploadManager {
 		doc.setSendDate(date);
 		doc.setStatus("อัปโหลดสำเร็จ");
 
+// ✅ เซ็ต path จริงบนเครื่อง
+		String uploadBasePath = "D:/Project496Uploads/uploadsFile"; // ปรับตามที่คุณสร้างไว้
+		new File(uploadBasePath).mkdirs(); // เผื่อยังไม่มี
+
 		if ("file".equals(fileType) && file != null && !file.isEmpty()) {
 			try {
-				String uploadDir = context.getRealPath("/assets/uploadsFile");
-				new File(uploadDir).mkdirs(); // สร้างโฟลเดอร์ถ้ายังไม่มี
-
-				// สร้างชื่อไฟล์ใหม่เพื่อเลี่ยงชื่อซ้ำ
+				// ✅ ตั้งชื่อไฟล์ไม่ซ้ำ
 				String safeFilename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-				String fullPath = uploadDir + File.separator + safeFilename;
+				String fullPath = uploadBasePath + File.separator + safeFilename;
+
+				// ✅ debug log
+				System.out.println("📂 Saving file to: " + fullPath);
 
 				file.transferTo(new File(fullPath));
 
-				// เก็บ path แบบ relative สำหรับเปิดดูผ่าน browser
-				doc.setFilepath("assets/images/uploadsFile/" + safeFilename);
+				// ✅ เก็บแค่ชื่อไฟล์ไว้ (ไม่ใช่ path จริง)
+				doc.setFilepath(safeFilename);
 
 			} catch (IOException e) {
 				e.printStackTrace();
 				doc.setStatus("เกิดข้อผิดพลาด");
 			}
-
 		} else if ("video".equals(fileType)) {
-			doc.setFilepath(videoLink);
+			doc.setFilepath(videoLink); // เก็บลิงก์โดยตรง
 		}
 
-		// หาลำดับ
+// ลำดับไฟล์
 		Query<Integer> maxQuery = session
 				.createQuery("SELECT MAX(fileno) FROM DocumentFile WHERE project.projectId = :pid", Integer.class);
 		maxQuery.setParameter("pid", projectId);

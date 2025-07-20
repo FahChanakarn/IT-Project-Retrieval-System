@@ -112,7 +112,7 @@
 						<td><c:choose>
 								<c:when test="${item.filetype == 'file'}">
 									<a class="btn btn-primary btn-sm"
-										href="${pageContext.request.contextPath}/${item.filepath}"
+										href="${pageContext.request.contextPath}/download/file/${item.fileId}"
 										target="_blank">ดูเอกสาร</a>
 								</c:when>
 								<c:otherwise>

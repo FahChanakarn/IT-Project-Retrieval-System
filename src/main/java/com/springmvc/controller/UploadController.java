@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -53,13 +54,36 @@ public class UploadController {
 	}
 
 	// 3. ไปหน้าแก้ไขไฟล์
-	@RequestMapping(value = "/editFile/{fileId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/editFileAndVideo/{fileId}", method = RequestMethod.GET)
 	public ModelAndView editFile(@PathVariable("fileId") int fileId) {
 		UploadManager manager = new UploadManager();
 		DocumentFile file = manager.getFileById(fileId);
 
-		ModelAndView mav = new ModelAndView("editFile");
+		ModelAndView mav = new ModelAndView("editFileAndVideo");
 		mav.addObject("file", file);
 		return mav;
 	}
+
+	@RequestMapping("/editFileAndVideo")
+	public ModelAndView editFileAndVideo(@RequestParam("id") int fileId) {
+		UploadManager fileManager = new UploadManager();
+		DocumentFile file = fileManager.getFileById(fileId);
+
+		ModelAndView mav = new ModelAndView("editFileAndVideo");
+		mav.addObject("file", file);
+		return mav;
+	}
+
+	@RequestMapping(value = "/updateFileAndVideo", method = RequestMethod.POST)
+	public ModelAndView updateFileAndVideo(HttpServletRequest request, @RequestParam("id") int id,
+			@RequestParam("name") String name, @RequestParam(value = "videoLink", required = false) String videoLink,
+			@RequestParam(value = "newFile", required = false) MultipartFile newFile) {
+
+		UploadManager fileManager = new UploadManager();
+		fileManager.updateFileOrVideo(id, name, videoLink, newFile, request);
+
+		// แก้ไขแล้วกลับไปหน้าฟอร์มเดิมพร้อม success popup
+		return new ModelAndView("redirect:/student496/editFileAndVideo/" + id + "?success=true");
+	}
+
 }

@@ -1,0 +1,19 @@
+@charset "UTF-8";
+body {
+	font-family: 'Kanit', sans-serif;
+}
+
+h5 {
+	color: #aa1818;
+	font-weight: bold;
+	margin-bottom: 1.5rem;
+}
+
+hr {
+	border-top: 2px solid;
+	margin-bottom: 2rem;
+}
+
+label {
+	font-weight: bold;
+}

@@ -10,6 +10,8 @@ import org.hibernate.query.Query;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -94,4 +96,32 @@ public class UploadManager {
 		session.close();
 		return file;
 	}
+
+	public void updateFileOrVideo(int id, String filename, String videoLink, MultipartFile newFile,
+			HttpServletRequest request) {
+		Session session = HibernateConnection.doHibernateConnection().openSession();
+		try {
+			session.beginTransaction();
+			DocumentFile file = session.get(DocumentFile.class, id);
+			file.setFilename(filename);
+
+			if (file.getFiletype().equals("video")) {
+				file.setFilepath(videoLink);
+			} else if (newFile != null && !newFile.isEmpty()) {
+				String uploadPath = request.getServletContext().getRealPath("/uploads/");
+				String filePath = uploadPath + File.separator + newFile.getOriginalFilename();
+				newFile.transferTo(new File(filePath));
+				file.setFilepath("uploads/" + newFile.getOriginalFilename());
+			}
+
+			session.update(file);
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			session.getTransaction().rollback();
+		} finally {
+			session.close();
+		}
+	}
+
 }

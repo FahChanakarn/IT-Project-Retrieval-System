@@ -73,8 +73,8 @@
 			<div class="mb-3" id="fileGroup">
 				<label class="form-label">เลือกไฟล์ที่ต้องการอัปโหลด :</label> <input
 					type="file" name="file" class="form-control" accept=".pdf" required>
-				<small class="text-danger">กรุณาอัปโหลดเฉพาะไฟล์ .pdf
-					เท่านั้น</small>
+				<small class="text-danger">*กรุณาอัปโหลดเฉพาะไฟล์ .pdf
+					เท่านั้น*</small>
 			</div>
 
 			<div class="mb-3" id="videoGroup" style="display: none;">
@@ -123,7 +123,7 @@
 						<td class="text-success fw-bold">${item.status}</td>
 						<!-- ✅ สถานะจาก Model -->
 						<td><a
-							href="${pageContext.request.contextPath}/student496/editFile/${item.fileId}"
+							href="${pageContext.request.contextPath}/student496/editFileAndVideo/${item.fileId}"
 							class="btn btn-success btn-sm"> <i
 								class="bi bi-pencil-square"></i>
 						</a></td>

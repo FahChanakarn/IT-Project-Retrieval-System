@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.model.Advisor;
+import com.springmvc.model.Project;
 
 @Controller
 @RequestMapping("/advisor")
@@ -66,5 +67,16 @@ public class AdvisorProjectController {
 		}
 		return list;
 	}
+	
+	@RequestMapping("/viewProjectDetail")
+	public ModelAndView viewProjectDetail(@RequestParam("projectId") int projectId) {
+	    ProjectManager projectManager = new ProjectManager();
+	    Project project = projectManager.findProjectById(projectId);
+	    
+	    ModelAndView mav = new ModelAndView("viewProjectDetail");
+	    mav.addObject("project", project);
+	    return mav;
+	}
+
 
 }

@@ -188,10 +188,12 @@ public class ProjectManager {
 
 			String hql = "SELECT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
 					+ "WHERE p.projectId = :projectId";
+
 			project = session.createQuery(hql, Project.class).setParameter("projectId", projectId).uniqueResult();
 
 			if (project != null) {
-				project.getProjectLangDetails().size(); // force load
+				project.getProjectLangDetails().size(); // lazy load ตัวที่สอง
+				project.getDocumentFiles().size();
 			}
 
 			session.getTransaction().commit();
@@ -271,7 +273,7 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			Session session = sessionFactory.openSession();
 
-			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh "
+			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh, p.projectId "
 					+ "FROM Student496 s JOIN s.project p "
 					+ "WHERE p.advisor.advisorId = :advisorId AND p.semester = :semester";
 

@@ -27,7 +27,8 @@
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/editAbstract">แก้ไขบทคัดย่อ</a></li>
-								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/student496/upload">อัปโหลดไฟล์</a></li>
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/student496/upload">อัปโหลดไฟล์</a></li>
 							</ul>
 						</div>
 
@@ -64,7 +65,8 @@
 								class="nav-link dropdown-toggle text-white" href="#"
 								role="button" data-bs-toggle="dropdown">จัดการโครงงาน</a>
 								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/listStudentProjects">รายการโครงงานทั้งหมด</a></li>
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/admin/listStudentProjects">รายการโครงงานทั้งหมด</a></li>
 									<li><a class="dropdown-item" href="#">รายการโครงงานของนักศึกษาในที่ปรึกษา</a></li>
 								</ul></li>
 
@@ -72,8 +74,10 @@
 								class="nav-link dropdown-toggle text-white" href="#"
 								role="button" data-bs-toggle="dropdown">ข้อมูลอาจารย์</a>
 								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/listAdvisors">รายชื่ออาจารย์</a></li>
-									<li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/addAdvisorForm">เพิ่มอาจารย์</a></li>
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/admin/listAdvisors">รายชื่ออาจารย์</a></li>
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/admin/addAdvisorForm">เพิ่มอาจารย์</a></li>
 								</ul></li>
 
 							<li class="nav-item dropdown"><a
@@ -100,6 +104,34 @@
 						</ul>
 					</c:when>
 
+					<c:when test="${not empty sessionScope.advisor}">
+						<a href="${pageContext.request.contextPath}/"
+							class="nav-link text-white">หน้าหลัก</a>
+
+						<ul class="nav d-flex flex-wrap align-items-center gap-3 mb-0">
+							<li class="nav-item dropdown"><a
+								class="nav-link dropdown-toggle text-white" href="#"
+								role="button" data-bs-toggle="dropdown"> จัดการโครงงาน </a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/advisor/listProjects">
+											รายการโครงงาน</a></li>
+								</ul></li>
+
+							<li class="nav-item dropdown"><a
+								class="nav-link dropdown-toggle text-white d-flex align-items-center"
+								href="#" role="button" data-bs-toggle="dropdown"> <i
+									class="bi bi-person fs-5 me-2"></i>
+									${sessionScope.advisor.adv_prefix}
+									${sessionScope.advisor.adv_firstName}
+							</a>
+								<ul class="dropdown-menu dropdown-menu-end">
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
+								</ul></li>
+						</ul>
+					</c:when>
+
 					<c:otherwise>
 						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
 
@@ -110,7 +142,7 @@
 								<li><a class="dropdown-item" href="#">นักศึกษา</a></li>
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/loginStudent496">นักศึกษา496</a></li>
-								<li><a class="dropdown-item" href="#">อาจารย์ที่ปรึกษา</a></li>
+								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/loginAdvisor">อาจารย์ที่ปรึกษา</a></li>
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/loginAdmin">ผู้ดูแลระบบ</a></li>
 							</ul>

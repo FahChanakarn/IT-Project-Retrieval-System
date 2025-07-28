@@ -1,40 +1,37 @@
 package com.springmvc.controller;
 
+import com.springmvc.manager.StudentImportManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.ui.Model;
-
-import java.io.IOException;
 
 @Controller
+@RequestMapping("/admin")
 public class StudentImportController {
 
-	@GetMapping("/admin/importStudent")
+	@Autowired
+	private StudentImportManager studentImportManager;
+
+	@RequestMapping(value = "/importStudent", method = RequestMethod.GET)
 	public String showImportPage() {
-		return "importStudentFile"; // ชี้ไปยัง importStudent.jsp
+		return "importStudentFile";
 	}
 
-	@PostMapping("/admin/importStudent")
+	@RequestMapping(value = "/importStudent", method = RequestMethod.POST)
 	public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
 		if (file.isEmpty()) {
-			model.addAttribute("error", "กรุณาเลือกไฟล์เพื่อทำการนำเข้า");
+			model.addAttribute("error", "กรุณาเลือกไฟล์ Excel");
 			return "importStudentFile";
 		}
 
 		try {
-			// 📝 ตัวอย่าง: อ่านไฟล์ที่อัปโหลดมา
-			byte[] fileData = file.getBytes();
-
-			
-			System.out.println("File uploaded: " + file.getOriginalFilename());
-            System.out.println("File size: " + file.getSize() + " bytes");
-            System.out.println("Content type: " + file.getContentType());
-
-			model.addAttribute("success", "นำเข้าข้อมูลสำเร็จ");
-		} catch (IOException e) {
+			int imported = studentImportManager.importStudentsFromExcel(file);
+			model.addAttribute("success", "นำเข้านักศึกษา " + imported + " คนสำเร็จแล้ว");
+		} catch (Exception e) {
 			e.printStackTrace();
-			model.addAttribute("error", "เกิดข้อผิดพลาดระหว่างการอัปโหลดไฟล์");
+			model.addAttribute("error", "เกิดข้อผิดพลาด: " + e.getMessage());
 		}
 
 		return "importStudentFile";

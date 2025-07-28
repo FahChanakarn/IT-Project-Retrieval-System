@@ -1,0 +1,95 @@
+/* ใช้ font Kanit ทั่วหน้า */
+body {
+	font-family: 'Kanit', sans-serif;
+}
+
+/* Header */
+h5 {
+	color: #aa1818;
+	font-weight: bold;
+	margin-bottom: 1.5rem;
+}
+
+/* เส้นคั่น */
+hr {
+	border-top: 2px solid #ccc;
+	margin-bottom: 2rem;
+}
+
+/* Dropdown select */
+select.form-select {
+	min-width: 200px;
+}
+
+/* ปรับ dropdown ภาคเรียน */
+.custom-semester-select {
+	width: 130px; 
+	font-size: 16px; 
+	padding: 6px 8px;
+}
+
+/* Container spacing */
+.container {
+	padding-top: 30px;
+	padding-bottom: 40px;
+}
+
+/* ================== ตาราง ================== */
+table {
+	background-color: white;
+	margin-bottom: 0;
+}
+
+.table thead th {
+	background-color: #e1f0fa;
+	color: #333;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.table tbody td {
+	background-color: #ffffff !important;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 15px;
+}
+
+/* ================== ปุ่ม ================== */
+.btn-sm {
+	font-size: 14px;
+	padding: 4px 12px;
+	border-radius: 6px;
+}
+
+.btn-primary {
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+	color: white;
+}
+
+.btn-success {
+	background-color: #198754;
+	border-color: #198754;
+	color: white;
+}
+
+/* ================== Pagination ================== */
+.pagination {
+	margin-top: 10px;
+}
+
+.pagination .page-item .page-link {
+	color: #0d6efd;
+	border-radius: 6px;
+}
+
+.pagination .page-item.active .page-link {
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+	color: white;
+}
+
+/* ปรับตรงกลาง */
+.d-flex.justify-content-center {
+	margin-top: 20px;
+}

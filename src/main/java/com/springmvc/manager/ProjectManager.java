@@ -264,4 +264,45 @@ public class ProjectManager {
 		return latestSemester != null ? latestSemester : "2/2567"; // fallback เผื่อว่าง
 	}
 
+	public List<Object[]> getStudentProjectsByAdvisorAndSemester(String advisorId, String semester, int offset,
+			int limit) {
+		List<Object[]> results = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+
+			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh "
+					+ "FROM Student496 s JOIN s.project p "
+					+ "WHERE p.advisor.advisorId = :advisorId AND p.semester = :semester";
+
+			results = session.createQuery(hql, Object[].class).setParameter("advisorId", advisorId)
+					.setParameter("semester", semester).setFirstResult(offset).setMaxResults(limit).list();
+
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	public int countProjectsByAdvisorAndSemester(String advisorId, String semester) {
+		int count = 0;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+
+			String hql = "SELECT COUNT(*) FROM Student496 s JOIN s.project p "
+					+ "WHERE p.advisor.advisorId = :advisorId AND p.semester = :semester";
+
+			Long result = (Long) session.createQuery(hql).setParameter("advisorId", advisorId)
+					.setParameter("semester", semester).uniqueResult();
+			count = result != null ? result.intValue() : 0;
+
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return count;
+	}
+
 }

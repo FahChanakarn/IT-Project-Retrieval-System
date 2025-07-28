@@ -59,9 +59,11 @@
 				<c:forEach var="row" items="${projects}">
 					<tr>
 						<td>${row[0]}</td>
-						<td>${row[1]}${row[2]}</td>
+						<td>${row[1]} ${row[2]}</td>
 						<td>${row[3]}</td>
-						<td><button class="btn btn-primary btn-sm">รายละเอียด</button></td>
+						<td><a
+							href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${row[4]}"
+							class="btn btn-primary btn-sm"> รายละเอียด </a></td>
 						<td><button class="btn btn-success btn-sm">อนุมัติ</button></td>
 					</tr>
 				</c:forEach>

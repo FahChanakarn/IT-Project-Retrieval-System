@@ -306,5 +306,37 @@ public class ProjectManager {
 		}
 		return count;
 	}
+	
+	public Project getProjectDetail(int projectId) {
+	    Session session = null;
+	    try {
+	        SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+	        session = sessionFactory.openSession();
+	        session.beginTransaction();
+
+	        String hql = "SELECT DISTINCT p FROM Project p "
+	                   + "LEFT JOIN FETCH p.advisor a "
+	                   + "LEFT JOIN FETCH p.student496s s "
+	                   + "WHERE p.projectId = :pid";
+
+	        Project project = session.createQuery(hql, Project.class)
+	                                 .setParameter("pid", projectId)
+	                                 .uniqueResult();
+
+	        session.getTransaction().commit();
+	        return project;
+	    } catch (Exception ex) {
+	        if (session != null && session.getTransaction().isActive()) {
+	            session.getTransaction().rollback();
+	        }
+	        ex.printStackTrace();
+	        return null;
+	    } finally {
+	        if (session != null && session.isOpen()) {
+	            session.close();
+	        }
+	    }
+	}
+	
 
 }

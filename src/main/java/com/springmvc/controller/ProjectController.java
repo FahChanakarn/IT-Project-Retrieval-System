@@ -94,4 +94,21 @@ public class ProjectController {
 		return mav;
 	}
 
+	@RequestMapping(value = "/viewAbstract", method = RequestMethod.GET)
+	public ModelAndView viewAbstract(@RequestParam("projectId") int projectId) {
+	    ProjectManager projectManager = new ProjectManager();
+	    Project project = projectManager.getProjectDetail(projectId);
+
+	    // ถ้าไม่เจอ project ให้กลับหน้า Home พร้อมข้อความ (ปรับตามระบบคุณได้)
+	    if (project == null) {
+	        ModelAndView mv = new ModelAndView("Home");
+	        mv.addObject("projects", projectManager.searchProjects(null)); // โหลดรายการทั้งหมด/ล่าสุด
+	        mv.addObject("error", "ไม่พบโครงงานที่ต้องการดูรายละเอียด");
+	        return mv;
+	    }
+
+	    ModelAndView mav = new ModelAndView("ViewAbstract"); // ชื่อ JSP: viewAbstract.jsp
+	    mav.addObject("project", project);
+	    return mav;
+	}
 }

@@ -1,0 +1,114 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ดูรายละเอียดบทคัดย่อ</title>
+<link rel="icon" type="image/png"
+	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<!-- Bootstrap JS -->
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/header.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/viewAbstract.css">
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
+	rel="stylesheet">
+</head>
+<body>
+	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
+
+	<div class="container mt-5">
+		<h5 class="fw-bold text-danger">${project.proj_NameTh} / ดูรายละเอียด</h5>
+		<hr>
+
+		<!-- Breadcrumb -->
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a
+					href="${pageContext.request.contextPath}/"
+					class="text-danger">กลับสู่หน้าค้นหา</a></li>
+			</ol>
+		</nav>
+
+		<div class="abstract-card">
+			<!-- Project Information -->
+			<div class="info-row">
+				<span class="info-label">ชื่อโครงงาน :</span> <span
+					class="info-value">${project.proj_NameTh}</span>
+			</div>
+
+			<div class="info-row">
+				<span class="info-label">Topic :</span> <span class="info-value">${project.proj_NameEn}</span>
+			</div>
+
+			<div class="info-row">
+				<span class="info-label">ผู้จัดทำ :</span>
+				<div class="info-value">
+					<div class="authors-list">
+						<c:forEach items="${project.student496s}" var="student"
+							varStatus="status">
+							<span class="author-name">
+								${student.stu_prefix}${student.stu_firstName}
+								${student.stu_lastName} </span>
+						</c:forEach>
+					</div>
+				</div>
+			</div>
+
+			<div class="info-row">
+				<span class="info-label">อาจารย์ที่ปรึกษา :</span> <span
+					class="info-value">
+					${project.advisor.adv_prefix}${project.advisor.adv_firstName}
+					${project.advisor.adv_lastName} </span>
+			</div>
+
+			<div class="info-row">
+				<span class="info-label">ภาคเรียน :</span> <span class="info-value">${project.semester}</span>
+			</div>
+
+			<!-- Abstract Section -->
+			<div class="abstract-section">
+				<div class="abstract-title">บทคัดย่อ</div>
+				<div class="abstract-content">${project.abstractTh}</div>
+
+				<!-- Keywords Thai -->
+				<div class="keywords-section">
+					<div class="keywords-label">คำสำคัญ :</div>
+					<div class="keywords-content">${project.keywordTh}</div>
+				</div>
+			</div>
+
+			<!-- English Abstract Section -->
+			<c:if test="${not empty project.abstractEn}">
+				<div class="abstract-section">
+					<div class="abstract-title">Abstract</div>
+					<div class="abstract-content">${project.abstractEn}</div>
+
+					<!-- Keywords English -->
+					<c:if test="${not empty project.keywordEn}">
+						<div class="keywords-section">
+							<div class="keywords-label">Keywords :</div>
+							<div class="keywords-content">${project.keywordEn}</div>
+						</div>
+					</c:if>
+				</div>
+			</c:if>
+		</div>
+	</div>
+</body>
+</html>

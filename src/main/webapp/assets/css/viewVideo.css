@@ -1,0 +1,30 @@
+body {
+	font-family: 'Kanit', sans-serif;
+}
+
+/* ✅ Title */
+h5 {
+	color: #aa1818;
+	margin-bottom: 1.5rem;
+	font-weight: bold;
+}
+
+/* ✅ เส้นแบ่งหัวเรื่อง */
+hr {
+	border-top: 2px solid;
+	margin-bottom: 2rem;
+}
+
+.link-back {
+	color: #0d6efd;
+	text-decoration: none;
+}
+
+.link-back:hover {
+	text-decoration: underline;
+}
+
+.video-wrapper {
+	max-width: 900px;
+	margin: 24px auto;
+}

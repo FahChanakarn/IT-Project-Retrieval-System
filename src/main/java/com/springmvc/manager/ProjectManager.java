@@ -1,5 +1,6 @@
 package com.springmvc.manager;
 
+import com.springmvc.model.DocumentFile;
 import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.Project;
 import org.hibernate.Session;
@@ -306,37 +307,112 @@ public class ProjectManager {
 		}
 		return count;
 	}
-	
+
 	public Project getProjectDetail(int projectId) {
-	    Session session = null;
-	    try {
-	        SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-	        session = sessionFactory.openSession();
-	        session.beginTransaction();
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
 
-	        String hql = "SELECT DISTINCT p FROM Project p "
-	                   + "LEFT JOIN FETCH p.advisor a "
-	                   + "LEFT JOIN FETCH p.student496s s "
-	                   + "WHERE p.projectId = :pid";
+			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.advisor a "
+					+ "LEFT JOIN FETCH p.student496s s " + "WHERE p.projectId = :pid";
 
-	        Project project = session.createQuery(hql, Project.class)
-	                                 .setParameter("pid", projectId)
-	                                 .uniqueResult();
+			Project project = session.createQuery(hql, Project.class).setParameter("pid", projectId).uniqueResult();
 
-	        session.getTransaction().commit();
-	        return project;
-	    } catch (Exception ex) {
-	        if (session != null && session.getTransaction().isActive()) {
-	            session.getTransaction().rollback();
-	        }
-	        ex.printStackTrace();
-	        return null;
-	    } finally {
-	        if (session != null && session.isOpen()) {
-	            session.close();
-	        }
-	    }
+			session.getTransaction().commit();
+			return project;
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
 	}
-	
 
+	public Project getProjectWithFiles(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			// ดึง Project + documentFiles (ชื่อความสัมพันธ์ใน Project ต้องตรง)
+			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.documentFiles df "
+					+ "WHERE p.projectId = :pid";
+
+			Project p = session.createQuery(hql, Project.class).setParameter("pid", projectId).uniqueResult();
+
+			// แตะ size() เผื่อเปิด lazy collection อื่นในหน้า (ไม่จำเป็นก็ได้)
+			if (p != null && p.getDocumentFiles() != null) {
+				p.getDocumentFiles().size();
+			}
+
+			session.getTransaction().commit();
+			return p;
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	/**
+	 * หาไฟล์วิดีโอรายการแรกของโปรเจ็กต์
+	 * 
+	 * @param onlyPublished ถ้า true จะกรองให้เอาเฉพาะที่ status = 'Published'
+	 *                      (ปรับค่าให้ตรงกับที่คุณบันทึกจริง)
+	 */
+	public DocumentFile findFirstVideoDoc(int projectId, boolean onlyPublished) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			StringBuilder hql = new StringBuilder("SELECT df FROM DocumentFile df "
+					+ "WHERE df.project.projectId = :pid " + "AND df.filetype = :vtype ");
+
+			if (onlyPublished) {
+				// ปรับค่าตามที่คุณเก็บจริง เช่น 'Published' / 'Y' / 'OPEN'
+				hql.append("AND df.status = :pub ");
+			}
+
+			hql.append("ORDER BY df.fileno ASC, df.fileId ASC");
+
+			var q = session.createQuery(hql.toString(), DocumentFile.class).setParameter("pid", projectId)
+					.setParameter("vtype", "video");
+
+			if (onlyPublished) {
+				q.setParameter("pub", "Published");
+			}
+
+			q.setMaxResults(1);
+			DocumentFile video = q.uniqueResult();
+
+			session.getTransaction().commit();
+			return video;
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
 }

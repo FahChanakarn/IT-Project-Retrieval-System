@@ -45,8 +45,8 @@
 
 		<!-- ปุ่ม -->
 		<div class="mb-4">
-			<a href="#" class="btn btn-primary btn-section">บทคัดย่อ</a> <a
-				href="#" class="btn btn-primary">วิดีโอ</a>
+			<a href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}" class="btn btn-primary btn-section">บทคัดย่อ</a> 
+			<a href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}" class="btn btn-primary">วิดีโอ</a>
 		</div>
 
 		<!-- ตารางไฟล์เอกสาร -->

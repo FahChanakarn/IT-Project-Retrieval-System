@@ -27,7 +27,7 @@ public class AdvisorProjectController {
 			return new ModelAndView("redirect:/loginAdvisor");
 		}
 
-		int pageSize = 6;
+		int pageSize = 10;
 		int offset = (page - 1) * pageSize;
 
 		ProjectManager projectManager = new ProjectManager();

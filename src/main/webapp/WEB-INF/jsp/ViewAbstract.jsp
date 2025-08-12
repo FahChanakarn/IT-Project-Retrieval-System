@@ -41,7 +41,7 @@
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a
 					href="${pageContext.request.contextPath}/"
-					class="text-danger">กลับสู่หน้าค้นหา</a></li>
+					class="text-primary">กลับสู่หน้าค้นหา</a></li>
 			</ol>
 		</nav>
 

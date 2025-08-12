@@ -26,7 +26,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-4 pt-4 fix-import-student-content">
-		<div class="mx-auto" style="max-width: 600px;">
+		<div class="mx-auto">
 			<h5>
 				<strong>ข้อมูลนักศึกษา / Import Excel File</strong>
 			</h5>
@@ -49,8 +49,8 @@
 
 				<div class="text-center">
 					<button type="submit" class="btn btn-success me-2">นำเข้า</button>
-					<a href="${pageContext.request.contextPath}/"
-						class="btn btn-danger">ยกเลิก</a>
+					<button type="button" onclick="location.href='${pageContext.request.contextPath}/'"
+						class="btn btn-danger">ยกเลิก</button>
 				</div>
 
 				<c:if test="${not empty error}">

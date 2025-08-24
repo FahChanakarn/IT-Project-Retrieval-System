@@ -33,15 +33,20 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold text-danger">${project.proj_NameTh} / ดูรายละเอียด</h5>
+		<h5 class="fw-bold text-danger">${project.proj_NameTh}/
+			ดูรายละเอียด</h5>
 		<hr>
 
 		<!-- Breadcrumb -->
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a
-					href="${pageContext.request.contextPath}/"
-					class="text-primary">กลับสู่หน้าค้นหา</a></li>
+					href="${pageContext.request.contextPath}/" class="text-primary">กลับสู่หน้าค้นหา</a></li>
+				<li class="breadcrumb-item"><a
+					href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+					class="btn btn-success btn-sm"> <i
+						class="bi bi-play-circle me-1"></i>ดูวิดีโอ
+				</a></li>
 			</ol>
 		</nav>
 

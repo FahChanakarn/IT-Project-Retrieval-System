@@ -28,7 +28,7 @@
 		<hr>
 
 		<form method="get"
-			action="${pageContext.request.contextPath}/advisor/listProjects"
+			action="${pageContext.request.contextPath}/admin/listProjects"
 			class="mb-4">
 			<div class="d-flex align-items-center gap-2">
 				<label for="semester" class="form-label mb-0">ภาคเรียน:</label> <select
@@ -44,43 +44,52 @@
 			</div>
 		</form>
 
-		<!-- ตารางข้อมูลนักศึกษา -->
-		<table class="table table-bordered">
-			<thead class="table-primary">
-				<tr>
-					<th>รหัสนักศึกษา</th>
-					<th>ชื่อ - สกุล</th>
-					<th>หัวข้อโครงงาน</th>
-					<th>รายละเอียด</th>
-					<th>อนุมัติการอัปโหลด</th>
-				</tr>
-			</thead>
-			<tbody>
-				<c:forEach var="row" items="${projects}">
-					<tr>
-						<td>${row[0]}</td>
-						<td>${row[1]} ${row[2]}</td>
-						<td>${row[3]}</td>
-						<td><a
-							href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${row[4]}"
-							class="btn btn-primary btn-sm"> รายละเอียด </a></td>
-						<td><button class="btn btn-success btn-sm">อนุมัติ</button></td>
-					</tr>
-				</c:forEach>
-			</tbody>
-		</table>
+		<c:choose>
+			<c:when test="${empty projects}">
+				<div class="alert alert-warning text-center mt-4">
+					ไม่พบข้อมูลโครงงานสำหรับภาคเรียนที่เลือก</div>
+			</c:when>
+			<c:otherwise>
+				<!-- ตารางข้อมูลนักศึกษา -->
+				<table class="table table-bordered">
+					<thead class="table-primary">
+						<tr>
+							<th>รหัสนักศึกษา</th>
+							<th>ชื่อ - สกุล</th>
+							<th>หัวข้อโครงงาน</th>
+							<th>รายละเอียด</th>
+							<th>อนุมัติการอัปโหลด</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="row" items="${projects}">
+							<tr>
+								<td>${row[0]}</td>
+								<td>${row[1]} ${row[2]}</td>
+								<td>${row[3]}</td>
+								<td><a
+									href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${row[4]}"
+									class="btn btn-primary btn-sm">รายละเอียด</a></td>
+								<td>
+									<button class="btn btn-success btn-sm">อนุมัติ</button>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
 
-		<!-- Pagination -->
-		<div class="d-flex justify-content-center mt-3">
-			<ul class="pagination">
-				<c:forEach var="i" begin="1" end="${totalPages}">
-					<li class="page-item ${i == currentPage ? 'active' : ''}"><a
-						class="page-link" href="?page=${i}&semester=${selectedSemester}">${i}</a>
-					</li>
-				</c:forEach>
-			</ul>
-		</div>
+				<!-- Pagination -->
+				<div class="d-flex justify-content-center mt-3">
+					<ul class="pagination">
+						<c:forEach var="i" begin="1" end="${totalPages}">
+							<li class="page-item ${i == currentPage ? 'active' : ''}"><a
+								class="page-link" href="?page=${i}&semester=${selectedSemester}">${i}</a>
+							</li>
+						</c:forEach>
+					</ul>
+				</div>
+			</c:otherwise>
+		</c:choose>
 	</div>
-
 </body>
 </html>

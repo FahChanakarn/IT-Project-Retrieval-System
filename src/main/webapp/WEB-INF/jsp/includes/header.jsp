@@ -66,8 +66,8 @@
 								role="button" data-bs-toggle="dropdown">จัดการโครงงาน</a>
 								<ul class="dropdown-menu">
 									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/listStudentProjects">รายการโครงงานทั้งหมด</a></li>
-									<li><a class="dropdown-item" href="#">รายการโครงงานของนักศึกษาในที่ปรึกษา</a></li>
+										href="${pageContext.request.contextPath}/admin/listProjects">รายการโครงงานทั้งหมด</a></li>
+									<li><a class="dropdown-item" href="">รายการโครงงานของนักศึกษาในที่ปรึกษา</a></li>
 								</ul></li>
 
 							<li class="nav-item dropdown"><a

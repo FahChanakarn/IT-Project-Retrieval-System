@@ -415,4 +415,68 @@ public class ProjectManager {
 			}
 		}
 	}
+
+	public List<Object[]> getAllStudentProjectsBySemester(String semester, int offset, int limit) {
+		List<Object[]> results = new ArrayList<>();
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh, p.projectId "
+					+ "FROM Student496 s JOIN s.project p " + "WHERE p.semester = :semester";
+
+			Query<Object[]> query = session.createQuery(hql, Object[].class);
+			query.setParameter("semester", semester);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+
+			results = query.list();
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return results;
+	}
+
+	public int countAllProjectsBySemester(String semester) {
+		Session session = null;
+		int count = 0;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT COUNT(p) FROM Project p WHERE p.semester = :semester";
+
+			Long result = (Long) session.createQuery(hql).setParameter("semester", semester).uniqueResult();
+			count = result != null ? result.intValue() : 0;
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return count;
+	}
+
 }

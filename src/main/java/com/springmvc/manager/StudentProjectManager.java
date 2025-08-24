@@ -7,6 +7,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StudentProjectManager {
@@ -23,5 +25,4 @@ public class StudentProjectManager {
 		session.close();
 		return result;
 	}
-
 }

@@ -61,11 +61,30 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-4">
-		<!-- ลิงก์กลับ -->
+		<!-- ลิงก์กลับ - แสดงตามสถานะการล็อกอิน -->
 		<div class="mb-2">
-			<a class="link-back"
-				href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${project.projectId}">
-				← กลับสู่รายละเอียด </a>
+			<c:choose>
+				<%-- กรณี login เป็น advisor --%>
+				<c:when test="${not empty sessionScope.advisor}">
+					<a class="link-back"
+						href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${project.projectId}">
+						← กลับสู่รายละเอียด </a>
+				</c:when>
+
+				<%-- กรณี login เป็น student (นักศึกษา496) --%>
+				<c:when test="${not empty sessionScope.student}">
+					<a class="link-back"
+						href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}">
+						← กลับสู่หน้าดูรายละเอียด </a>
+				</c:when>
+
+				<%-- กรณีไม่ได้ login --%>
+				<c:otherwise>
+					<a class="link-back"
+						href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}">
+						← กลับสู่บทคัดย่อ </a>
+				</c:otherwise>
+			</c:choose>
 		</div>
 
 		<!-- หัวข้อ -->
@@ -75,28 +94,23 @@
 		</h5>
 		<hr />
 
-		<!-- 1) ถ้า Controller ส่ง videoDoc มา ใช้อันนั้นก่อน -->
 		<c:set var="videoPath" value="" />
 		<c:if
 			test="${not empty videoDoc and videoDoc.filetype eq 'video' and not empty videoDoc.filepath}">
 			<c:set var="videoPath" value="${videoDoc.filepath}" />
 		</c:if>
 
-		<!-- 2) ถ้ายังว่าง ให้ค้นจาก project.documentFiles เอา “ตัวแรกที่ตรงเงื่อนไข” -->
 		<c:if test="${empty videoPath and not empty project.documentFiles}">
 			<c:forEach items="${project.documentFiles}" var="df">
-				<!-- เงื่อนไข: เป็นวิดีโอ, มีลิงก์, (ทางเลือก) เผยแพร่แล้ว -->
 				<c:if
 					test="${empty videoPath 
                      and df.filetype eq 'video' 
                      and not empty df.filepath}">
-					<!-- ถ้าต้องการบังคับเฉพาะที่เผยแพร่ ให้เพิ่ม and df.status eq 'Published' ในบรรทัดบน -->
 					<c:set var="videoPath" value="${df.filepath}" />
 				</c:if>
 			</c:forEach>
 		</c:if>
 
-		<!-- 3) สร้าง embed URL -->
 		<%
 		String raw = (String) pageContext.getAttribute("videoPath");
 		String embed = toEmbedUrl(raw);

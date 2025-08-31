@@ -85,7 +85,7 @@
 								role="button" data-bs-toggle="dropdown">ข้อมูลนักศึกษา</a>
 								<ul class="dropdown-menu">
 									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/importStudent">
+										href="${pageContext.request.contextPath}/admin/importStudentFile">
 											Import ข้อมูลนักศึกษา</a></li>
 								</ul></li>
 

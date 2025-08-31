@@ -53,7 +53,7 @@ public class Project {
 	private Advisor advisor;
 
 	@ManyToOne
-	@JoinColumn(name = "type_id", nullable = false)
+	@JoinColumn(name = "type_id", nullable = true)
 	private TypeDB typeDB;
 
 	@OneToMany(mappedBy = "project")

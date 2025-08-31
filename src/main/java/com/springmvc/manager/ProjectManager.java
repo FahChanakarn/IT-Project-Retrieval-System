@@ -232,22 +232,30 @@ public class ProjectManager {
 	}
 
 	public List<Project> getProjectsBySemester(String semester) {
-		List<Project> projectList = new ArrayList<>();
+		Session session = null;
+		List<Project> projects = new ArrayList<>();
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
-			Query<Project> query = session.createQuery("FROM Project WHERE semester = :semester", Project.class);
-			query.setParameter("semester", semester);
-			projectList = query.list();
+			String hql = "SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.student496s "
+					+ "WHERE p.semester = :semester ORDER BY p.projectId ASC";
+
+			projects = session.createQuery(hql, Project.class).setParameter("semester", semester).getResultList();
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception e) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
 			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
-		return projectList;
+		return projects;
 	}
 
 	public String getLatestSemester() {

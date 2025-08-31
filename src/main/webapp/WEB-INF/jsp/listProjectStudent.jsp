@@ -28,7 +28,7 @@
 		<hr>
 
 		<form method="get"
-			action="${pageContext.request.contextPath}/admin/listProjects"
+			action="${pageContext.request.contextPath}/advisor/listProjects"
 			class="mb-4">
 			<div class="d-flex align-items-center gap-2">
 				<label for="semester" class="form-label mb-0">ภาคเรียน:</label> <select

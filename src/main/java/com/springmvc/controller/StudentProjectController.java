@@ -21,9 +21,8 @@ public class StudentProjectController {
 			@RequestParam(value = "semester", required = false) String semester, HttpSession session) {
 
 		Advisor admin = (Advisor) session.getAttribute("admin");
-
 		if (admin == null) {
-		    return new ModelAndView("redirect:/loginAdmin");
+			return new ModelAndView("redirect:/loginAdmin");
 		}
 
 		int pageSize = 10;
@@ -31,25 +30,30 @@ public class StudentProjectController {
 
 		ProjectManager projectManager = new ProjectManager();
 
-		// ✅ ถ้ายังไม่เลือกภาคเรียน → ดึงภาคเรียนล่าสุดอัตโนมัติ
+		// ดึงภาคเรียนล่าสุด ถ้าไม่ได้เลือก
 		if (semester == null || semester.isEmpty()) {
 			semester = projectManager.getLatestSemester();
 		}
 
-		// ✅ ดึงโครงงานทั้งหมด (ไม่กรองตาม advisor) สำหรับ admin
-		List<Object[]> projects = projectManager.getAllStudentProjectsBySemester(semester, offset, pageSize);
-		int totalRecords = projectManager.countAllProjectsBySemester(semester);
+		// ดึง Project เป็น List<Project>
+		List<Project> projects = projectManager.getProjectsBySemester(semester);
+
+		int totalRecords = projects.size();
 		int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
-		// ✅ สร้างรายการภาคเรียนแบบ dynamic (ย้อนจากปีปัจจุบันไปปีเริ่มต้น)
+		// สร้าง semester list
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
 		List<String> semesterList = new ArrayList<>();
 		for (int y = currentYear; y >= 2562; y--) {
 			semesterList.add("2/" + y);
 		}
 
-		ModelAndView mav = new ModelAndView("listProjectStudent");
-		mav.addObject("projects", projects);
+		// Pagination (ตัด subset ของ project ตามหน้า)
+		int toIndex = Math.min(offset + pageSize, projects.size());
+		List<Project> pageProjects = projects.subList(offset, toIndex);
+
+		ModelAndView mav = new ModelAndView("listStudentProject");
+		mav.addObject("studentProjects", pageProjects);
 		mav.addObject("currentPage", page);
 		mav.addObject("totalPages", totalPages);
 		mav.addObject("selectedSemester", semester);

@@ -18,7 +18,6 @@
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/loginStudent496.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -44,17 +43,21 @@
 				<strong>เข้าสู่ระบบด้วยบัญชีอาจารย์</strong>
 			</h5>
 
-			<form action="loginAdvisor" method="post">
+			<form id="loginForm" action="loginAdvisor" method="post">
 				<div class="mb-3">
 					<label for="email" class="form-label text-danger">อีเมล</label> <input
-						type="email" name="email" id="email" class="form-control"
+						type="text" name="email" id="email" class="form-control"
 						placeholder="example@email.com" required>
+					<!-- error message -->
+					<div id="emailError" class="text-danger mt-1 small"></div>
 				</div>
 
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
 						class="form-control" required>
+					<!-- error message -->
+					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 
 				<c:if test="${not empty error}">
@@ -63,31 +66,100 @@
 
 				<button type="submit" class="btn btn-login mt-2">เข้าสู่ระบบ</button>
 			</form>
+
+			<!-- Alert เมื่อ login ไม่ผ่าน -->
 			<c:if test="${loginFailed}">
+				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 				<script>
-        Swal.fire({
-            icon: 'error',
-            title: 'ไม่สามารถเข้าสู่ระบบได้',
-            text: 'กรุณาตรวจสอบอีเมลหรือรหัสผ่าน',
-            confirmButtonText: 'ตกลง'
-        });
-    </script>
+			        Swal.fire({
+			            icon: 'error',
+			            title: 'ไม่สามารถเข้าสู่ระบบได้',
+			            text: 'กรุณาตรวจสอบอีเมลหรือรหัสผ่าน',
+			            confirmButtonText: 'ตกลง'
+			        });
+			    </script>
 			</c:if>
 
+			<!-- Alert เมื่อ login สำเร็จ -->
 			<c:if test="${loginSuccess}">
+				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 				<script>
-        Swal.fire({
-            icon: 'success',
-            title: 'เข้าสู่ระบบสำเร็จ',
-            showConfirmButton: false,
-            timer: 2000
-        }).then(() => {
-            window.location.href = '<c:url value="/"/>';
-        });
-    </script>
+			        Swal.fire({
+			            icon: 'success',
+			            title: 'เข้าสู่ระบบสำเร็จ',
+			            showConfirmButton: false,
+			            timer: 2000
+			        }).then(() => {
+			            window.location.href = '<c:url value="/"/>';
+			        });
+			    </script>
 			</c:if>
 		</div>
 	</div>
+
+	<!-- ตรวจสอบ email & password แบบ real-time -->
+	<script>
+	const emailInput = document.getElementById("email");
+	const passwordInput = document.getElementById("password");
+	const emailError = document.getElementById("emailError");
+	const passwordError = document.getElementById("passwordError");
+
+	// ตรวจสอบอีเมล
+	function validateEmail() {
+	    const email = emailInput.value.trim();
+	    emailError.textContent = "";
+
+	    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	    if (!emailRegex.test(email)) {
+	        emailError.textContent = "*กรุณากรอกอีเมลให้ถูกต้อง";
+	        return false;
+	    }
+
+	    // ดึงเฉพาะส่วนหน้า @
+	    const localPart = email.split("@")[0];
+
+	    if (localPart.length < 4) {
+	        emailError.textContent = "*ชื่ออีเมลต้องมีความยาวอย่างน้อย 4 ตัวอักษร";
+	        return false;
+	    } else if (localPart.length > 16) {
+	        emailError.textContent = "*ชื่ออีเมลต้องมีความยาวไม่เกิน 16 ตัวอักษร";
+	        return false;
+	    }
+	    return true;
+	}
+
+	// ตรวจสอบรหัสผ่าน
+	function validatePassword() {
+	    const password = passwordInput.value.trim();
+	    passwordError.textContent = "";
+
+	    if (password.length < 5) {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
+	        return false;
+	    } else if (password.length > 12) {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
+	        return false;
+	    } else if (/\s/.test(password)) {
+	        passwordError.textContent = "*รหัสผ่านห้ามมีช่องว่าง";
+	        return false;
+	    }
+	    return true;
+	}
+
+	// เช็ค real-time ตอนกรอก
+	emailInput.addEventListener("input", validateEmail);
+	passwordInput.addEventListener("input", validatePassword);
+
+	// เช็คอีกครั้งก่อน submit
+	document.getElementById("loginForm").addEventListener("submit", function(event) {
+	    const validEmail = validateEmail();
+	    const validPassword = validatePassword();
+
+	    if (!validEmail || !validPassword) {
+	        event.preventDefault(); // ไม่ส่งฟอร์มถ้ามี error
+	    }
+	});
+	</script>
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

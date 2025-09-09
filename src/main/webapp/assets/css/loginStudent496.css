@@ -52,7 +52,7 @@ body {
 
 .login-icon {
 	position: absolute;
-	left: 50%;
+	left: 45%;
 	top: 82%;
 	transform: translate(-50%, -50%) rotate(10deg);
 	max-height: 105px;

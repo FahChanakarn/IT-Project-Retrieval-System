@@ -5,7 +5,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Login - Admin</title>
-<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
+<link rel="icon" type="image/png"
+	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <!-- Google Fonts: Kanit -->
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
@@ -44,17 +45,21 @@
 				<strong>เข้าสู่ระบบด้วยบัญชีผู้ดูแลระบบ</strong>
 			</h5>
 
-			<form action="loginAdmin" method="post">
+			<form id="loginForm" action="loginAdmin" method="post">
 				<div class="mb-3">
 					<label for="email" class="form-label text-danger">อีเมล</label> <input
-						type="email" name="email" id="email" class="form-control"
+						type="text" name="email" id="email" class="form-control"
 						placeholder="example@email.com" required>
+					<!-- error message -->
+					<div id="emailError" class="text-danger mt-1 small"></div>
 				</div>
 
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
 						class="form-control" required>
+					<!-- error message -->
+					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 
 				<c:if test="${not empty error}">
@@ -65,6 +70,71 @@
 			</form>
 		</div>
 	</div>
+
+	<!-- Validation Script -->
+	<script>
+		const emailInput = document.getElementById("email");
+		const passwordInput = document.getElementById("password");
+		const emailError = document.getElementById("emailError");
+		const passwordError = document.getElementById("passwordError");
+
+		// ตรวจสอบอีเมล
+		function validateEmail() {
+			const email = emailInput.value.trim();
+			emailError.textContent = "";
+
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(email)) {
+				emailError.textContent = "*กรุณากรอกอีเมลให้ถูกต้อง";
+				return false;
+			}
+
+			// ดึงเฉพาะส่วนหน้า @
+			const localPart = email.split("@")[0];
+
+			if (localPart.length < 4) {
+				emailError.textContent = "*ชื่ออีเมลต้องมีความยาวอย่างน้อย 4 ตัวอักษร";
+				return false;
+			} else if (localPart.length > 16) {
+				emailError.textContent = "*ชื่ออีเมลต้องมีความยาวไม่เกิน 16 ตัวอักษร";
+				return false;
+			}
+			return true;
+		}
+
+		// ตรวจสอบรหัสผ่าน
+		function validatePassword() {
+			const password = passwordInput.value.trim();
+			passwordError.textContent = "";
+
+			if (password.length < 5) {
+				passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
+				return false;
+			} else if (password.length > 12) {
+				passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
+				return false;
+			} else if (/\\s/.test(password)) {
+				passwordError.textContent = "*รหัสผ่านห้ามมีช่องว่าง";
+				return false;
+			}
+			return true;
+		}
+
+		// เช็ค real-time ตอนกรอก
+		emailInput.addEventListener("input", validateEmail);
+		passwordInput.addEventListener("input", validatePassword);
+
+		// เช็คอีกครั้งก่อน submit
+		document.getElementById("loginForm").addEventListener("submit",
+				function(event) {
+					const validEmail = validateEmail();
+					const validPassword = validatePassword();
+
+					if (!validEmail || !validPassword) {
+						event.preventDefault(); // ไม่ส่งฟอร์มถ้ามี error
+					}
+				});
+	</script>
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

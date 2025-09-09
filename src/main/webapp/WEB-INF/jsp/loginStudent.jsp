@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login - นักศึกษา 496</title>
+<title>Login - นักศึกษา</title>
 <link rel="icon" type="image/png"
 	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <!-- Google Fonts: Kanit -->
@@ -39,7 +39,7 @@
 
 		<div class="login-right">
 			<h5 class="mb-4">
-				<strong>เข้าสู่ระบบด้วยบัญชีนักศึกษา496</strong>
+				<strong>เข้าสู่ระบบด้วยบัญชีนักศึกษา</strong>
 			</h5>
 
 			<form id="loginForm" action="loginStudent496" method="post">

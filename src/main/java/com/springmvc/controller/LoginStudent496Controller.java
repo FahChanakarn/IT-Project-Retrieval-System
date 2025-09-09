@@ -32,20 +32,27 @@ public class LoginStudent496Controller {
 		Student496Manager manager = new Student496Manager();
 		Student496 student = manager.findByStuIdAndPassword(stuId, password);
 
-		if (student != null) {
-		    HttpSession session = request.getSession();
-		    session.setAttribute("student", student);
+		ModelAndView mav = new ModelAndView("loginStudent496"); // JSP login เดิม
 
-		    // ✅ ตั้ง projectId จาก student.getProject()
-		    if (student.getProject() != null) {
-		        session.setAttribute("projectId", student.getProject().getProjectId());
-		    }
-		    return new ModelAndView("redirect:/searchProjects");
+		if (student != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("student", student);
+
+			if (student.getProject() != null) {
+				session.setAttribute("projectId", student.getProject().getProjectId());
+			}
+
+			// ตั้งค่าให้ JSP แสดง SweetAlert success
+			mav.addObject("loginSuccess", true);
+
+			// ถ้าอยากให้ redirect หลัง 2 วินาทีใน SweetAlert
+			mav.addObject("redirectUrl", request.getContextPath() + "/searchProjects");
+
 		} else {
-			ModelAndView mav = new ModelAndView("loginStudent496");
-			mav.addObject("error", "รหัสผ่านไม่ถูกต้อง");
-			return mav;
+			mav.addObject("loginFailed", true); // JSP จะโชว์ SweetAlert error
 		}
+
+		return mav;
 	}
 
 }

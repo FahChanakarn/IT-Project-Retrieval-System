@@ -139,7 +139,7 @@
 							<a class="nav-link dropdown-toggle" href="#" role="button"
 								data-bs-toggle="dropdown"> เข้าสู่ระบบ </a>
 							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="#">นักศึกษา</a></li>
+								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/loginStudent">นักศึกษา</a></li>
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/loginStudent496">นักศึกษา496</a></li>
 								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/loginAdvisor">อาจารย์ที่ปรึกษา</a></li>

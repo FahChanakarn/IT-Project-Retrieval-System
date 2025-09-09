@@ -26,14 +26,15 @@ public class LoginAdminController {
 		Advisor admin = advisorManager.findByEmailAndPassword(email, password);
 
 		if (admin != null && "อาจารย์ประสานงาน".equals(admin.getAdv_position())) {
-			// ✅ ตรวจสอบว่าเป็น admin จริงตาม position
 			HttpSession session = request.getSession();
 			session.setAttribute("admin", admin); // เก็บใน session เป็น admin
 
-			return new ModelAndView("redirect:/searchProjects");
+			ModelAndView mav = new ModelAndView("loginAdmin");
+			mav.addObject("loginSuccess", true);
+			return mav;
 		} else {
 			ModelAndView mav = new ModelAndView("loginAdmin");
-			mav.addObject("error", "ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบอีเมล รหัสผ่าน หรือสิทธิ์ผู้ดูแลระบบ");
+			mav.addObject("loginFailed", true);
 			return mav;
 		}
 	}

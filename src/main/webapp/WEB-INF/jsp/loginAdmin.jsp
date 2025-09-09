@@ -68,6 +68,33 @@
 
 				<button type="submit" class="btn btn-login mt-2">เข้าสู่ระบบ</button>
 			</form>
+			<!-- Alert เมื่อ login ไม่ผ่าน -->
+			<c:if test="${loginFailed}">
+				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+				<script>
+			        Swal.fire({
+			            icon: 'error',
+			            title: 'ไม่สามารถเข้าสู่ระบบได้',
+			            text: 'กรุณาตรวจสอบอีเมลหรือรหัสผ่าน',
+			            confirmButtonText: 'ตกลง'
+			        });
+			    </script>
+			</c:if>
+
+			<!-- Alert เมื่อ login สำเร็จ -->
+			<c:if test="${loginSuccess}">
+				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+				<script>
+			        Swal.fire({
+			            icon: 'success',
+			            title: 'เข้าสู่ระบบสำเร็จ',
+			            showConfirmButton: false,
+			            timer: 2000
+			        }).then(() => {
+			            window.location.href = '<c:url value="/"/>';
+			        });
+			    </script>
+			</c:if>
 		</div>
 	</div>
 

@@ -53,7 +53,7 @@ public class Project {
 	private Advisor advisor;
 
 	@ManyToOne
-	@JoinColumn(name = "type_id", nullable = false)
+	@JoinColumn(name = "type_id", nullable = true)
 	private TypeDB typeDB;
 
 	@OneToMany(mappedBy = "project")
@@ -61,6 +61,9 @@ public class Project {
 
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	private List<ProjectLangDetail> projectLangDetails;
+	
+	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+	private List<DocumentFile> documentFiles;
 
 	public Project() {
 		super();
@@ -218,6 +221,13 @@ public class Project {
 	public void setProjectLangDetails(List<ProjectLangDetail> projectLangDetails) {
 		this.projectLangDetails = projectLangDetails;
 	}
-	
+
+	public List<DocumentFile> getDocumentFiles() {
+		return documentFiles;
+	}
+
+	public void setDocumentFiles(List<DocumentFile> documentFiles) {
+		this.documentFiles = documentFiles;
+	}
 	
 }

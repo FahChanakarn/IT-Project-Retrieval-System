@@ -1,0 +1,59 @@
+body {
+	font-family: 'Kanit', sans-serif;
+}
+
+.container {
+	margin-top: 40px;
+}
+
+h5 {
+	color: #aa1818;
+	font-weight: bold;
+	margin-bottom: 1.5rem;
+}
+
+hr {
+	border-top: 2px solid #ccc;
+	margin-bottom: 2rem;
+}
+
+.project-info {
+	margin-bottom: 20px;
+	line-height: 1.6;
+}
+
+.project-info span {
+	font-weight: bold;
+	color: #000;
+}
+
+.btn {
+	font-size: 14px;
+	padding: 5px 15px;
+	margin-right: 10px;
+}
+
+.btn-outline-primary {
+	border-color: #0d6efd;
+	color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+	background-color: #0d6efd;
+	color: #fff;
+}
+
+.table thead th {
+	background-color: #e1f0fa;
+	color: #333;
+	text-align: center;
+}
+
+.table td, .table th {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.toggle-switch {
+	transform: scale(1.2);
+}

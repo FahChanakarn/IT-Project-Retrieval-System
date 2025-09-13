@@ -191,7 +191,7 @@ request.setAttribute("currentYear", thisYear);
 
 									<div class="col-md-3 text-end align-self-center">
 										<a
-											href="${pageContext.request.contextPath}/projectDetail?projectId=${project.projectId}"
+											href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
 											class="btn btn-primary btn-sm">ดูรายละเอียด</a>
 									</div>
 								</div>

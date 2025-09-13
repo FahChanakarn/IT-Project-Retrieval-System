@@ -6,7 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>รายการโครงงานของนักศึกษา</title>
-<link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
+<link rel="icon" type="image/png"
+	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -26,9 +27,9 @@
 			รายการโครงงานของนักศึกษา</h5>
 		<hr>
 
-		<div class="mb-3">
+		<div class="mb-3" style="display: flex; align-items: center; gap: 8px;">
 			<label class="form-label fw-bold">ภาคเรียน :</label> <select
-				class="form-select w-auto d-inline"
+				class="form-select custom-semester-select"
 				onchange="location = '?semester=' + this.value;">
 				<c:forEach var="sem" items="${semesterList}">
 					<option value="${sem}" ${sem == selectedSemester ? 'selected' : ''}>${sem}</option>
@@ -48,12 +49,12 @@
 			</thead>
 			<tbody>
 				<c:forEach var="project" items="${studentProjects}">
-					<c:forEach var="student" items="${project.students}">
+					<c:forEach var="student" items="${project.student496s}">
 						<tr>
 							<td>${student.stuId}</td>
 							<td>${student.stu_prefix}${student.stu_firstName}
 								${student.stu_lastName}</td>
-							<td>${project.project_nameTh}</td>
+							<td>${project.proj_NameTh}</td>
 							<td><a class="btn btn-primary btn-sm"
 								href="${pageContext.request.contextPath}/project/detail/${project.projectId}">
 									รายละเอียด </a></td>
@@ -63,8 +64,8 @@
 									<input type="hidden" name="projectId"
 										value="${project.projectId}" />
 									<button type="submit" class="btn btn-success btn-sm"
-										${project.uploadApproved ? 'disabled' : ''}>
-										${project.uploadApproved ? 'เผยแพร่แล้ว' : 'อนุมัติ'}</button>
+										${project.approveStatus ? 'disabled' : ''}>
+										${project.approveStatus ? 'เผยแพร่แล้ว' : 'อนุมัติ'}</button>
 								</form>
 							</td>
 						</tr>

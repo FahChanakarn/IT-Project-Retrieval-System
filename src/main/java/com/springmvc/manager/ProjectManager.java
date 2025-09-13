@@ -1,5 +1,6 @@
 package com.springmvc.manager;
 
+import com.springmvc.model.DocumentFile;
 import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.Project;
 import org.hibernate.Session;
@@ -188,10 +189,12 @@ public class ProjectManager {
 
 			String hql = "SELECT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
 					+ "WHERE p.projectId = :projectId";
+
 			project = session.createQuery(hql, Project.class).setParameter("projectId", projectId).uniqueResult();
 
 			if (project != null) {
-				project.getProjectLangDetails().size(); // force load
+				project.getProjectLangDetails().size(); // lazy load ตัวที่สอง
+				project.getDocumentFiles().size();
 			}
 
 			session.getTransaction().commit();
@@ -229,22 +232,30 @@ public class ProjectManager {
 	}
 
 	public List<Project> getProjectsBySemester(String semester) {
-		List<Project> projectList = new ArrayList<>();
+		Session session = null;
+		List<Project> projects = new ArrayList<>();
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
-			Query<Project> query = session.createQuery("FROM Project WHERE semester = :semester", Project.class);
-			query.setParameter("semester", semester);
-			projectList = query.list();
+			String hql = "SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.student496s "
+					+ "WHERE p.semester = :semester ORDER BY p.projectId ASC";
+
+			projects = session.createQuery(hql, Project.class).setParameter("semester", semester).getResultList();
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception e) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
 			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
-		return projectList;
+		return projects;
 	}
 
 	public String getLatestSemester() {
@@ -262,6 +273,218 @@ public class ProjectManager {
 			e.printStackTrace();
 		}
 		return latestSemester != null ? latestSemester : "2/2567"; // fallback เผื่อว่าง
+	}
+
+	public List<Object[]> getStudentProjectsByAdvisorAndSemester(String advisorId, String semester, int offset,
+			int limit) {
+		List<Object[]> results = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+
+			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh, p.projectId "
+					+ "FROM Student496 s JOIN s.project p "
+					+ "WHERE p.advisor.advisorId = :advisorId AND p.semester = :semester";
+
+			results = session.createQuery(hql, Object[].class).setParameter("advisorId", advisorId)
+					.setParameter("semester", semester).setFirstResult(offset).setMaxResults(limit).list();
+
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	public int countProjectsByAdvisorAndSemester(String advisorId, String semester) {
+		int count = 0;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			Session session = sessionFactory.openSession();
+
+			String hql = "SELECT COUNT(*) FROM Student496 s JOIN s.project p "
+					+ "WHERE p.advisor.advisorId = :advisorId AND p.semester = :semester";
+
+			Long result = (Long) session.createQuery(hql).setParameter("advisorId", advisorId)
+					.setParameter("semester", semester).uniqueResult();
+			count = result != null ? result.intValue() : 0;
+
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return count;
+	}
+
+	public Project getProjectDetail(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.advisor a "
+					+ "LEFT JOIN FETCH p.student496s s " + "WHERE p.projectId = :pid";
+
+			Project project = session.createQuery(hql, Project.class).setParameter("pid", projectId).uniqueResult();
+
+			session.getTransaction().commit();
+			return project;
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	public Project getProjectWithFiles(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			// ดึง Project + documentFiles (ชื่อความสัมพันธ์ใน Project ต้องตรง)
+			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.documentFiles df "
+					+ "WHERE p.projectId = :pid";
+
+			Project p = session.createQuery(hql, Project.class).setParameter("pid", projectId).uniqueResult();
+
+			// แตะ size() เผื่อเปิด lazy collection อื่นในหน้า (ไม่จำเป็นก็ได้)
+			if (p != null && p.getDocumentFiles() != null) {
+				p.getDocumentFiles().size();
+			}
+
+			session.getTransaction().commit();
+			return p;
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	/**
+	 * หาไฟล์วิดีโอรายการแรกของโปรเจ็กต์
+	 * 
+	 * @param onlyPublished ถ้า true จะกรองให้เอาเฉพาะที่ status = 'Published'
+	 *                      (ปรับค่าให้ตรงกับที่คุณบันทึกจริง)
+	 */
+	public DocumentFile findFirstVideoDoc(int projectId, boolean onlyPublished) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			StringBuilder hql = new StringBuilder("SELECT df FROM DocumentFile df "
+					+ "WHERE df.project.projectId = :pid " + "AND df.filetype = :vtype ");
+
+			if (onlyPublished) {
+				// ปรับค่าตามที่คุณเก็บจริง เช่น 'Published' / 'Y' / 'OPEN'
+				hql.append("AND df.status = :pub ");
+			}
+
+			hql.append("ORDER BY df.fileno ASC, df.fileId ASC");
+
+			var q = session.createQuery(hql.toString(), DocumentFile.class).setParameter("pid", projectId)
+					.setParameter("vtype", "video");
+
+			if (onlyPublished) {
+				q.setParameter("pub", "Published");
+			}
+
+			q.setMaxResults(1);
+			DocumentFile video = q.uniqueResult();
+
+			session.getTransaction().commit();
+			return video;
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	public List<Object[]> getAllStudentProjectsBySemester(String semester, int offset, int limit) {
+		List<Object[]> results = new ArrayList<>();
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh, p.projectId "
+					+ "FROM Student496 s JOIN s.project p " + "WHERE p.semester = :semester";
+
+			Query<Object[]> query = session.createQuery(hql, Object[].class);
+			query.setParameter("semester", semester);
+			query.setFirstResult(offset);
+			query.setMaxResults(limit);
+
+			results = query.list();
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return results;
+	}
+
+	public int countAllProjectsBySemester(String semester) {
+		Session session = null;
+		int count = 0;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			String hql = "SELECT COUNT(p) FROM Project p WHERE p.semester = :semester";
+
+			Long result = (Long) session.createQuery(hql).setParameter("semester", semester).uniqueResult();
+			count = result != null ? result.intValue() : 0;
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return count;
 	}
 
 }

@@ -61,3 +61,4 @@ Thumbs.db
 hs_err_pid*.log
 rebel.xml
 *.swp
+src/main/java/com/springmvc/model/HibernateConnection.java

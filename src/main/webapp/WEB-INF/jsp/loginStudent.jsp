@@ -57,7 +57,7 @@
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
-						class="form-control" required>
+						class="form-control">
 					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 
@@ -88,18 +88,34 @@
 	    const password = passwordInput.value.trim();
 	    passwordError.textContent = "";
 
-	    if (password.length < 5) {
-	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
-	        return false;
-	    } else if (password.length > 12) {
-	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
-	        return false;
-	    } else if (/\s/.test(password)) {
-	        passwordError.textContent = "*รหัสผ่านห้ามมีช่องว่าง";
+	    // เช็คห้ามว่าง
+	    if (password === "") {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่าน";
 	        return false;
 	    }
+	    // เช็คความยาว
+	    else if (password.length < 5) {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
+	        return false;
+	    } 
+	    else if (password.length > 12) {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
+	        return false;
+	    } 
+	    // เช็คห้ามมีช่องว่าง
+	    else if (/\s/.test(password)) {
+	        passwordError.textContent = "*รหัสผ่านห้ามมีช่องว่าง";
+	        return false;
+	    } 
+	    // เช็คห้ามมีภาษาไทย
+	    else if (/[ก-๙]/.test(password)) {
+	        passwordError.textContent = "*รหัสผ่านห้ามเป็นตัวอักษรภาษาไทย";
+	        return false;
+	    }
+
 	    return true;
 	}
+
 
 	// Real-time validation
 	stuSelect.addEventListener("change", validateStuId);

@@ -27,6 +27,17 @@ hr {
 	padding: 6px 8px;
 }
 
+.table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table td, .table th {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+
 .table th, .table td {
 	vertical-align: middle !important;
 	text-align: center;

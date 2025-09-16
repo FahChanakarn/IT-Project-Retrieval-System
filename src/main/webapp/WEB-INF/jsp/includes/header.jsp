@@ -26,9 +26,21 @@
 								data-bs-toggle="dropdown"> จัดการโครงงาน </a>
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item"
-									href="${pageContext.request.contextPath}/editAbstract">แก้ไขบทคัดย่อ</a></li>
-								<li><a class="dropdown-item"
-									href="${pageContext.request.contextPath}/student496/upload">อัปโหลดไฟล์</a></li>
+									href="${pageContext.request.contextPath}/editAbstract">
+										แก้ไขบทคัดย่อ </a></li>
+
+								<li><c:choose>
+										<c:when
+											test="${not empty sessionScope.student.project and sessionScope.student.project.approveStatus == 'approved'}">
+											<a class="dropdown-item"
+												href="${pageContext.request.contextPath}/student496/upload">
+												อัปโหลดไฟล์ </a>
+										</c:when>
+										<c:otherwise>
+											<a class="dropdown-item disabled" href="#"
+												title="ต้องได้รับอนุมัติก่อน"> อัปโหลดไฟล์ </a>
+										</c:otherwise>
+									</c:choose></li>
 							</ul>
 						</div>
 
@@ -55,6 +67,7 @@
 							</ul>
 						</div>
 					</c:when>
+
 
 					<c:when test="${not empty sessionScope.admin}">
 						<a href="${pageContext.request.contextPath}/"
@@ -132,6 +145,20 @@
 						</ul>
 					</c:when>
 
+					<c:when test="${not empty sessionScope.itstudent}">
+						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
+
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle d-flex align-items-center"
+								href="#" role="button" data-bs-toggle="dropdown">
+								${sessionScope.itstudent.stu_firstName} </a>
+							<ul class="dropdown-menu dropdown-menu-end">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
+							</ul>
+						</div>
+					</c:when>
+
 					<c:otherwise>
 						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
 
@@ -139,10 +166,12 @@
 							<a class="nav-link dropdown-toggle" href="#" role="button"
 								data-bs-toggle="dropdown"> เข้าสู่ระบบ </a>
 							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/loginStudent">นักศึกษา</a></li>
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/loginStudent">นักศึกษา</a></li>
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/loginStudent496">นักศึกษา496</a></li>
-								<li><a class="dropdown-item" href="${pageContext.request.contextPath}/loginAdvisor">อาจารย์ที่ปรึกษา</a></li>
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/loginAdvisor">อาจารย์ที่ปรึกษา</a></li>
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/loginAdmin">ผู้ดูแลระบบ</a></li>
 							</ul>

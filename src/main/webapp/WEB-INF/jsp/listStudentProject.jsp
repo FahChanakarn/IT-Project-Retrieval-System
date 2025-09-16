@@ -40,11 +40,11 @@
 		<table class="table table-bordered align-middle text-center">
 			<thead class="table-light">
 				<tr>
-					<th>รหัสนักศึกษา</th>
-					<th>ชื่อ - สกุล</th>
-					<th>หัวข้อโครงงาน</th>
-					<th>รายละเอียด</th>
-					<th>อนุมัติการอัปโหลด</th>
+					<th style="width: 10%;">รหัสนักศึกษา</th>
+					<th style="width: 20%;">ชื่อ - สกุล</th>
+					<th style="width: 40%;">หัวข้อโครงงาน</th>
+					<th style="width: 15%;">รายละเอียด</th>
+					<th style="width: 15%;">อนุมัติการอัปโหลด</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -56,7 +56,7 @@
 								${student.stu_lastName}</td>
 							<td>${project.proj_NameTh}</td>
 							<td><a class="btn btn-primary btn-sm"
-								href="${pageContext.request.contextPath}/project/detail/${project.projectId}">
+								href="${pageContext.request.contextPath}/admin/viewProjectDetail?projectId=${project.projectId}">
 									รายละเอียด </a></td>
 							<td>
 								<form method="post"

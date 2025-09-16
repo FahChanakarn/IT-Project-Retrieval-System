@@ -70,9 +70,16 @@
 								<td><a
 									href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${row[4]}"
 									class="btn btn-primary btn-sm">รายละเอียด</a></td>
-								<td>
-									<button class="btn btn-success btn-sm">อนุมัติ</button>
-								</td>
+								<td><c:choose>
+										<c:when test="${row[5] == 'approved'}">
+											<button class="btn btn-success btn-sm" disabled>อนุมัติแล้ว</button>
+										</c:when>
+										<c:otherwise>
+											<button type="button"
+												class="btn btn-success btn-sm approve-btn"
+												data-project-id="${row[4]}">อนุมัติ</button>
+										</c:otherwise>
+									</c:choose></td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -91,5 +98,31 @@
 			</c:otherwise>
 		</c:choose>
 	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$(".approve-btn").click(function() {
+				var btn = $(this);
+				var projectId = btn.data("project-id");
+
+				$.ajax({
+					url : "${pageContext.request.contextPath}/advisor/approveUploadAjax",
+					method : "POST",
+					data : {
+						projectId : projectId},
+					success : function(response) {
+						if (response === "success") {
+							btn.text("อนุมัติแล้ว");
+							btn.prop("disabled",true);} 
+						else {
+							alert("ไม่สามารถอนุมัติได้ กรุณาลองใหม่");}
+					},
+					error : function() {
+					alert("เกิดข้อผิดพลาดในการส่งข้อมูล");}
+				});
+			});
+		});
+	</script>
 </body>
 </html>

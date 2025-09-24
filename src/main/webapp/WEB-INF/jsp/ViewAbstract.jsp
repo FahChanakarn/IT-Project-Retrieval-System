@@ -36,20 +36,17 @@
 		<h5 class="fw-bold text-danger">${project.proj_NameTh}/
 			ดูรายละเอียด</h5>
 		<hr>
-
-		<!-- Breadcrumb -->
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a
-					href="${pageContext.request.contextPath}/" class="text-primary">กลับสู่หน้าค้นหา</a></li>
-				<li class="breadcrumb-item"><a
-					href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-					class="btn btn-success btn-sm"> <i
-						class="bi bi-play-circle me-1"></i>ดูวิดีโอ
-				</a></li>
-			</ol>
-		</nav>
-
+		<div class="mb-3">
+			<a
+				href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
+				class="btn btn-primary me-2"> <i
+				class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+			</a> <a
+				href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+				class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+				ดูวิดีโอ
+			</a>
+		</div>
 		<div class="abstract-card">
 			<!-- Project Information -->
 			<div class="info-row">

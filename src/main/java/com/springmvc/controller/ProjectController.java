@@ -1,5 +1,6 @@
 package com.springmvc.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -28,22 +29,21 @@ public class ProjectController {
 		TypeDBManager typeDBManager = new TypeDBManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
-		List<String> projectTypes = projectManager.getAllProjectTypes();
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
 		List<String> semesters = projectManager.getAllSemesters();
 		List<ProgrammingLang> programmingLangs = programmingLangManager.getAllProgrammingLanguages();
 		List<TypeDB> typeDBs = typeDBManager.getAllTypeDBs();
 
 		List<Project> projects = projectManager.searchProjects(keyword);
 
-		// ✅ สร้าง ModelAndView
 		ModelAndView mav = new ModelAndView("Home");
 		mav.addObject("projects", projects);
 		mav.addObject("advisors", activeAdvisors);
-		mav.addObject("projectTypes", projectTypes);
+		mav.addObject("projectTypes", projectTypes); // ✅ ส่งไป JSP
 		mav.addObject("semesters", semesters);
 		mav.addObject("programmingLangs", programmingLangs);
 		mav.addObject("typeDBs", typeDBs);
-		mav.addObject("keyword", keyword); // ✅ ส่งค่า keyword ไป JSP
+		mav.addObject("keyword", keyword);
 
 		return mav;
 	}
@@ -62,13 +62,13 @@ public class ProjectController {
 		List<Project> projects = projectManager.filterProjects(projectType, advisorIds, semesters, typeDBIds, languages,
 				testingStatus, startYear, endYear);
 
-		// โหลดข้อมูลแถบด้านซ้าย
 		AdvisorManager advisorManager = new AdvisorManager();
 		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
 		TypeDBManager typeDBManager = new TypeDBManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
-		List<String> projectTypes = projectManager.getAllProjectTypes();
+		// 🔹 ใช้ค่าคงที่เหมือนกัน
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
 		List<String> allSemesters = projectManager.getAllSemesters();
 		List<ProgrammingLang> programmingLangs = programmingLangManager.getAllProgrammingLanguages();
 		List<TypeDB> typeDBs = typeDBManager.getAllTypeDBs();
@@ -81,7 +81,7 @@ public class ProjectController {
 		mav.addObject("programmingLangs", programmingLangs);
 		mav.addObject("typeDBs", typeDBs);
 
-		// ส่งค่าที่เลือกกลับไป JSP เพื่อให้ dropdown คงสถานะ
+		// ส่งค่าที่เลือกกลับไป JSP
 		mav.addObject("selectedProjectType", projectType);
 		mav.addObject("selectedAdvisorIds", advisorIds);
 		mav.addObject("selectedSemesters", semesters);
@@ -96,19 +96,19 @@ public class ProjectController {
 
 	@RequestMapping(value = "/viewAbstract", method = RequestMethod.GET)
 	public ModelAndView viewAbstract(@RequestParam("projectId") int projectId) {
-	    ProjectManager projectManager = new ProjectManager();
-	    Project project = projectManager.getProjectDetail(projectId);
+		ProjectManager projectManager = new ProjectManager();
+		Project project = projectManager.getProjectDetail(projectId);
 
-	    // ถ้าไม่เจอ project ให้กลับหน้า Home พร้อมข้อความ (ปรับตามระบบคุณได้)
-	    if (project == null) {
-	        ModelAndView mv = new ModelAndView("Home");
-	        mv.addObject("projects", projectManager.searchProjects(null)); // โหลดรายการทั้งหมด/ล่าสุด
-	        mv.addObject("error", "ไม่พบโครงงานที่ต้องการดูรายละเอียด");
-	        return mv;
-	    }
+		// ถ้าไม่เจอ project ให้กลับหน้า Home พร้อมข้อความ (ปรับตามระบบคุณได้)
+		if (project == null) {
+			ModelAndView mv = new ModelAndView("Home");
+			mv.addObject("projects", projectManager.searchProjects(null)); // โหลดรายการทั้งหมด/ล่าสุด
+			mv.addObject("error", "ไม่พบโครงงานที่ต้องการดูรายละเอียด");
+			return mv;
+		}
 
-	    ModelAndView mav = new ModelAndView("ViewAbstract"); // ชื่อ JSP: viewAbstract.jsp
-	    mav.addObject("project", project);
-	    return mav;
+		ModelAndView mav = new ModelAndView("ViewAbstract"); // ชื่อ JSP: viewAbstract.jsp
+		mav.addObject("project", project);
+		return mav;
 	}
 }

@@ -1,5 +1,6 @@
 package com.springmvc.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -29,7 +30,7 @@ public class HomeController {
 		TypeDBManager typeDBManager = new TypeDBManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
-		List<String> projectTypes = projectManager.getAllProjectTypes();
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
 		List<String> semesters = projectManager.getAllSemesters();
 		List<ProgrammingLang> programmingLangs = prolangManager.getAllProgrammingLanguages();
 		List<TypeDB> typeDBs = typeDBManager.getAllTypeDBs();

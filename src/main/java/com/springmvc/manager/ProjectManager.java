@@ -61,6 +61,10 @@ public class ProjectManager {
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
+			if (keyword == null) {
+				keyword = "";
+			}
+			keyword = keyword.toLowerCase().trim();
 
 			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s s "
 					+ "LEFT JOIN FETCH p.advisor a " + "WHERE LOWER(p.proj_NameTh) LIKE :kw "
@@ -70,7 +74,7 @@ public class ProjectManager {
 					+ "OR LOWER(CONCAT(s.stu_prefix, ' ', s.stu_firstName, ' ', s.stu_lastName)) LIKE :kw";
 
 			var query = session.createQuery(hql, Project.class);
-			query.setParameter("kw", "%" + keyword.toLowerCase().trim() + "%");
+			query.setParameter("kw", "%" + keyword + "%"); // ใช้ keyword ที่เช็คแล้ว
 
 			projects = query.getResultList();
 
@@ -260,7 +264,7 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh, p.projectId "
+			String hql = "SELECT s.stuId, s.stu_firstName, s.stu_lastName, p.proj_NameTh, p.projectId, p.approveStatus "
 					+ "FROM Student496 s JOIN s.project p "
 					+ "WHERE p.advisor.advisorId = :advisorId AND p.semester = :semester";
 
@@ -436,6 +440,27 @@ public class ProjectManager {
 		}
 
 		return count;
+	}
+
+	public List<DocumentFile> getPublishedFilesByProjectId(int projectId) {
+		List<DocumentFile> files = new ArrayList<>();
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			// ใช้ publishStatus = 1
+			String hql = "FROM DocumentFile df WHERE df.project.projectId = :pid AND df.publishStatus = 1 ORDER BY df.fileno ASC";
+			Query<DocumentFile> query = session.createQuery(hql, DocumentFile.class);
+			query.setParameter("pid", projectId);
+			files = query.list();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen())
+				session.close();
+		}
+		return files;
 	}
 
 }

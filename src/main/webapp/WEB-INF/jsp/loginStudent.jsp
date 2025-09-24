@@ -42,14 +42,19 @@
 				<strong>เข้าสู่ระบบด้วยบัญชีนักศึกษา</strong>
 			</h5>
 
-			<form id="loginForm" action="loginStudent496" method="post">
+			<form id="loginForm" action="loginStudent" method="post">
 				<div class="mb-3">
 					<label for="stuId" class="form-label text-danger">รหัสนักศึกษา</label>
 					<select class="form-select" name="stuId" id="stuId">
 						<option value="">เลือกรหัสนักศึกษา</option>
-						<c:forEach var="stu" items="${studentList}">
-							<option value="${stu.stuId}">${stu.stuId}</option>
-						</c:forEach>
+						<c:if test="${not empty studentList}">
+							<c:forEach var="stu" items="${studentList}">
+								<option value="${stu.stuId}">${stu.stuId}</option>
+							</c:forEach>
+						</c:if>
+						<c:if test="${empty studentList}">
+							<option disabled>ไม่มีนักศึกษาที่ว่าง</option>
+						</c:if>
 					</select>
 					<div id="stuIdError" class="text-danger mt-1 small"></div>
 				</div>
@@ -134,27 +139,28 @@
 	<!-- SweetAlert -->
 	<c:if test="${loginFailed}">
 		<script>
-	    Swal.fire({
-	        icon: 'error',
-	        title: 'ไม่สามารถเข้าสู่ระบบได้',
-	        text: 'กรุณาตรวจสอบรหัสนักศึกษา หรือรหัสผ่าน',
-	        confirmButtonText: 'ตกลง'
-	    });
-	</script>
+        Swal.fire({
+            icon: 'error',
+            title: 'ไม่สามารถเข้าสู่ระบบได้',
+            text: 'กรุณาตรวจสอบรหัสนักศึกษา หรือรหัสผ่าน',
+            confirmButtonText: 'ตกลง'
+        });
+    </script>
 	</c:if>
 
 	<c:if test="${loginSuccess}">
 		<script>
-	    Swal.fire({
-	        icon: 'success',
-	        title: 'เข้าสู่ระบบสำเร็จ',
-	        showConfirmButton: false,
-	        timer: 2000
-	    }).then(() => {
-	        window.location.href = '${redirectUrl}';
-	    });
-	</script>
+        Swal.fire({
+            icon: 'success',
+            title: 'เข้าสู่ระบบสำเร็จ',
+            showConfirmButton: false,
+            timer: 2000
+        }).then(() => {
+            window.location.href = '${redirectUrl}';
+        });
+    </script>
 	</c:if>
+
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

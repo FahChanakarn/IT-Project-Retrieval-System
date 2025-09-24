@@ -30,6 +30,9 @@ public class DocumentFile {
     
     @Column(name = "file_type", length = 255)
     private String filetype;
+   
+    @Column(name = "publish_status")
+    private boolean publishStatus;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
@@ -107,6 +110,14 @@ public class DocumentFile {
 
 	public void setFiletype(String filetype) {
 		this.filetype = filetype;
+	}
+
+	public boolean isPublishStatus() {
+		return publishStatus;
+	}
+
+	public void setPublishStatus(boolean publishStatus) {
+		this.publishStatus = publishStatus;
 	}
 
 	public Project getProject() {

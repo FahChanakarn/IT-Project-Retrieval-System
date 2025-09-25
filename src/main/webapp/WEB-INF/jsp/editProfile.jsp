@@ -35,16 +35,17 @@
 			<form action="${pageContext.request.contextPath}/updateProfile"
 				method="post" enctype="multipart/form-data">
 				<div class="profile-section">
+					<!-- ✅ แก้ไขการแสดงรูปโปรไฟล์ -->
 					<c:choose>
 						<c:when test="${not empty sessionScope.student.stu_image}">
 							<img
-								src="${pageContext.request.contextPath}/${sessionScope.student.stu_image}"
-								class="profile-img">
+								src="${pageContext.request.contextPath}/profileImage/${sessionScope.student.stu_image}"
+								class="profile-img" alt="Profile Image">
 						</c:when>
 						<c:otherwise>
 							<img
 								src="${pageContext.request.contextPath}/assets/images/default-profile.png"
-								class="profile-img">
+								class="profile-img" alt="Default Profile">
 						</c:otherwise>
 					</c:choose>
 

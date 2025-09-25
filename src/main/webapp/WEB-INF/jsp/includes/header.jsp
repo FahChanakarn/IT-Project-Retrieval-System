@@ -49,7 +49,7 @@
 								href="#" role="button" data-bs-toggle="dropdown"> <c:choose>
 									<c:when test="${not empty sessionScope.student.stu_image}">
 										<img
-											src="${pageContext.request.contextPath}/${sessionScope.student.stu_image}"
+											src="${pageContext.request.contextPath}/profileImage/${sessionScope.student.stu_image}"
 											width="30" height="30" class="rounded-circle me-2">
 									</c:when>
 									<c:otherwise>

@@ -20,6 +20,8 @@ public class Student {
 	@Column(name = "stu_lastname", length = 100, nullable = false)
 	private String stu_lastName;
 
+	
+	
 	@Column(name = "stu_password", length = 10, nullable = false)
 	private String stu_password;
 

@@ -2,11 +2,16 @@ package com.springmvc.controller;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.model.Advisor;
@@ -18,7 +23,9 @@ public class StudentProjectController {
 
 	@RequestMapping("/listProjects")
 	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(value = "semester", required = false) String semester, HttpSession session) {
+			@RequestParam(value = "semester", required = false) String semester,
+			@RequestParam(value = "success", required = false) String successMessage,
+			@RequestParam(value = "error", required = false) String errorMessage, HttpSession session) {
 
 		Advisor admin = (Advisor) session.getAttribute("admin");
 		if (admin == null) {
@@ -59,6 +66,14 @@ public class StudentProjectController {
 		mav.addObject("selectedSemester", semester);
 		mav.addObject("semesterList", semesterList);
 
+		// เพิ่ม messages
+		if (successMessage != null) {
+			mav.addObject("successMessage", successMessage);
+		}
+		if (errorMessage != null) {
+			mav.addObject("errorMessage", errorMessage);
+		}
+
 		return mav;
 	}
 
@@ -79,5 +94,54 @@ public class StudentProjectController {
 			list.add("2/" + year);
 		}
 		return list;
+	}
+
+	// Controller ที่แก้ไขแล้ว - ใช้ ModelAndView แทน @ResponseBody
+
+	@RequestMapping(value = "/removeStudent", method = RequestMethod.POST)
+	public ModelAndView removeStudent(@RequestParam("projectId") int projectId, HttpSession session) {
+
+		try {
+			Advisor admin = (Advisor) session.getAttribute("admin");
+			if (admin == null) {
+				return new ModelAndView("redirect:/loginAdmin");
+			}
+
+			ProjectManager projectManager = new ProjectManager();
+
+			// ตรวจสอบว่าโครงงานมีอยู่จริง
+			if (!projectManager.projectExists(projectId)) {
+				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+				mav.addObject("error", "ไม่พบข้อมูลโครงงาน");
+				return mav;
+			}
+
+			// ตรวจสอบว่านักศึกษาแก้ไขบทคัดย่อแล้วหรือไม่
+			boolean hasEditedAbstract = projectManager.hasStudentEditedAbstract(projectId);
+
+			if (hasEditedAbstract) {
+				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+				mav.addObject("error", "ไม่สามารถลบได้ เนื่องจากนักศึกษาได้ทำการแก้ไขบทคัดย่อแล้ว");
+				return mav;
+			}
+
+			boolean deleted = projectManager.deleteProjectAndStudents(projectId);
+
+			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+			if (deleted) {
+				mav.addObject("success", "ลบข้อมูลเรียบร้อยแล้ว");
+			} else {
+				mav.addObject("error", "เกิดข้อผิดพลาดในการลบข้อมูล");
+			}
+
+			return mav;
+
+		} catch (Exception e) {
+			System.out.println("DEBUG: Exception occurred: " + e.getMessage());
+			e.printStackTrace();
+			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+			mav.addObject("error", "เกิดข้อผิดพลาดในระบบ: " + e.getMessage());
+			return mav;
+		}
 	}
 }

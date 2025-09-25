@@ -16,18 +16,39 @@
 	href="${pageContext.request.contextPath}/assets/css/listStudentProject.css">
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold text-danger">โครงงาน /
-			รายการโครงงานของนักศึกษา</h5>
+		<h5 class="fw-bold text-danger">จัดการโครงงาน /
+			รายการโครงงานทั้งหมด</h5>
 		<hr>
 
-		<div class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+		<!-- แสดง Alert Messages -->
+		<c:if test="${not empty param.success}">
+			<div class="alert alert-success alert-dismissible fade show"
+				role="alert">
+				${param.success}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		</c:if>
+
+		<c:if test="${not empty param.error}">
+			<div class="alert alert-danger alert-dismissible fade show"
+				role="alert">
+				${param.error}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		</c:if>
+
+		<div class="mb-3"
+			style="display: flex; align-items: center; gap: 8px;">
 			<label class="form-label fw-bold">ภาคเรียน :</label> <select
 				class="form-select custom-semester-select"
 				onchange="location = '?semester=' + this.value;">
@@ -42,9 +63,10 @@
 				<tr>
 					<th style="width: 10%;">รหัสนักศึกษา</th>
 					<th style="width: 20%;">ชื่อ - สกุล</th>
-					<th style="width: 40%;">หัวข้อโครงงาน</th>
+					<th style="width: 30%;">หัวข้อโครงงาน</th>
 					<th style="width: 15%;">รายละเอียด</th>
 					<th style="width: 15%;">อนุมัติการอัปโหลด</th>
+					<th style="width: 10%;">ลบข้อมูล</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -68,6 +90,13 @@
 										${project.approveStatus ? 'เผยแพร่แล้ว' : 'อนุมัติ'}</button>
 								</form>
 							</td>
+							<td>
+								<button type="button" class="btn btn-danger btn-sm"
+									onclick="confirmDelete(${project.projectId}, this)"
+									data-project-name="<c:out value='${project.proj_NameTh}' escapeXml='true'/>">
+									<i class="fas fa-trash"></i> ลบ
+								</button>
+							</td>
 						</tr>
 					</c:forEach>
 				</c:forEach>
@@ -84,6 +113,75 @@
 			</ul>
 		</nav>
 	</div>
+
+	<!-- Hidden Form สำหรับส่งข้อมูลลบ -->
+	<form id="deleteForm" method="POST" style="display: none;"
+		action="${pageContext.request.contextPath}/admin/removeStudent">
+		<input type="hidden" id="deleteProjectId" name="projectId" />
+	</form>
+
+	<script>
+		function confirmDelete(projectId, buttonElement) {
+			// ดึงชื่อโครงงานจาก data attribute
+			const projectName = buttonElement.getAttribute('data-project-name') || 'ไม่ระบุชื่อ';
+			
+			console.log('Project ID:', projectId);
+			console.log('Project Name:', projectName);
+			
+			Swal.fire({
+				title: 'ยืนยันการลบ',
+				html: 'คุณต้องการลบโครงงาน<br><strong>"' + projectName + '"</strong><br>และข้อมูลที่เกี่ยวข้องทั้งหมดหรือไม่?',
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#d33',
+				cancelButtonColor: '#6c757d',
+				confirmButtonText: 'ใช่, ลบเลย!',
+				cancelButtonText: 'ยกเลิก',
+				reverseButtons: true
+			}).then((result) => {
+				if (result.isConfirmed) {
+					// แสดง loading
+					Swal.fire({
+						title: 'กำลังดำเนินการ...',
+						text: 'โปรดรอสักครู่',
+						icon: 'info',
+						allowOutsideClick: false,
+						showConfirmButton: false,
+						willOpen: () => {
+							Swal.showLoading();
+						}
+					});
+					
+					// ส่งข้อมูลผ่าน form
+					document.getElementById('deleteProjectId').value = projectId;
+					document.getElementById('deleteForm').submit();
+				}
+			});
+		}
+
+		// ลบ function escapeHtml ออก
+
+		// แสดง Alert เมื่อกลับมาจากการลบ
+		window.addEventListener('DOMContentLoaded', function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.get('success')) {
+				Swal.fire({
+					title: 'สำเร็จ!',
+					text: urlParams.get('success'),
+					icon: 'success',
+					confirmButtonText: 'ตกลง'
+				});
+			} else if (urlParams.get('error')) {
+				Swal.fire({
+					title: 'เกิดข้อผิดพลาด',
+					text: urlParams.get('error'),
+					icon: 'error',
+					confirmButtonText: 'ตกลง'
+				});
+			}
+		});
+	</script>
+
 
 </body>
 </html>

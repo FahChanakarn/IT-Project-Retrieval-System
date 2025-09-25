@@ -490,4 +490,95 @@ public class ProjectManager {
 
 		return project;
 	}
+
+	// เพิ่มใน ProjectManager.java
+
+	/**
+	 * ตรวจสอบว่านักศึกษาได้แก้ไขบทคัดย่อหรือไม่
+	 */
+	public boolean hasStudentEditedAbstract(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			// ตรวจสอบจาก abstract_edit_log หรือ audit table
+			// หรือตรวจสอบจากการมี abstract ที่ไม่ใช่ค่าเริ่มต้น
+			String hql = "SELECT COUNT(p) FROM Project p WHERE p.projectId = :projectId "
+					+ "AND (p.abstractTh IS NOT NULL AND TRIM(p.abstractTh) != '' "
+					+ "OR p.abstractEn IS NOT NULL AND TRIM(p.abstractEn) != '')";
+
+			Long count = (Long) session.createQuery(hql).setParameter("projectId", projectId).uniqueResult();
+
+			return count != null && count > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return true; // ถ้าเกิดข้อผิดพลาด ให้ถือว่าแก้ไขแล้ว (เพื่อความปลอดภัย)
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	public boolean deleteProjectAndStudents(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			// 1. ลบ ProjectLangDetail ก่อน (เนื่องจากมี foreign key)
+			String deleteLangDetailHql = "DELETE FROM ProjectLangDetail pld WHERE pld.project.projectId = :projectId";
+			session.createQuery(deleteLangDetailHql).setParameter("projectId", projectId).executeUpdate();
+
+			// 2. ลบ DocumentFile
+			String deleteDocumentHql = "DELETE FROM DocumentFile df WHERE df.project.projectId = :projectId";
+			session.createQuery(deleteDocumentHql).setParameter("projectId", projectId).executeUpdate();
+
+			// 3. ลบ Student496 (นักศึกษาที่เกี่ยวข้องกับโครงงาน)
+			String deleteStudentHql = "DELETE FROM Student496 s WHERE s.project.projectId = :projectId";
+			session.createQuery(deleteStudentHql).setParameter("projectId", projectId).executeUpdate();
+
+			// 4. ลบ Project สุดท้าย
+			String deleteProjectHql = "DELETE FROM Project p WHERE p.projectId = :projectId";
+			session.createQuery(deleteProjectHql).setParameter("projectId", projectId).executeUpdate();
+
+			session.getTransaction().commit();
+			return true;
+
+		} catch (Exception e) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	public boolean projectExists(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			Long count = (Long) session.createQuery("SELECT COUNT(p) FROM Project p WHERE p.projectId = :projectId")
+					.setParameter("projectId", projectId).uniqueResult();
+
+			return count != null && count > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
 }

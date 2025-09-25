@@ -455,32 +455,44 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			// ดึง Project พื้นฐานก่อน
-			project = session.get(Project.class, projectId);
+			// Query 1: ดึง Project พร้อม students เท่านั้น
+			String hql1 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
+					+ "LEFT JOIN FETCH p.typeDB " + "WHERE p.projectId = :projectId";
+
+			project = session.createQuery(hql1, Project.class).setParameter("projectId", projectId).setMaxResults(1)
+					.uniqueResult();
 
 			if (project != null) {
-				// ดึง students แยก
-				String hqlStudents = "SELECT DISTINCT s FROM Student496 s WHERE s.project.projectId = :projectId";
-				List<Student496> students = session.createQuery(hqlStudents, Student496.class)
-						.setParameter("projectId", projectId).list();
-				project.setStudent496s(students);
+				// Query 2: ดึง projectLangDetails แยก
+				String hql2 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.projectLangDetails pld "
+						+ "LEFT JOIN FETCH pld.programmingLang " + "WHERE p.projectId = :projectId";
 
-				// ดึง projectLangDetails แยก
-				String hqlLangDetails = "SELECT pld FROM ProjectLangDetail pld "
-						+ "LEFT JOIN FETCH pld.programmingLang " + "WHERE pld.project.projectId = :projectId";
+				session.createQuery(hql2, Project.class).setParameter("projectId", projectId).uniqueResult();
 
-				List<ProjectLangDetail> detailsList = session.createQuery(hqlLangDetails, ProjectLangDetail.class)
-						.setParameter("projectId", projectId).list();
+				// Query 3: ดึง documentFiles แยก
+				String hql3 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.documentFiles "
+						+ "WHERE p.projectId = :projectId";
 
-				project.setProjectLangDetails(new HashSet<>(detailsList));
+				session.createQuery(hql3, Project.class).setParameter("projectId", projectId).uniqueResult();
 
-				// Initialize typeDB
+				// Force initialize collections เพื่อกัน lazy loading error
+				project.getStudent496s().size();
+				project.getProjectLangDetails().size();
+				project.getDocumentFiles().size();
+
 				if (project.getTypeDB() != null) {
 					project.getTypeDB().getSoftwareName();
 				}
+
+				System.out.println("✅ Loaded Project: ID=" + project.getProjectId() + ", NameTH="
+						+ project.getProj_NameTh() + ", Students=" + project.getStudent496s().size() + ", LangDetails="
+						+ project.getProjectLangDetails().size() + ", Files=" + project.getDocumentFiles().size());
+			} else {
+				System.out.println("⚠️ Project not found with ID = " + projectId);
 			}
 
 		} catch (Exception e) {
+			System.err.println("❌ Error in findProjectForEditAbstract: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (session != null && session.isOpen()) {
@@ -491,19 +503,12 @@ public class ProjectManager {
 		return project;
 	}
 
-	// เพิ่มใน ProjectManager.java
-
-	/**
-	 * ตรวจสอบว่านักศึกษาได้แก้ไขบทคัดย่อหรือไม่
-	 */
 	public boolean hasStudentEditedAbstract(int projectId) {
 		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			// ตรวจสอบจาก abstract_edit_log หรือ audit table
-			// หรือตรวจสอบจากการมี abstract ที่ไม่ใช่ค่าเริ่มต้น
 			String hql = "SELECT COUNT(p) FROM Project p WHERE p.projectId = :projectId "
 					+ "AND (p.abstractTh IS NOT NULL AND TRIM(p.abstractTh) != '' "
 					+ "OR p.abstractEn IS NOT NULL AND TRIM(p.abstractEn) != '')";

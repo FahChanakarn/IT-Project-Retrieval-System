@@ -21,6 +21,8 @@ import com.springmvc.model.Project;
 @RequestMapping("/admin")
 public class StudentProjectController {
 
+	private ProjectManager projectManager = new ProjectManager();
+
 	@RequestMapping("/listProjects")
 	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "semester", required = false) String semester,
@@ -78,16 +80,40 @@ public class StudentProjectController {
 	}
 
 	@RequestMapping("/viewProjectDetail")
-	public ModelAndView viewProjectDetail(@RequestParam("projectId") int projectId) {
-		ProjectManager projectManager = new ProjectManager();
-		Project project = projectManager.findProjectById(projectId);
+	public ModelAndView viewProjectDetail(@RequestParam("projectId") int projectId, HttpSession session) {
 
-		ModelAndView mav = new ModelAndView("viewProjectDetail");
-		mav.addObject("project", project);
-		return mav;
+		System.out.println("DEBUG: viewProjectDetail called with projectId = " + projectId);
+
+		Advisor admin = (Advisor) session.getAttribute("admin");
+		if (admin == null) {
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		try {
+			Project project = projectManager.findProjectForEditAbstract(projectId);
+
+			if (project == null) {
+				System.out.println("DEBUG: Project not found: " + projectId);
+				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+				mav.addObject("error", "ไม่พบข้อมูลโครงงาน");
+				return mav;
+			}
+
+			System.out.println("DEBUG: Project found: " + project.getProj_NameTh());
+
+			ModelAndView mav = new ModelAndView("viewProjectDetail");
+			mav.addObject("project", project);
+			return mav;
+
+		} catch (Exception e) {
+			System.out.println("DEBUG: Exception in viewProjectDetail: " + e.getMessage());
+			e.printStackTrace();
+			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+			mav.addObject("error", "เกิดข้อผิดพลาดในการดึงข้อมูล");
+			return mav;
+		}
 	}
 
-	// Helper method สำหรับสร้างรายการภาคเรียน
 	public List<String> generateSemesterList(int startYear, int endYear) {
 		List<String> list = new ArrayList<>();
 		for (int year = endYear; year >= startYear; year--) {
@@ -96,7 +122,55 @@ public class StudentProjectController {
 		return list;
 	}
 
-	// Controller ที่แก้ไขแล้ว - ใช้ ModelAndView แทน @ResponseBody
+	@RequestMapping(value = "/approveUpload", method = RequestMethod.POST)
+	public ModelAndView approveUpload(@RequestParam("projectId") int projectId, HttpSession session) {
+
+		System.out.println("DEBUG: approveUpload called with projectId = " + projectId);
+
+		Advisor admin = (Advisor) session.getAttribute("admin");
+		if (admin == null) {
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		try {
+			ProjectManager projectManager = new ProjectManager();
+			Project project = projectManager.findProjectById(projectId);
+
+			if (project == null) {
+				System.out.println("DEBUG: Project not found for approval: " + projectId);
+				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+				mav.addObject("error", "ไม่พบข้อมูลโครงงาน");
+				return mav;
+			}
+
+			// ตรวจสอบว่าอนุมัติแล้วหรือยัง
+			if ("1".equals(project.getApproveStatus()) || "approved".equalsIgnoreCase(project.getApproveStatus())) {
+				System.out.println("DEBUG: Project already approved: " + projectId);
+				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+				mav.addObject("error", "โครงงานนี้ได้รับการอนุมัติแล้ว");
+				return mav;
+			}
+
+			// อนุมัติโครงงาน
+			project.setApproveStatus("1"); // หรือ "approved" ตามที่ระบบใช้
+			project.setApproveDate(new java.util.Date());
+
+			projectManager.updateProject(project);
+
+			System.out.println("DEBUG: Project approved successfully: " + projectId);
+
+			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+			mav.addObject("success", "อนุมัติโครงงานเรียบร้อยแล้ว");
+			return mav;
+
+		} catch (Exception e) {
+			System.out.println("DEBUG: Exception in approveUpload: " + e.getMessage());
+			e.printStackTrace();
+			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
+			mav.addObject("error", "เกิดข้อผิดพลาดในการอนุมัติ");
+			return mav;
+		}
+	}
 
 	@RequestMapping(value = "/removeStudent", method = RequestMethod.POST)
 	public ModelAndView removeStudent(@RequestParam("projectId") int projectId, HttpSession session) {

@@ -85,9 +85,22 @@
 									action="${pageContext.request.contextPath}/admin/approveUpload">
 									<input type="hidden" name="projectId"
 										value="${project.projectId}" />
-									<button type="submit" class="btn btn-success btn-sm"
-										${project.approveStatus ? 'disabled' : ''}>
-										${project.approveStatus ? 'เผยแพร่แล้ว' : 'อนุมัติ'}</button>
+
+									<!-- ตรวจสอบสถานะการอนุมัติ -->
+									<c:choose>
+										<c:when
+											test="${project.approveStatus == '1' || project.approveStatus == 'approved'}">
+											<button type="button" class="btn btn-success btn-sm" disabled>
+												<i class="fas fa-check"></i> อนุมัติแล้ว
+											</button>
+										</c:when>
+										<c:otherwise>
+											<button type="submit" class="btn btn-success btn-sm"
+												onclick="return confirm('คุณต้องการอนุมัติโครงงานนี้หรือไม่?')">
+												<i class="fas fa-check-circle"></i> อนุมัติ
+											</button>
+										</c:otherwise>
+									</c:choose>
 								</form>
 							</td>
 							<td>
@@ -181,7 +194,6 @@
 			}
 		});
 	</script>
-
 
 </body>
 </html>

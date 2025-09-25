@@ -5,7 +5,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>วิดีโอโครงงาน</title>
+<title>วิดีโอตัวอย่างการใช้งานโปรแกรม</title>
 
 <!-- Bootstrap -->
 <link rel="stylesheet"
@@ -129,7 +129,7 @@
 			</c:when>
 			<c:otherwise>
 				<div class="alert alert-warning mt-4" role="alert">
-					ไม่พบวิดีโอ</div>
+					${errorMessage}</div>
 			</c:otherwise>
 		</c:choose>
 	</div>

@@ -17,13 +17,18 @@ public class VideoController {
 		// ดึงโปรเจ็กต์พร้อมไฟล์แนบ (documentFiles)
 		Project project = pm.getProjectWithFiles(projectId);
 
-		// เอาไฟล์วิดีโอรายการแรกที่ "เผยแพร่" (ปรับเป็น false
-		// ถ้าให้ที่ปรึกษาดูได้ทุกไฟล์)
+		// เอาไฟล์วิดีโอรายการแรกที่ "เผยแพร่"
 		DocumentFile videoDoc = pm.findFirstVideoDoc(projectId, true);
 
 		ModelAndView mav = new ModelAndView("viewVideo");
 		mav.addObject("project", project);
-		mav.addObject("videoDoc", videoDoc); // ใน JSP จะอ่าน videoDoc.filepath
+
+		if (videoDoc != null) {
+			mav.addObject("videoDoc", videoDoc);
+		} else {
+			mav.addObject("errorMessage", "ยังไม่มีวิดีโอเผยแพร่สำหรับโครงงานนี้");
+		}
+
 		return mav;
 	}
 }

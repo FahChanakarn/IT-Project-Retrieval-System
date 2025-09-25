@@ -75,7 +75,6 @@
 										class="btn btn-success btn-sm">ดูวิดีโอ</a>
 								</c:when>
 								<c:otherwise>
-									<!-- เปลี่ยน URL ให้มีชื่อไฟล์เพื่อ browser แสดง tab เป็นชื่อไฟล์ PDF -->
 									<a
 										href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
 										class="btn btn-success btn-sm" target="_blank">

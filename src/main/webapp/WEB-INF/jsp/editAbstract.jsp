@@ -22,9 +22,13 @@
 	href="${pageContext.request.contextPath}/assets/css/editAbstract.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script
+	src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
+
 	<div class="container mt-4">
 		<div class="path-title">${project.proj_NameTh}/แก้ไขบทคัดย่อ</div>
 
@@ -32,30 +36,45 @@
 			method="post">
 			<input type="hidden" name="projectId" value="${project.projectId}">
 
+			<!-- ผู้จัดทำ -->
 			<div class="mb-3">
-				<label class="form-label fw-bold">ผู้จัดทำ :</label>
-				<c:forEach var="student" items="${project.student496s}">
-						${student.stu_firstName} ${student.stu_lastName}
+				<c:forEach var="student" items="${project.student496s}"
+					varStatus="status">
+					<c:choose>
+						<c:when test="${project.student496s.size() > 1}">
+							<span class="fw-bold">ผู้จัดทำคนที่ ${status.index + 1}:</span> ${student.stuId} ${student.stu_firstName} ${student.stu_lastName}
+                    </c:when>
+						<c:otherwise>
+							<span class="fw-bold">ผู้จัดทำ:</span> ${student.stuId} ${student.stu_firstName} ${student.stu_lastName}
+                    </c:otherwise>
+					</c:choose>
+					<br />
 				</c:forEach>
 			</div>
 
+			<!-- ภาคเรียน -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">ภาคเรียน :</label>
 				${project.semester}
 			</div>
 
+			<!-- ชื่อโครงงานภาษาไทย -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">ชื่อโครงงานภาษาไทย :</label> <input
 					type="text" class="form-control" name="projNameTh"
 					value="${project.proj_NameTh}">
+				<div class="text-danger small error-msg"></div>
 			</div>
 
+			<!-- ชื่อโครงงานภาษาอังกฤษ -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">ชื่อโครงงานภาษาอังกฤษ :</label> <input
 					type="text" class="form-control" name="projNameEn"
 					value="${project.proj_NameEn}">
+				<div class="text-danger small error-msg"></div>
 			</div>
 
+			<!-- ประเภทโครงงาน -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">ประเภทโครงงาน :</label> <select
 					class="form-select" name="projectType">
@@ -66,58 +85,76 @@
 				</select>
 			</div>
 
+			<!-- ซอฟต์แวร์ฐานข้อมูล -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">ซอฟต์แวร์ฐานข้อมูล :</label> <select
 					class="form-select" name="typeDBId">
+					<option value="" disabled selected>เลือกซอฟต์แวร์ฐานข้อมูล</option>
 					<c:forEach var="db" items="${typeDBs}">
 						<option value="${db.typeId}"
 							${db.typeId == project.typeDB.typeId ? 'selected' : ''}>${db.softwareName}</option>
 					</c:forEach>
 				</select>
+				<div class="text-danger small error-msg"></div>
 			</div>
 
+			<!-- ภาษาที่ใช้ในการพัฒนา -->
 			<div class="mb-3">
-				<label class="form-label fw-bold">ภาษาที่ใช้ในการพัฒนา :</label><br>
+				<label class="form-label fw-bold">ภาษาที่ใช้ในการพัฒนา :</label><br />
 				<c:forEach var="lang" items="${programmingLangs}">
-					<c:set var="isChecked" value="false" />
+					<c:set var="checked" value="" />
 					<c:forEach var="detail" items="${project.projectLangDetails}">
 						<c:if test="${detail.programmingLang.langId == lang.langId}">
-							<c:set var="isChecked" value="true" />
+							<c:set var="checked" value="checked" />
 						</c:if>
 					</c:forEach>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="checkbox" name="languageIds"
-							value="${lang.langId}" ${isChecked ? 'checked' : ''}> <label
+							value="${lang.langId}" ${checked}> <label
 							class="form-check-label">${lang.langName}</label>
 					</div>
 				</c:forEach>
+
+				<div class="mt-2">
+					<label class="form-label">ภาษาอื่น ๆ:</label> <input type="text"
+						class="form-control" name="otherLanguages"
+						placeholder="ตัวอย่าง: C#, C++, Swift, PHP">
+				</div>
+				<div class="text-danger small error-msg" id="languageError"></div>
 			</div>
 
+			<!-- บทคัดย่อ -->
 			<div class="mb-3">
-				<label class="form-label fw-bold">บทคัดย่อ (ภาษาไทย) :</label>
-				<textarea class="form-control" name="abstractTh" rows="5" required>${project.abstractTh}</textarea>
-				<div class="form-text text-danger">*กรุณากรอกบทคัดย่อความยาวไม่เกิน
-					1000 ตัวอักษร*</div>
+				<label class="form-label fw-bold">บทคัดย่อ (ภาษาไทย) :</label> <a
+					href="${pageContext.request.contextPath}/assets/files/sample_abstract.pdf"
+					target="_blank"> ตัวอย่างการเขียนบทคัดย่อและคำสำคัญ (PDF) </a>
+				<textarea id="thaiAbstract" class="form-control" name="abstractTh"
+					rows="5">${project.abstractTh}</textarea>
+				<div class="text-danger small error-msg" id="thaiAbstractError"></div>
 
-				<label class="form-label fw-bold">บทคัดย่อ (ภาษาอังกฤษ) :</label>
-				<textarea class="form-control" name="abstractEn" rows="5" required>${project.abstractEn}</textarea>
-				<div class="form-text text-danger">*กรุณากรอกบทคัดย่อความยาวไม่เกิน
-					1000 ตัวอักษร*</div>
+				<label class="form-label fw-bold mt-3">บทคัดย่อ (ภาษาอังกฤษ)
+					:</label>
+				<textarea id="engAbstract" class="form-control" name="abstractEn"
+					rows="5">${project.abstractEn}</textarea>
+				<div class="text-danger small error-msg" id="engAbstractError"></div>
 			</div>
 
+			<!-- คำสำคัญ -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">คำสำคัญ (ภาษาไทย) :</label> <input
 					type="text" class="form-control" name="keywordTh"
-					value="${project.keywordTh}" required>
+					value="${project.keywordTh}">
+				<div class="text-danger small error-msg"></div>
 			</div>
 
 			<div class="mb-3">
 				<label class="form-label fw-bold">คำสำคัญ (ภาษาอังกฤษ) :</label> <input
 					type="text" class="form-control" name="keywordEn"
 					value="${project.keywordEn}">
+				<div class="text-danger small error-msg"></div>
 			</div>
 
-
+			<!-- ปุ่ม -->
 			<div class="text-center">
 				<button type="submit" class="btn btn-success">บันทึก</button>
 				<a href="${pageContext.request.contextPath}/searchProjects"
@@ -125,5 +162,84 @@
 			</div>
 		</form>
 	</div>
+
+	<script>
+let thaiEditor, engEditor;
+
+// สร้าง CKEditor
+ClassicEditor
+    .create(document.querySelector('#thaiAbstract'), { toolbar: ['heading', '|', 'bold', 'italic', '|', 'link', '|', 'fontSize'], fontSize: { options: [10, 12, 14, 'default', 18, 20, 24, 28, 32, 36] } })
+    .then(editor => { thaiEditor = editor; })
+    .catch(error => console.error(error));
+
+ClassicEditor
+    .create(document.querySelector('#engAbstract'), { toolbar: ['heading', '|', 'bold', 'italic', '|', 'link', '|', 'fontSize'], fontSize: { options: [10, 12, 14, 'default', 18, 20, 24, 28, 32, 36] } })
+    .then(editor => { engEditor = editor; })
+    .catch(error => console.error(error));
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    form.querySelectorAll('.error-msg').forEach(div => div.textContent = '');
+    let valid = true;
+
+    // ชื่อโครงงานภาษาไทย
+    const projNameTh = form.projNameTh.value.trim();
+    const regexTh = /^[ก-๙A-Za-z0-9(),\s]+$/;
+    if (!projNameTh) { form.projNameTh.nextElementSibling.textContent = "*กรุณากรอกชื่อโครงงานภาษาไทย"; valid = false; }
+    else if (!regexTh.test(projNameTh)) { form.projNameTh.nextElementSibling.textContent = "*ชื่อโครงงานภาษาไทย สามารถเป็นภาษาไทย อังกฤษ และตัวเลขได้ อักขระพิเศษ () , เท่านั้น"; valid = false; }
+
+    // ชื่อโครงงานภาษาอังกฤษ
+    const projNameEn = form.projNameEn.value.trim();
+    const regexEn = /^[A-Za-z0-9(),.\s]+$/;
+    if (!projNameEn) { form.projNameEn.nextElementSibling.textContent = "*กรุณากรอกชื่อโครงงานภาษาอังกฤษ"; valid = false; }
+    else if (!regexEn.test(projNameEn)) { form.projNameEn.nextElementSibling.textContent = "*ชื่อโครงงานภาษาอังกฤษ สามารถเป็นอังกฤษ และตัวเลขได้ อักขระพิเศษ () , . เท่านั้น"; valid = false; }
+
+    // ซอฟต์แวร์ฐานข้อมูล
+    if (!form.typeDBId.value) { form.typeDBId.nextElementSibling.textContent = "*กรุณาเลือกซอฟต์แวร์ฐานข้อมูล"; valid = false; }
+
+    const languages = form.querySelectorAll('input[name="languageIds"]:checked');
+    const otherLang = form.otherLanguages.value.trim();
+    let languageError = document.getElementById('languageError');
+    languageError.textContent = ""; // เคลียร์ก่อน validate
+
+    // ภาษาที่ใช้ในการพัฒนา
+    if (languages.length === 0) {
+        languageError.textContent = "*กรุณาเลือกภาษาที่ใช้ในการพัฒนาอย่างน้อย 1 ภาษา";
+        valid = false;
+    } else if (otherLang) {
+        const langNames = Array.from(form.querySelectorAll('input[name="languageIds"]'))
+            .map(i => i.nextElementSibling.textContent.trim().toLowerCase());
+        if (langNames.includes(otherLang.toLowerCase())) {
+            languageError.textContent = `ภาษาซ้ำกับรายการภาษาที่เลือก`;
+            valid = false;
+        }
+    }
+
+ // บทคัดย่อ
+    const abstractTh = thaiEditor.getData().trim();
+    if (abstractTh.length < 500 || abstractTh.length > 1500) { 
+        document.getElementById('thaiAbstractError').textContent = "*บทคัดย่อภาษาไทย ต้องมีความยาว 500–1000 ตัวอักษร"; 
+        valid = false; 
+    }
+
+    const abstractEn = engEditor.getData().trim();
+    if (abstractEn.length < 500 || abstractEn.length > 1500) { 
+        document.getElementById('engAbstractError').textContent = "*บทคัดย่อภาษาอังกฤษ ต้องมีความยาว 500–1000 ตัวอักษร"; 
+        valid = false; 
+    }
+
+    // คำสำคัญ
+    const keywordTh = form.keywordTh.value.trim();
+    if (!keywordTh) { form.keywordTh.nextElementSibling.textContent = "*กรุณากรอกคำสำคัญภาษาไทย"; valid = false; }
+    const keywordEn = form.keywordEn.value.trim();
+    if (!keywordEn) { form.keywordEn.nextElementSibling.textContent = "*กรุณากรอกคำสำคัญภาษาอังกฤษ"; valid = false; }
+
+    if (valid) {
+        Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลสำเร็จ', showConfirmButton: false, timer: 1500 })
+            .then(() => { form.submit(); });
+    }
+});
+</script>
 </body>
 </html>

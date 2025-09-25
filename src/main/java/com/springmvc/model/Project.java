@@ -1,7 +1,9 @@
 package com.springmvc.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -60,7 +62,7 @@ public class Project {
 	private List<Student496> student496s;
 
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-	private List<ProjectLangDetail> projectLangDetails;
+	private Set<ProjectLangDetail> projectLangDetails = new HashSet<>();
 	
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	private List<DocumentFile> documentFiles;
@@ -72,7 +74,7 @@ public class Project {
 	public Project(int projectId, String proj_NameTh, String proj_NameEn, String semester, String abstractTh,
 			String abstractEn, String projectType, String approveStatus, Date approveDate, String testing_status,
 			String keywordTh, String keywordEn, Advisor advisor, TypeDB typeDB, List<Student496> student496s,
-			List<ProjectLangDetail> projectLangDetails) {
+			Set<ProjectLangDetail> projectLangDetails, List<DocumentFile> documentFiles) {
 		super();
 		this.projectId = projectId;
 		this.proj_NameTh = proj_NameTh;
@@ -90,6 +92,7 @@ public class Project {
 		this.typeDB = typeDB;
 		this.student496s = student496s;
 		this.projectLangDetails = projectLangDetails;
+		this.documentFiles = documentFiles;
 	}
 
 
@@ -205,7 +208,7 @@ public class Project {
 	public void setTypeDB(TypeDB typeDB) {
 		this.typeDB = typeDB;
 	}
-
+	
 	public List<Student496> getStudent496s() {
 		return student496s;
 	}
@@ -214,11 +217,11 @@ public class Project {
 		this.student496s = student496s;
 	}
 
-	public List<ProjectLangDetail> getProjectLangDetails() {
+	public Set<ProjectLangDetail> getProjectLangDetails() {
 		return projectLangDetails;
 	}
 
-	public void setProjectLangDetails(List<ProjectLangDetail> projectLangDetails) {
+	public void setProjectLangDetails(Set<ProjectLangDetail> projectLangDetails) {
 		this.projectLangDetails = projectLangDetails;
 	}
 

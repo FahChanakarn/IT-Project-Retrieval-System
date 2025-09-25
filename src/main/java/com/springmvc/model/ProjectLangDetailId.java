@@ -25,5 +25,31 @@ public class ProjectLangDetailId implements Serializable {
     public int hashCode() {
         return Objects.hash(projectId, langId);
     }
+    
+	public ProjectLangDetailId() {
+	}
+
+	public ProjectLangDetailId(int projectId, int langId) {
+		super();
+		this.projectId = projectId;
+		this.langId = langId;
+	}
+
+	public int getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
+	}
+
+	public int getLangId() {
+		return langId;
+	}
+
+	public void setLangId(int langId) {
+		this.langId = langId;
+	}
+   
 }
 

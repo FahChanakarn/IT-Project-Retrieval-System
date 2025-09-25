@@ -27,7 +27,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-4">
-		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
+		<h5>${project.proj_NameTh}/รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->
@@ -47,11 +47,13 @@
 			</p>
 		</div>
 
-		<!-- ปุ่มบทคัดย่อ -->
+		<!-- ปุ่มบทคัดย่อ + ปุ่มวิดีโอ -->
 		<div class="mb-4">
 			<a
 				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-				class="btn btn-primary btn-section"> บทคัดย่อ </a>
+				class="btn btn-primary btn-section"> บทคัดย่อ </a> <a
+				href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+				class="btn btn-primary btn-section"> วิดีโอตัวอย่างการใช้งานโปรแกรม </a>
 		</div>
 
 		<!-- ตารางไฟล์เอกสาร -->
@@ -66,24 +68,18 @@
 			<tbody>
 				<c:forEach var="file" items="${project.documentFiles}"
 					varStatus="loop">
-					<tr>
-						<td>${loop.index + 1}</td>
-						<td>${file.filename}</td>
-						<td class="text-center"><c:choose>
-								<c:when test="${file.filetype eq 'video'}">
-									<a
-										href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}&fileId=${file.fileId}"
-										class="btn btn-success btn-sm"> ดูวิดีโอ </a>
-								</c:when>
-								<c:otherwise>
-									<a
-										href="${pageContext.request.contextPath}/download/file/${file.fileId}"
-										class="btn btn-success btn-sm" target="_blank">
-										ดูไฟล์เอกสาร </a>
-								</c:otherwise>
-							</c:choose></td>
-					</tr>
+					<c:if test="${file.filetype ne 'video'}">
+						<tr>
+							<td>${loop.index + 1}</td>
+							<td>${file.filename}</td>
+							<td class="text-center"><a
+								href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
+								class="btn btn-success btn-sm" target="_blank"> ดูไฟล์เอกสาร
+							</a></td>
+						</tr>
+					</c:if>
 				</c:forEach>
+
 				<c:if test="${empty project.documentFiles}">
 					<tr>
 						<td colspan="3" class="text-center text-muted">ยังไม่มีไฟล์เผยแพร่</td>

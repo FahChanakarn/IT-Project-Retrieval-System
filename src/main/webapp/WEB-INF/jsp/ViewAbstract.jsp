@@ -37,15 +37,28 @@
 			ดูรายละเอียด</h5>
 		<hr>
 		<div class="mb-3">
-			<a
-				href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
-				class="btn btn-primary me-2"> <i
-				class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
-			</a> <a
-				href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-				class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
-				ดูวิดีโอ
-			</a>
+			<c:choose>
+				<c:when
+					test="${empty sessionScope.itstudent and empty sessionScope.student and empty sessionScope.advisor and empty sessionScope.admin}">
+					<a href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+						class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+						วิดีโอตัวอย่างการใช้งานโปรแกรม
+					</a>
+				</c:when>
+
+				<c:otherwise>
+					<a
+						href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
+						class="btn btn-primary me-2"> <i
+						class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+					</a>
+					<a
+						href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+						class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+						วิดีโอตัวอย่างการใช้งานโปรแกรม
+					</a>
+				</c:otherwise>
+			</c:choose>
 		</div>
 		<div class="abstract-card">
 			<!-- Project Information -->

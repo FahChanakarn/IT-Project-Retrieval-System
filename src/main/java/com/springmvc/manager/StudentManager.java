@@ -57,7 +57,6 @@ public class StudentManager {
 			query.setParameter("password", password);
 
 			List<Student> list = query.list();
-			System.out.println("Matching students: " + list.size());
 			if (!list.isEmpty())
 				return list.get(0);
 			else

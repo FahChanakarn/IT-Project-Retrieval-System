@@ -3,35 +3,19 @@ package com.springmvc.manager;
 import com.springmvc.model.DocumentFile;
 import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.Project;
+import com.springmvc.model.ProjectLangDetail;
+import com.springmvc.model.Student496;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProjectManager {
-
-	public List<String> getAllProjectTypes() {
-		List<String> projectTypes = null;
-		Session session = null;
-
-		try {
-			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			session = sessionFactory.openSession();
-
-			String hql = "SELECT DISTINCT projectType FROM Project";
-			projectTypes = session.createQuery(hql, String.class).getResultList();
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			if (session != null && session.isOpen()) {
-				session.close();
-			}
-		}
-		return projectTypes;
-	}
 
 	public List<String> getAllSemesters() {
 		List<String> semesters = null;
@@ -463,4 +447,47 @@ public class ProjectManager {
 		return files;
 	}
 
+	public Project findProjectForEditAbstract(int projectId) {
+		Project project = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			// ดึง Project พื้นฐานก่อน
+			project = session.get(Project.class, projectId);
+
+			if (project != null) {
+				// ดึง students แยก
+				String hqlStudents = "SELECT DISTINCT s FROM Student496 s WHERE s.project.projectId = :projectId";
+				List<Student496> students = session.createQuery(hqlStudents, Student496.class)
+						.setParameter("projectId", projectId).list();
+				project.setStudent496s(students);
+
+				// ดึง projectLangDetails แยก
+				String hqlLangDetails = "SELECT pld FROM ProjectLangDetail pld "
+						+ "LEFT JOIN FETCH pld.programmingLang " + "WHERE pld.project.projectId = :projectId";
+
+				List<ProjectLangDetail> detailsList = session.createQuery(hqlLangDetails, ProjectLangDetail.class)
+						.setParameter("projectId", projectId).list();
+
+				project.setProjectLangDetails(new HashSet<>(detailsList));
+
+				// Initialize typeDB
+				if (project.getTypeDB() != null) {
+					project.getTypeDB().getSoftwareName();
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return project;
+	}
 }

@@ -1,5 +1,8 @@
 package com.springmvc.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -24,9 +27,10 @@ public class EditAbstractController {
 		}
 
 		int projectId = student.getProject().getProjectId();
-
 		ProjectManager projectManager = new ProjectManager();
-		Project project = projectManager.findProjectById(projectId);
+
+		// ใช้ method ใหม่ที่ fetch projectLangDetails, student496s และ documentFiles
+		Project project = projectManager.findProjectForEditAbstract(projectId);
 
 		if (project == null) {
 			ModelAndView mav = new ModelAndView("editAbstract");
@@ -41,7 +45,9 @@ public class EditAbstractController {
 		mav.addObject("projectName", project.getProj_NameTh());
 		mav.addObject("studentFullName", studentFullName);
 
-		mav.addObject("projectTypes", projectManager.getAllProjectTypes());
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		mav.addObject("projectTypes", projectTypes);
+
 		mav.addObject("typeDBs", new TypeDBManager().getAllTypeDBs());
 		mav.addObject("programmingLangs", new ProgrammingLangManager().getAllProgrammingLanguages());
 
@@ -49,42 +55,76 @@ public class EditAbstractController {
 	}
 
 	@RequestMapping(value = "/updateAbstract", method = RequestMethod.POST)
-	public ModelAndView updateAbstract(@RequestParam("abstractTh") String abstractTh,
-			@RequestParam("abstractEn") String abstractEn, @RequestParam("keywordTh") String keywordTh,
-			@RequestParam("keywordEn") String keywordEn, HttpSession session) {
+	public ModelAndView updateAbstract(@RequestParam("projNameTh") String projNameTh,
+			@RequestParam("projNameEn") String projNameEn, @RequestParam("projectType") String projectType,
+			@RequestParam("typeDBId") int typeDBId,
+			@RequestParam(value = "languageIds", required = false) int[] languageIds,
+			@RequestParam(value = "otherLanguages", required = false) String otherLanguages,
+			@RequestParam("abstractTh") String abstractTh, @RequestParam("abstractEn") String abstractEn,
+			@RequestParam("keywordTh") String keywordTh, @RequestParam("keywordEn") String keywordEn,
+			HttpSession session) {
 
 		Student496 student = (Student496) session.getAttribute("student");
-
 		if (student == null || student.getProject() == null) {
 			return new ModelAndView("redirect:/loginStudent496");
 		}
 
 		int projectId = student.getProject().getProjectId();
-
 		ProjectManager projectManager = new ProjectManager();
-		Project project = projectManager.findProjectById(projectId);
 
-		// ✅ อัปเดตค่าที่รับมา
+		// ใช้ method ใหม่
+		Project project = projectManager.findProjectForEditAbstract(projectId);
+
+		// อัปเดตข้อมูลพื้นฐาน
+		project.setProj_NameTh(projNameTh);
+		project.setProj_NameEn(projNameEn);
+		project.setProjectType(projectType);
+
+		// อัปเดต typeDB
+		TypeDBManager typeDBManager = new TypeDBManager();
+		project.setTypeDB(typeDBManager.findTypeDBById(typeDBId));
+
+		// อัปเดต languages (Many-to-Many) โดยไม่ลบของเก่า
+		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
+
+		if (languageIds != null) {
+			for (int langId : languageIds) {
+				if (!programmingLangManager.existsProjectLangDetail(projectId, langId)) {
+					programmingLangManager.createProjectLangDetailAndSave(project, langId);
+				}
+			}
+		}
+
+		// เพิ่มภาษาที่กรอกเอง
+		if (otherLanguages != null && !otherLanguages.trim().isEmpty()) {
+			String[] otherLangs = otherLanguages.split(",");
+			for (String langName : otherLangs) {
+				langName = langName.trim();
+				if (!langName.isEmpty()) {
+					programmingLangManager.addOtherLanguageToProject(project, langName);
+				}
+			}
+		}
+
+		// อัปเดต abstract และ keyword
 		project.setAbstractTh(abstractTh);
 		project.setAbstractEn(abstractEn);
 		project.setKeywordTh(keywordTh);
 		project.setKeywordEn(keywordEn);
 
+		// บันทึก Project
 		projectManager.updateProject(project);
 
-		// ✅ โหลด dropdown เดิมกลับไปด้วย
+		// โหลดกลับไปยัง editAbstract
 		ModelAndView mav = new ModelAndView("editAbstract");
 		mav.addObject("project", project);
 		mav.addObject("successMessage", "บันทึกข้อมูลเรียบร้อยแล้ว");
 
-		// ดึง dropdown กลับมาเพื่อให้ฟอร์มโหลดข้อมูลได้ครบ
-		mav.addObject("projectTypes", projectManager.getAllProjectTypes());
-		TypeDBManager typeDBManager = new TypeDBManager();
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		mav.addObject("projectTypes", projectTypes);
 		mav.addObject("typeDBs", typeDBManager.getAllTypeDBs());
-		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
 		mav.addObject("programmingLangs", programmingLangManager.getAllProgrammingLanguages());
 
 		return mav;
 	}
-
 }

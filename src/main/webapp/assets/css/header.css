@@ -4,7 +4,7 @@
 body {
 	font-family: 'Kanit', sans-serif;
 	margin: 0;
-	padding-top: 80px; /* ปรับตามความสูง header จริง */
+	padding-top: 80px;
 	overflow-x: hidden;
 }
 
@@ -17,6 +17,16 @@ body {
 	width: 100vw;
 	left: 0;
 	z-index: 1020;
+}
+
+/* ชื่อระบบตรงกลาง navbar */
+.header-title {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #fff;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+	letter-spacing: 0.5px;
+	margin: 0;
 }
 
 .logo-img {
@@ -54,7 +64,7 @@ body {
 	gap: 1rem;
 }
 
-/* ✅ Footer (ถ้าจะใช้ซ้ำได้ด้วย) */
+/* Footer */
 .footer {
 	background-color: #aa1818;
 	color: white;
@@ -63,7 +73,13 @@ body {
 	width: 100vw;
 }
 
-/* ✅ Responsive Header */
+/* Responsive */
+@media ( max-width : 992px) {
+	.header-title {
+		font-size: 1.2rem;
+	}
+}
+
 @media ( max-width : 768px) {
 	.faculty-title {
 		font-size: 1rem;
@@ -77,5 +93,14 @@ body {
 	}
 	.dropdown-menu {
 		width: 100%;
+	}
+	.header-title {
+		font-size: 1rem;
+	}
+}
+
+@media ( max-width : 576px) {
+	.header-title {
+		display: none; /* ซ่อนชื่อในหน้าจอเล็กมาก */
 	}
 }

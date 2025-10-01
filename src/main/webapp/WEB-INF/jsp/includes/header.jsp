@@ -4,7 +4,7 @@
 
 <header class="header">
 	<div class="container-fluid px-4">
-		<div class="row align-items-center justify-content-between">
+		<div class="row align-items-center">
 			<!-- โลโก้ -->
 			<div class="col-auto d-flex align-items-center">
 				<img
@@ -12,9 +12,13 @@
 					alt="IT Logo" class="logo-img">
 			</div>
 
+			<!-- ชื่อระบบตรงกลาง -->
+			<div class="col text-center">
+				<h1 class="header-title mb-0">ระบบสืบค้นโครงงานสารสนเทศ</h1>
+			</div>
+
 			<!-- เมนู -->
-			<div
-				class="col d-flex justify-content-end align-items-center flex-wrap gap-3">
+			<div class="col-auto d-flex align-items-center flex-wrap gap-3">
 
 				<c:choose>
 

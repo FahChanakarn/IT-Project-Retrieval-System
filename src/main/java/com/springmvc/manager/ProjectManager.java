@@ -576,4 +576,28 @@ public class ProjectManager {
 			}
 		}
 	}
+
+	public List<Project> getAllProjects() {
+		List<Project> projects = null;
+		Session session = null;
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s s "
+					+ "LEFT JOIN FETCH p.advisor a " + "ORDER BY p.projectId DESC";
+
+			projects = session.createQuery(hql, Project.class).getResultList();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return projects != null ? projects : new ArrayList<>();
+	}
 }

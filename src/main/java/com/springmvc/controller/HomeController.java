@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.AdvisorManager;
@@ -13,12 +14,15 @@ import com.springmvc.manager.ProgrammingLangManager;
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.model.Advisor;
 import com.springmvc.model.ProgrammingLang;
+import com.springmvc.model.Project;
 
 @Controller
 public class HomeController {
 
+	private static final int PROJECTS_PER_PAGE = 10;
+
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public ModelAndView home() {
+	public ModelAndView home(@RequestParam(value = "page", defaultValue = "1") int page) {
 		AdvisorManager advisorManager = new AdvisorManager();
 		ProjectManager projectManager = new ProjectManager();
 		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
@@ -32,19 +36,42 @@ public class HomeController {
 				.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING);
 		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
 
+		// ดึงโปรเจคทั้งหมดและคำนวณ pagination
+		List<Project> allProjects = projectManager.getAllProjects(); // ต้องมี method นี้ใน ProjectManager
+		int totalProjects = allProjects != null ? allProjects.size() : 0;
+		int totalPages = (int) Math.ceil((double) totalProjects / PROJECTS_PER_PAGE);
+
+		// ตรวจสอบหน้าที่ขอมา
+		if (page < 1)
+			page = 1;
+		if (page > totalPages && totalPages > 0)
+			page = totalPages;
+
+		// คำนวณ index สำหรับ subList
+		int fromIndex = (page - 1) * PROJECTS_PER_PAGE;
+		int toIndex = Math.min(fromIndex + PROJECTS_PER_PAGE, totalProjects);
+
+		List<Project> projects = (allProjects != null && !allProjects.isEmpty())
+				? allProjects.subList(fromIndex, toIndex)
+				: allProjects;
+
 		ModelAndView mav = new ModelAndView("Home");
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
 		mav.addObject("semesters", semesters);
 		mav.addObject("programmingLangs", programmingLangs);
 		mav.addObject("dbmsLangs", dbmsLangs);
+		mav.addObject("projects", projects);
+		mav.addObject("currentPage", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("totalProjects", totalProjects);
 
 		return mav;
 	}
 
 	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	public ModelAndView backhome() {
-		return new ModelAndView("Home");
+		return new ModelAndView("redirect:/");
 	}
 
 	@RequestMapping("/logout")

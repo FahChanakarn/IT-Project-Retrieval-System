@@ -43,7 +43,6 @@ request.setAttribute("currentYear", thisYear);
 
 	<!-- Main Content -->
 	<div class="container mt-4">
-		<h2 class="main-title">ระบบสืบค้นโครงงานสารสนเทศ</h2>
 		<div class="row">
 			<!-- Sidebar -->
 			<div class="col-md-3">
@@ -165,6 +164,14 @@ request.setAttribute("currentYear", thisYear);
 						</div>
 					</form>
 
+					<!-- แสดงจำนวนโปรเจค -->
+					<c:if test="${not empty projects}">
+						<div class="mb-3">
+							<small class="text-muted">แสดง ${projects.size()} จาก
+								${totalProjects} โครงงาน (หน้า ${currentPage} จาก ${totalPages})</small>
+						</div>
+					</c:if>
+
 					<c:forEach var="project" items="${projects}">
 						<div class="card mb-3 project-card">
 							<div class="card-body">
@@ -200,6 +207,48 @@ request.setAttribute("currentYear", thisYear);
 						</div>
 					</c:forEach>
 
+					<!-- Pagination -->
+					<c:if test="${totalPages > 1}">
+						<nav aria-label="Project pagination">
+							<ul class="pagination justify-content-center">
+								<!-- Previous Button -->
+								<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+									<a class="page-link" href="#"
+									onclick="goToPage(${currentPage - 1}); return false;"
+									aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+								</a>
+								</li>
+
+								<!-- Page Numbers -->
+								<c:forEach var="i" begin="1" end="${totalPages}">
+									<c:choose>
+										<c:when test="${i == currentPage}">
+											<li class="page-item active"><span class="page-link">${i}</span>
+											</li>
+										</c:when>
+										<c:when
+											test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+											<li class="page-item"><a class="page-link" href="#"
+												onclick="goToPage(${i}); return false;">${i}</a></li>
+										</c:when>
+										<c:when test="${i == currentPage - 3 || i == currentPage + 3}">
+											<li class="page-item disabled"><span class="page-link">...</span>
+											</li>
+										</c:when>
+									</c:choose>
+								</c:forEach>
+
+								<!-- Next Button -->
+								<li
+									class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+									<a class="page-link" href="#"
+									onclick="goToPage(${currentPage + 1}); return false;"
+									aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+								</a>
+								</li>
+							</ul>
+						</nav>
+					</c:if>
 
 					<c:if test="${empty projects}">
 						<div class="alert alert-warning mt-3">
@@ -212,8 +261,64 @@ request.setAttribute("currentYear", thisYear);
 	</div>
 	<jsp:include page="/WEB-INF/jsp/includes/footer.jsp" />
 
-	<!-- JS logic -->
+
 	<script>
+// เก็บค่า keyword สำหรับ search pagination
+const currentKeyword = "${not empty keyword ? keyword : ''}";
+const totalPages = ${not empty totalPages ? totalPages : 1};
+
+// ฟังก์ชันสำหรับเปลี่ยนหน้า
+function goToPage(page) {
+  console.log("goToPage called with page:", page);
+  console.log("currentKeyword:", currentKeyword);
+  console.log("totalPages:", totalPages);
+  
+  if (page < 1 || page > totalPages) {
+    console.log("Page out of range");
+    return;
+  }
+  
+  // ตรวจสอบว่ามีการ search หรือ filter
+  if (currentKeyword && currentKeyword.trim() !== "") {
+    // กรณี search
+    const url = "${pageContext.request.contextPath}/searchProjects?keyword=" + 
+                encodeURIComponent(currentKeyword) + "&page=" + page;
+    console.log("Navigating to search:", url);
+    window.location.href = url;
+  } else {
+    // กรณี filter หรือหน้าปกติ
+    const form = document.getElementById("filterForm");
+    const formData = new FormData(form);
+    const params = new URLSearchParams();
+    
+    // เพิ่มค่าจาก form
+    for (let [key, value] of formData.entries()) {
+      if (value && value.trim() !== "") {
+        params.append(key, value);
+      }
+    }
+    
+    // เพิ่ม page
+    params.append("page", page);
+    
+    // ตรวจสอบว่ามี filter หรือไม่
+    const paramsString = params.toString();
+    console.log("Params:", paramsString);
+    
+    if (paramsString === "page=" + page) {
+      // ไม่มี filter -> ไปหน้าแรก
+      const url = "${pageContext.request.contextPath}/?page=" + page;
+      console.log("Navigating to home:", url);
+      window.location.href = url;
+    } else {
+      // มี filter
+      const url = "${pageContext.request.contextPath}/filterProjects?" + paramsString;
+      console.log("Navigating to filter:", url);
+      window.location.href = url;
+    }
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   document.querySelectorAll(".form-select, .form-check-input").forEach(el => {
     el.addEventListener("change", () => document.getElementById("filterForm").submit());

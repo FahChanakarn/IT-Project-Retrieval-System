@@ -97,5 +97,43 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.3</version>
 		</dependency>
+		<!-- สำหรับ JSON support ใน Spring MVC -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext7-core</artifactId>
+			<version>7.2.5</version>
+			<type>pom</type>
+		</dependency>
+
+		<!-- หรือใช้แบบแยก dependency ทีละตัว (แนะนำ) -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>kernel</artifactId>
+			<version>7.2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>layout</artifactId>
+			<version>7.2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>io</artifactId>
+			<version>7.2.5</version>
+		</dependency>
+
+		<!-- ถ้าต้องการใช้ฟอนต์ภาษาไทย -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>font-asian</artifactId>
+			<version>7.2.5</version>
+		</dependency>
 	</dependencies>
 </project>

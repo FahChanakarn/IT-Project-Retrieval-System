@@ -1,106 +1,131 @@
-@import
-	url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
 
 body {
-	font-family: 'Kanit', sans-serif;
-	margin: 0;
-	padding-top: 80px;
-	overflow-x: hidden;
+    font-family: 'Kanit', sans-serif;
+    margin: 0;
+    padding-top: 80px;
+    overflow-x: hidden;
 }
 
 .header {
-	background-color: #aa1818;
-	color: white;
-	padding: 15px 0;
-	position: fixed;
-	top: 0;
-	width: 100vw;
-	left: 0;
-	z-index: 1020;
+    background-color: #aa1818;
+    color: white;
+    padding: 15px 0;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    left: 0;
+    z-index: 1020;
 }
 
 /* ชื่อระบบตรงกลาง navbar */
 .header-title {
-	font-size: 1.5rem;
-	font-weight: 600;
-	color: #fff;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-	letter-spacing: 0.5px;
-	margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+    margin: 0;
+    height: 2em;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animation สำหรับข้อความเลื่อน */
+.sliding-text {
+    display: block;
+    animation: slideText 8s ease-in-out infinite;
+}
+
+@keyframes slideText {
+    0%, 40% {
+        transform: translateY(0);
+    }
+    45%, 95% {
+        transform: translateY(-50%);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
+.sliding-text span {
+    display: block;
+    line-height: 2em;
 }
 
 .logo-img {
-	width: 240px;
-	height: auto;
-	max-width: 100%;
+    width: 240px;
+    height: auto;
+    max-width: 100%;
 }
 
 .faculty-title {
-	font-size: 1.2rem;
-	font-weight: bold;
-	line-height: 1.2;
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1.2;
 }
 
 .university-title {
-	font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 .nav-link {
-	color: white;
-	transition: color 0.3s ease;
+    color: white;
+    transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-	color: #e6af30;
+    color: #e6af30;
 }
 
 .dropdown-toggle::after {
-	vertical-align: middle;
+    vertical-align: middle;
 }
 
 .header .nav.d-inline-flex {
-	flex-wrap: wrap;
-	justify-content: flex-end;
-	gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 /* Footer */
 .footer {
-	background-color: #aa1818;
-	color: white;
-	text-align: center;
-	padding: 1rem 0;
-	width: 100vw;
+    background-color: #aa1818;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    width: 100vw;
 }
 
 /* Responsive */
-@media ( max-width : 992px) {
-	.header-title {
-		font-size: 1.2rem;
-	}
+@media (max-width: 992px) {
+    .header-title {
+        font-size: 1.2rem;
+    }
 }
 
-@media ( max-width : 768px) {
-	.faculty-title {
-		font-size: 1rem;
-	}
-	.university-title {
-		font-size: 0.8rem;
-	}
-	.nav-link {
-		display: block;
-		margin-bottom: 10px;
-	}
-	.dropdown-menu {
-		width: 100%;
-	}
-	.header-title {
-		font-size: 1rem;
-	}
+@media (max-width: 768px) {
+    .faculty-title {
+        font-size: 1rem;
+    }
+    .university-title {
+        font-size: 0.8rem;
+    }
+    .nav-link {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .dropdown-menu {
+        width: 100%;
+    }
+    .header-title {
+        font-size: 1rem;
+    }
 }
 
-@media ( max-width : 576px) {
-	.header-title {
-		display: none; /* ซ่อนชื่อในหน้าจอเล็กมาก */
-	}
+@media (max-width: 576px) {
+    .header-title {
+        font-size: 0.9rem;
+    }
 }

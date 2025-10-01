@@ -14,7 +14,12 @@
 
 			<!-- ชื่อระบบตรงกลาง -->
 			<div class="col text-center">
-				<h1 class="header-title mb-0">ระบบสืบค้นโครงงานสารสนเทศ</h1>
+				<div class="header-title mb-0">
+					<div class="sliding-text">
+						<span>ระบบสืบค้นโครงงานสารสนเทศ</span> <span>Information
+							Technology Project Retrieval System</span>
+					</div>
+				</div>
 			</div>
 
 			<!-- เมนู -->

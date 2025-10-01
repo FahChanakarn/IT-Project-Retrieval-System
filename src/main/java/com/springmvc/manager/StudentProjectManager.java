@@ -1,14 +1,10 @@
 package com.springmvc.manager;
 
-import com.springmvc.model.Project;
-import com.springmvc.model.Student;
 import com.springmvc.model.HibernateConnection;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 public class StudentProjectManager {

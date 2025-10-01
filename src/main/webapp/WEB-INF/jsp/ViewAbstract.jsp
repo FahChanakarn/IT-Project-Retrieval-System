@@ -63,12 +63,12 @@
 		<div class="abstract-card">
 			<!-- Project Information -->
 			<div class="info-row">
-				<span class="info-label">ชื่อโครงงาน :</span> <span
+				<span class="info-label">ชื่อโครงงาน(ภาษาไทย) :</span> <span
 					class="info-value">${project.proj_NameTh}</span>
 			</div>
 
 			<div class="info-row">
-				<span class="info-label">Topic :</span> <span class="info-value">${project.proj_NameEn}</span>
+				<span class="info-label">ชื่อโครงงาน(ภาษาอังกฤษ) :</span> <span class="info-value">${project.proj_NameEn}</span>
 			</div>
 
 			<div class="info-row">

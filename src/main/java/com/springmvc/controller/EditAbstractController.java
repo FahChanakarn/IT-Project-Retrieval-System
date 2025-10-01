@@ -1,6 +1,7 @@
 package com.springmvc.controller;
 
 import java.util.Arrays;
+
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -11,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.ProgrammingLangManager;
 import com.springmvc.manager.ProjectManager;
-import com.springmvc.manager.TypeDBManager;
+
 import com.springmvc.model.Project;
 import com.springmvc.model.Student496;
 
@@ -48,7 +49,6 @@ public class EditAbstractController {
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
 
-		mav.addObject("typeDBs", new TypeDBManager().getAllTypeDBs());
 		mav.addObject("programmingLangs", new ProgrammingLangManager().getAllProgrammingLanguages());
 
 		return mav;
@@ -80,9 +80,6 @@ public class EditAbstractController {
 		project.setProj_NameEn(projNameEn);
 		project.setProjectType(projectType);
 
-		// อัปเดต typeDB
-		TypeDBManager typeDBManager = new TypeDBManager();
-		project.setTypeDB(typeDBManager.findTypeDBById(typeDBId));
 
 		// อัปเดต languages (Many-to-Many) โดยไม่ลบของเก่า
 		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
@@ -122,7 +119,6 @@ public class EditAbstractController {
 
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
-		mav.addObject("typeDBs", typeDBManager.getAllTypeDBs());
 		mav.addObject("programmingLangs", programmingLangManager.getAllProgrammingLanguages());
 
 		return mav;

@@ -22,7 +22,7 @@ public class Advisor {
     @Column(name = "advisor_email", length = 30, unique = true, nullable = false)
     private String adv_email;
 
-    @Column(name = "advisorpassword", length = 10, nullable = false)
+    @Column(name = "advisorpassword", length = 15, nullable = false)
     private String adv_password;
 
     @Column(name = "position", length = 100, nullable = false)

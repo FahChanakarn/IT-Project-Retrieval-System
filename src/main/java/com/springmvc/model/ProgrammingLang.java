@@ -3,26 +3,33 @@ package com.springmvc.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name="programming_lang")
+@Table(name = "programming_lang")
 public class ProgrammingLang {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lang_id")
-    private int langId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "lang_id")
+	private int langId;
 
-    @Column(name = "langname", length = 100, unique = true, nullable = false)
-    private String langName;
+	@Column(name = "lang_name", length = 100, unique = true, nullable = false)
+	private String langName;
 
-	public ProgrammingLang() {
-		super();
-		// TODO Auto-generated constructor stub
+	@Enumerated(EnumType.STRING) // ✅ เก็บ enum เป็นข้อความ เช่น "PROGRAMMING", "DBMS"
+	@Column(name = "lang_type", length = 50, nullable = false)
+	private LangType langType;
+
+	// Enum ภายใน class
+	public enum LangType {
+		PROGRAMMING, DBMS
 	}
 
-	public ProgrammingLang(int langId, String langName) {
-		super();
+	public ProgrammingLang() {
+	}
+
+	public ProgrammingLang(int langId, String langName, LangType langType) {
 		this.langId = langId;
 		this.langName = langName;
+		this.langType = langType;
 	}
 
 	public int getLangId() {
@@ -41,6 +48,11 @@ public class ProgrammingLang {
 		this.langName = langName;
 	}
 
-	
+	public LangType getLangType() {
+		return langType;
+	}
 
+	public void setLangType(LangType langType) {
+		this.langType = langType;
+	}
 }

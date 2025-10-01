@@ -22,7 +22,7 @@ public class Student {
 
 	
 	
-	@Column(name = "stu_password", length = 10, nullable = false)
+	@Column(name = "stu_password", length = 15, nullable = false)
 	private String stu_password;
 
 	public Student() {

@@ -3,17 +3,13 @@ package com.springmvc.manager;
 import com.springmvc.model.DocumentFile;
 import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.Project;
-import com.springmvc.model.ProjectLangDetail;
-import com.springmvc.model.Student496;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ProjectManager {
 
@@ -74,7 +70,7 @@ public class ProjectManager {
 	}
 
 	public List<Project> filterProjects(String projectType, List<String> advisorIds, List<String> semesters,
-			List<Integer> typeDBIds, List<String> languages, String testingStatus, String startYear, String endYear) {
+			List<String> languages, List<String> databases, String testingStatus, String startYear, String endYear) {
 
 		List<Project> projects = null;
 		Session session = null;
@@ -95,11 +91,11 @@ public class ProjectManager {
 			if (semesters != null && !semesters.isEmpty()) {
 				hql.append(" AND p.semester IN (:semesters)");
 			}
-			if (typeDBIds != null && !typeDBIds.isEmpty()) {
-				hql.append(" AND p.typeDB.typeId IN (:typeDBIds)");
-			}
 			if (languages != null && !languages.isEmpty()) {
-				hql.append(" AND lang.langName IN (:languages)");
+				hql.append(" AND lang.langName IN (:languages) AND lang.langType = 'PROGRAMMING'");
+			}
+			if (databases != null && !databases.isEmpty()) {
+				hql.append(" AND lang.langName IN (:databases) AND lang.langType = 'DBMS'");
 			}
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				hql.append(" AND p.testing_status = :testingStatus");
@@ -120,11 +116,11 @@ public class ProjectManager {
 			if (semesters != null && !semesters.isEmpty()) {
 				query.setParameterList("semesters", semesters);
 			}
-			if (typeDBIds != null && !typeDBIds.isEmpty()) {
-				query.setParameter("typeDBIds", typeDBIds);
-			}
 			if (languages != null && !languages.isEmpty()) {
 				query.setParameter("languages", languages);
+			}
+			if (databases != null && !databases.isEmpty()) {
+				query.setParameter("databases", databases);
 			}
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				query.setParameter("testingStatus", testingStatus);
@@ -455,34 +451,28 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			// Query 1: ดึง Project พร้อม students เท่านั้น
+			// ลบ LEFT JOIN FETCH p.typeDB
 			String hql1 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
-					+ "LEFT JOIN FETCH p.typeDB " + "WHERE p.projectId = :projectId";
+					+ "WHERE p.projectId = :projectId";
 
 			project = session.createQuery(hql1, Project.class).setParameter("projectId", projectId).setMaxResults(1)
 					.uniqueResult();
 
 			if (project != null) {
-				// Query 2: ดึง projectLangDetails แยก
+				// ดึง projectLangDetails
 				String hql2 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.projectLangDetails pld "
 						+ "LEFT JOIN FETCH pld.programmingLang " + "WHERE p.projectId = :projectId";
-
 				session.createQuery(hql2, Project.class).setParameter("projectId", projectId).uniqueResult();
 
-				// Query 3: ดึง documentFiles แยก
+				// ดึง documentFiles
 				String hql3 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.documentFiles "
 						+ "WHERE p.projectId = :projectId";
-
 				session.createQuery(hql3, Project.class).setParameter("projectId", projectId).uniqueResult();
 
-				// Force initialize collections เพื่อกัน lazy loading error
+				// Force initialize collections
 				project.getStudent496s().size();
 				project.getProjectLangDetails().size();
 				project.getDocumentFiles().size();
-
-				if (project.getTypeDB() != null) {
-					project.getTypeDB().getSoftwareName();
-				}
 
 				System.out.println("✅ Loaded Project: ID=" + project.getProjectId() + ", NameTH="
 						+ project.getProj_NameTh() + ", Students=" + project.getStudent496s().size() + ", LangDetails="

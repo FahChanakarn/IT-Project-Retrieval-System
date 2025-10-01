@@ -104,16 +104,14 @@ request.setAttribute("currentYear", thisYear);
 						</div>
 					</div>
 
-
-
 					<div class="filter-section">
 						<div class="filter-title">ซอฟต์แวร์ฐานข้อมูล</div>
-						<c:forEach var="db" items="${typeDBs}">
+						<c:forEach var="db" items="${dbmsLangs}">
 							<div class="form-check">
-								<input class="form-check-input filter-input" type="checkbox"
-									name="typeDBIds" value="${db.typeId}" id="db_${db.typeId}"
-									<c:if test="${not empty selectedTypeDBIds && selectedTypeDBIds.contains(db.typeId)}">checked</c:if>>
-								<label class="form-check-label" for="db_${db.typeId}">${db.softwareName}</label>
+								<input class="form-check-input" type="checkbox" name="databases"
+									value="${db.langName}" id="db_${db.langId}"
+									<c:if test="${not empty selectedDatabases && selectedDatabases.contains(db.langName)}">checked</c:if>>
+								<label class="form-check-label" for="db_${db.langId}">${db.langName}</label>
 							</div>
 						</c:forEach>
 					</div>
@@ -121,13 +119,15 @@ request.setAttribute("currentYear", thisYear);
 					<div class="filter-section">
 						<div class="filter-title">ภาษาที่ใช้</div>
 						<c:forEach var="lang" items="${programmingLangs}">
-							<div class="form-check">
-								<input class="form-check-input filter-input" type="checkbox"
-									name="languages" value="${lang.langName}"
-									id="lang_${lang.langId}"
-									<c:if test="${not empty selectedLanguages && selectedLanguages.contains(lang.langName)}">checked</c:if>>
-								<label class="form-check-label" for="lang_${lang.langId}">${lang.langName}</label>
-							</div>
+							<c:if test="${lang.langType.name() == 'PROGRAMMING'}">
+								<div class="form-check">
+									<input class="form-check-input filter-input" type="checkbox"
+										name="languages" value="${lang.langName}"
+										id="lang_${lang.langId}"
+										<c:if test="${not empty selectedLanguages && selectedLanguages.contains(lang.langName)}">checked</c:if>>
+									<label class="form-check-label" for="lang_${lang.langId}">${lang.langName}</label>
+								</div>
+							</c:if>
 						</c:forEach>
 					</div>
 
@@ -171,6 +171,7 @@ request.setAttribute("currentYear", thisYear);
 								<div class="row">
 									<div class="col-md-9">
 										<h5 class="card-title">${project.proj_NameTh}</h5>
+										<h5 class="card-title">${project.proj_NameEn}</h5>
 
 										<c:forEach var="student" items="${project.student496s}">
 											<p class="card-text mb-0">ผู้จัดทำ: ${student.stuId}

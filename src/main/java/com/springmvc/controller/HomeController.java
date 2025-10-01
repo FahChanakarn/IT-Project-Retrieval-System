@@ -2,22 +2,17 @@ package com.springmvc.controller;
 
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.AdvisorManager;
 import com.springmvc.manager.ProgrammingLangManager;
 import com.springmvc.manager.ProjectManager;
-import com.springmvc.manager.TypeDBManager;
 import com.springmvc.model.Advisor;
 import com.springmvc.model.ProgrammingLang;
-import com.springmvc.model.TypeDB;
 
 @Controller
 public class HomeController {
@@ -26,22 +21,24 @@ public class HomeController {
 	public ModelAndView home() {
 		AdvisorManager advisorManager = new AdvisorManager();
 		ProjectManager projectManager = new ProjectManager();
-		ProgrammingLangManager prolangManager = new ProgrammingLangManager();
-		TypeDBManager typeDBManager = new TypeDBManager();
+		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
-		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> semesters = projectManager.getAllSemesters();
-		List<ProgrammingLang> programmingLangs = prolangManager.getAllProgrammingLanguages();
-		List<TypeDB> typeDBs = typeDBManager.getAllTypeDBs();
+
+		// ใช้ method ใหม่แยก type จาก manager
+		List<ProgrammingLang> programmingLangs = programmingLangManager
+				.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING);
+		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
 
 		ModelAndView mav = new ModelAndView("Home");
-
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
 		mav.addObject("semesters", semesters);
 		mav.addObject("programmingLangs", programmingLangs);
-		mav.addObject("typeDBs", typeDBs);
+		mav.addObject("dbmsLangs", dbmsLangs);
+
 		return mav;
 	}
 
@@ -52,8 +49,7 @@ public class HomeController {
 
 	@RequestMapping("/logout")
 	public String logout(HttpSession session) {
-		session.invalidate(); // 🔴 ลบ session ทั้งหมดออก
-		return "redirect:/searchProjects"; // 🔁 กลับไปหน้า home หรือหน้า login
+		session.invalidate();
+		return "redirect:/searchProjects";
 	}
-
 }

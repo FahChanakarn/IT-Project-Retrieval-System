@@ -111,7 +111,6 @@ public class ImportStudentManager {
 				project.setApproveStatus("0");
 				project.setTesting_status("0");
 				project.setAdvisor(advisor);
-				project.setTypeDB(null); // ไม่ต้องใส่ TypeDB
 				session.save(project);
 
 				// --- สร้าง Student496 (รวม Student ด้วย) ---

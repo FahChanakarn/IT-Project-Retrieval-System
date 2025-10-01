@@ -54,10 +54,6 @@ public class Project {
 	@JoinColumn(name = "advisor_id", nullable = false)
 	private Advisor advisor;
 
-	@ManyToOne
-	@JoinColumn(name = "type_id", nullable = true)
-	private TypeDB typeDB;
-
 	@OneToMany(mappedBy = "project")
 	private List<Student496> student496s;
 
@@ -73,7 +69,7 @@ public class Project {
 
 	public Project(int projectId, String proj_NameTh, String proj_NameEn, String semester, String abstractTh,
 			String abstractEn, String projectType, String approveStatus, Date approveDate, String testing_status,
-			String keywordTh, String keywordEn, Advisor advisor, TypeDB typeDB, List<Student496> student496s,
+			String keywordTh, String keywordEn, Advisor advisor, List<Student496> student496s,
 			Set<ProjectLangDetail> projectLangDetails, List<DocumentFile> documentFiles) {
 		super();
 		this.projectId = projectId;
@@ -89,7 +85,6 @@ public class Project {
 		this.keywordTh = keywordTh;
 		this.keywordEn = keywordEn;
 		this.advisor = advisor;
-		this.typeDB = typeDB;
 		this.student496s = student496s;
 		this.projectLangDetails = projectLangDetails;
 		this.documentFiles = documentFiles;
@@ -199,14 +194,6 @@ public class Project {
 
 	public void setAdvisor(Advisor advisor) {
 		this.advisor = advisor;
-	}
-
-	public TypeDB getTypeDB() {
-		return typeDB;
-	}
-
-	public void setTypeDB(TypeDB typeDB) {
-		this.typeDB = typeDB;
 	}
 	
 	public List<Student496> getStudent496s() {

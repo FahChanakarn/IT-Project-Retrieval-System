@@ -27,7 +27,6 @@ public class HibernateConnection {
 							.addAnnotatedClass(Student.class)
 							.addAnnotatedClass(Student496.class)
 							.addAnnotatedClass(Project.class)
-							.addAnnotatedClass(TypeDB.class)
 							.addAnnotatedClass(DocumentFile.class)
 							.addAnnotatedClass(ProgrammingLang.class)
 							.addAnnotatedClass(ProjectLangDetailId.class)

@@ -16,7 +16,7 @@ public class Student496Manager {
 		session.close();
 		return list;
 	}
-
+	
 	public Student496 findById(String stuId) {
 		Session session = HibernateConnection.doHibernateConnection().openSession();
 		Student496 student = session.get(Student496.class, stuId);
@@ -24,17 +24,23 @@ public class Student496Manager {
 		return student;
 	}
 
+
+	public Student496 findByStuId(String stuId) {
+		return findById(stuId);
+	}
+
+	@Deprecated
 	public Student496 findByStuIdAndPassword(String stuId, String password) {
 		Session session = HibernateConnection.doHibernateConnection().openSession();
 		Query<Student496> query = session
 				.createQuery("FROM Student496 WHERE stuId = :stuId AND stu_password = :password", Student496.class);
 		query.setParameter("stuId", stuId);
 		query.setParameter("password", password);
-
 		Student496 student = query.uniqueResult();
 		session.close();
 		return student;
 	}
+
 
 	public void updateStudent(Student496 student) {
 		Session session = HibernateConnection.doHibernateConnection().openSession();
@@ -44,4 +50,24 @@ public class Student496Manager {
 		session.close();
 	}
 
+	public boolean updateStudentSafe(Student496 student) {
+		Session session = null;
+		try {
+			session = HibernateConnection.doHibernateConnection().openSession();
+			session.beginTransaction();
+			session.update(student);
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			if (session != null && session.getTransaction() != null) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+	}
 }

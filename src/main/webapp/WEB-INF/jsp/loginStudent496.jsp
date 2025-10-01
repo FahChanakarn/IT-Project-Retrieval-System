@@ -57,7 +57,8 @@
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
-						class="form-control">
+						class="form-control" placeholder="รหัสผ่าน (5-15 ตัวอักษร)"
+						maxlength="15">
 					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 
@@ -93,13 +94,14 @@
 	        passwordError.textContent = "*กรุณากรอกรหัสผ่าน";
 	        return false;
 	    }
-	    // เช็คความยาว
+	    // เช็คความยาวขั้นต่ำ
 	    else if (password.length < 5) {
 	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
 	        return false;
-	    } 
-	    else if (password.length > 12) {
-	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
+	    }
+	    // ✅ ปรับความยาวสูงสุดเป็น 100 เพราะ BCrypt hash ยาว ~60 ตัวอักษร
+	    else if (password.length > 100) {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 100 ตัวอักษร";
 	        return false;
 	    } 
 	    // เช็คห้ามมีช่องว่าง
@@ -116,7 +118,6 @@
 	    return true;
 	}
 
-
 	// Real-time validation
 	stuSelect.addEventListener("change", validateStuId);
 	passwordInput.addEventListener("input", validatePassword);
@@ -131,25 +132,29 @@
 	});
 	</script>
 
-	<!-- SweetAlert -->
+	<!-- SweetAlert for Login Failed -->
 	<c:if test="${loginFailed}">
 		<script>
 	    Swal.fire({
 	        icon: 'error',
 	        title: 'ไม่สามารถเข้าสู่ระบบได้',
-	        text: 'กรุณาตรวจสอบรหัสนักศึกษา หรือรหัสผ่าน',
-	        confirmButtonText: 'ตกลง'
+	        text: '${not empty errorMessage ? errorMessage : "กรุณาตรวจสอบรหัสนักศึกษา หรือรหัสผ่าน"}',
+	        confirmButtonText: 'ตกลง',
+	        confirmButtonColor: '#d33'
 	    });
 	</script>
 	</c:if>
 
+	<!-- SweetAlert for Login Success -->
 	<c:if test="${loginSuccess}">
 		<script>
 	    Swal.fire({
 	        icon: 'success',
 	        title: 'เข้าสู่ระบบสำเร็จ',
+	        text: 'กำลังเข้าสู่หน้าหลัก...',
 	        showConfirmButton: false,
-	        timer: 2000
+	        timer: 2000,
+	        timerProgressBar: true
 	    }).then(() => {
 	        window.location.href = '${redirectUrl}';
 	    });

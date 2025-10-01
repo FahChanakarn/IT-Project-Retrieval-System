@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.Student496Manager;
 import com.springmvc.model.Student496;
+import com.springmvc.controller.PasswordUtil;
 
 @Controller
 public class LoginStudent496Controller {
@@ -30,29 +31,53 @@ public class LoginStudent496Controller {
 			HttpServletRequest request) {
 
 		Student496Manager manager = new Student496Manager();
-		Student496 student = manager.findByStuIdAndPassword(stuId, password);
+		ModelAndView mav = new ModelAndView("loginStudent496");
 
-		ModelAndView mav = new ModelAndView("loginStudent496"); // JSP login เดิม
+		try {
+			Student496 student = manager.findByStuId(stuId);
 
-		if (student != null) {
-			HttpSession session = request.getSession();
-			session.setAttribute("student", student);
-
-			if (student.getProject() != null) {
-				session.setAttribute("projectId", student.getProject().getProjectId());
+			if (student == null) {
+				mav.addObject("loginFailed", true);
+				mav.addObject("errorMessage", "ไม่พบรหัสนักศึกษานี้ในระบบ");
+				// ✅ โหลด studentList กลับมาเพื่อแสดงใน dropdown
+				List<Student496> studentList = manager.getAllStudents();
+				mav.addObject("studentList", studentList);
+				return mav;
 			}
 
-			// ตั้งค่าให้ JSP แสดง SweetAlert success
-			mav.addObject("loginSuccess", true);
+			if (PasswordUtil.verifyPassword(password, student.getStu_password())) {
+				HttpSession session = request.getSession();
+				session.setAttribute("student", student);
 
-			// ถ้าอยากให้ redirect หลัง 2 วินาทีใน SweetAlert
-			mav.addObject("redirectUrl", request.getContextPath() + "/searchProjects");
+				if (student.getProject() != null) {
+					session.setAttribute("projectId", student.getProject().getProjectId());
+				}
 
-		} else {
-			mav.addObject("loginFailed", true); // JSP จะโชว์ SweetAlert error
+				mav.addObject("loginSuccess", true);
+				mav.addObject("redirectUrl", request.getContextPath() + "/searchProjects");
+			} else {
+				mav.addObject("loginFailed", true);
+				mav.addObject("errorMessage", "รหัสผ่านไม่ถูกต้อง");
+				// ✅ โหลด studentList กลับมาเพื่อแสดงใน dropdown
+				List<Student496> studentList = manager.getAllStudents();
+				mav.addObject("studentList", studentList);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("loginFailed", true);
+			mav.addObject("errorMessage", "เกิดข้อผิดพลาดในระบบ: " + e.getMessage());
+			// ✅ โหลด studentList กลับมาเพื่อแสดงใน dropdown
+			List<Student496> studentList = manager.getAllStudents();
+			mav.addObject("studentList", studentList);
 		}
 
 		return mav;
 	}
 
+	@RequestMapping(value = "/logoutStudent", method = RequestMethod.GET)
+	public String logoutStudent(HttpSession session) {
+		session.invalidate();
+		return "redirect:/loginStudent496";
+	}
 }

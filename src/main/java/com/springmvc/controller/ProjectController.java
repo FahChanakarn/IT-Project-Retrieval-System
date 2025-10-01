@@ -29,7 +29,7 @@ public class ProjectController {
 		TypeDBManager typeDBManager = new TypeDBManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
-		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> semesters = projectManager.getAllSemesters();
 		List<ProgrammingLang> programmingLangs = programmingLangManager.getAllProgrammingLanguages();
 		List<TypeDB> typeDBs = typeDBManager.getAllTypeDBs();
@@ -68,7 +68,7 @@ public class ProjectController {
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
 		// 🔹 ใช้ค่าคงที่เหมือนกัน
-		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> allSemesters = projectManager.getAllSemesters();
 		List<ProgrammingLang> programmingLangs = programmingLangManager.getAllProgrammingLanguages();
 		List<TypeDB> typeDBs = typeDBManager.getAllTypeDBs();

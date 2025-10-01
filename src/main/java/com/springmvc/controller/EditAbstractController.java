@@ -45,7 +45,7 @@ public class EditAbstractController {
 		mav.addObject("projectName", project.getProj_NameTh());
 		mav.addObject("studentFullName", studentFullName);
 
-		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
 
 		mav.addObject("typeDBs", new TypeDBManager().getAllTypeDBs());
@@ -120,7 +120,7 @@ public class EditAbstractController {
 		mav.addObject("project", project);
 		mav.addObject("successMessage", "บันทึกข้อมูลเรียบร้อยแล้ว");
 
-		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing");
+		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
 		mav.addObject("typeDBs", typeDBManager.getAllTypeDBs());
 		mav.addObject("programmingLangs", programmingLangManager.getAllProgrammingLanguages());

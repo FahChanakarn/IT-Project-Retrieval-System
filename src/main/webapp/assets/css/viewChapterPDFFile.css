@@ -1,0 +1,222 @@
+@charset "UTF-8";
+
+	/* PDF Viewer Container */
+	.pdf-viewer-container {
+		height: 600px;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		margin: 20px 0;
+	}
+
+	#pdf-viewer {
+		height: 80vh;
+	}
+
+	/* Download Info Styles */
+	.download-info {
+		background: #f8f9fa;
+		padding: 15px;
+		border-radius: 8px;
+		margin: 10px 0;
+	}
+
+	.download-info h6 {
+		color: #dc3545;
+		border-bottom: 1px solid #dee2e6;
+		padding-bottom: 8px;
+	}
+
+	/* Token Info */
+	.token-info {
+		font-size: 0.9em;
+		color: #6c757d;
+		background-color: #f8f9fa;
+		padding: 10px;
+		border-radius: 8px;
+		border-left: 4px solid #007bff;
+	}
+
+	/* Expiry Details */
+	.expiry-details {
+		background: #f8f9fa;
+		padding: 12px;
+		border-radius: 8px;
+		border-left: 4px solid #ffc107;
+		margin-top: 10px;
+	}
+
+	.expiry-details div {
+		font-size: 14px;
+		color: #495057;
+		padding: 5px 0;
+	}
+
+	/* Alert Styles */
+	.alert-info {
+		background-color: #d1ecf1;
+		border-color: #b6d4db;
+		color: #0c5460;
+	}
+
+	.alert-warning {
+		background-color: #fff3cd;
+		border-left: 4px solid #ffc107;
+	}
+
+	/* Copy Success Message */
+	.copy-success {
+		color: #28a745;
+		font-size: 0.875rem;
+		font-weight: bold;
+		animation: fadeIn 0.3s ease-in;
+	}
+
+	@keyframes fadeIn {
+		from { 
+			opacity: 0; 
+			transform: translateY(-10px); 
+		}
+		to { 
+			opacity: 1; 
+			transform: translateY(0); 
+		}
+	}
+
+	/* Loading Spinner */
+	.loading-spinner {
+		display: none;
+		animation: pulse 1.5s infinite;
+	}
+
+	
+
+	/* Download Button Styles */
+	.btn-download-secure {
+		background: linear-gradient(45deg, #28a745, #20c997);
+		border: none;
+		color: white;
+		transition: all 0.3s ease;
+	}
+
+	.btn-download-secure:hover {
+		background: linear-gradient(45deg, #218838, #1abc9c);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+		color: white;
+	}
+
+	.btn-download-secure:active {
+		transform: translateY(0);
+	}
+
+	.btn-download-secure:disabled {
+		background-color: #6c757d;
+		cursor: not-allowed;
+		opacity: 0.65;
+	}
+
+	/* Modal Styles */
+	.modal-lg {
+		max-width: 90vw;
+	}
+
+	.modal-header .bi-shield-check {
+		font-size: 1.2em;
+	}
+
+	/* Table Hover Effect */
+	.table-hover tbody tr:hover {
+		background-color: #f8f9fa;
+		transition: background-color 0.2s ease;
+	}
+
+	/* Expiry Info Badge */
+	.expiry-info-badge {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		padding: 8px 15px;
+		border-radius: 20px;
+		font-size: 0.85rem;
+		display: inline-block;
+		margin-top: 10px;
+	}
+
+	/* Additional Button Styles */
+	.btn-section {
+		margin-right: 10px;
+		transition: all 0.3s ease;
+	}
+
+	.btn-section:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+	}
+
+	/* Toast Container */
+	#toast-container {
+		z-index: 9999;
+	}
+
+	/* Responsive Adjustments */
+	@media (max-width: 768px) {
+		.expiry-details {
+			padding: 8px;
+			font-size: 12px;
+		}
+
+		.modal-dialog {
+			margin: 10px;
+		}
+
+		#pdf-viewer {
+			height: 60vh;
+		}
+
+		.pdf-viewer-container {
+			height: 400px;
+		}
+
+		.btn-section {
+			margin-bottom: 10px;
+			width: 100%;
+		}
+
+		.modal-lg {
+			max-width: 95vw;
+		}
+	}
+
+	/* Loading Animation for Button */
+	.btn-download-secure .spinner-border-sm {
+		width: 1rem;
+		height: 1rem;
+		border-width: 0.2em;
+	}
+
+	/* Icon Styles */
+	.bi-file-earmark-pdf {
+		font-size: 1.1em;
+	}
+
+	.bi-shield-check {
+		font-size: 1em;
+	}
+
+	/* Card Info Box */
+	.card {
+		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		transition: box-shadow 0.3s ease;
+	}
+
+	.card:hover {
+		box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+	}
+
+	/* Additional Alert Styling */
+	.alert {
+		border-radius: 8px;
+	}
+
+	.alert i {
+		font-size: 1.1em;
+	}

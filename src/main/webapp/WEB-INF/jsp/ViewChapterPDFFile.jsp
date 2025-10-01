@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,6 +20,8 @@
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/viewProjectDetail.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/viewChapterPDFFile.css">
 
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -33,17 +36,30 @@
 		<!-- ข้อมูลโครงงาน -->
 		<div class="mb-3">
 			<p>
-				<strong>ชื่อโครงงาน :</strong> ${project.proj_NameTh}
+				<strong>ชื่อโครงงาน :</strong>
+				<c:out value="${project.proj_NameTh}" default="ไม่ระบุ" />
 			</p>
 			<p>
 				<strong>ผู้จัดทำ :</strong>
-				<c:forEach var="s" items="${project.student496s}" varStatus="loop">
-                    ${s.stu_prefix}${s.stu_firstName} ${s.stu_lastName}<c:if
-						test="${!loop.last}">, </c:if>
-				</c:forEach>
+				<c:choose>
+					<c:when test="${not empty project.student496s}">
+						<c:forEach var="s" items="${project.student496s}"
+							varStatus="status">
+							<c:out value="${s.stu_prefix}" />
+							<c:out value="${s.stu_firstName}" />
+							<c:out value="${s.stu_lastName}" />
+							<c:if
+								test="${status.index lt (fn:length(project.student496s) - 1)}">, </c:if>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						ไม่พบข้อมูลผู้จัดทำ
+					</c:otherwise>
+				</c:choose>
 			</p>
 			<p>
-				<strong>ภาคเรียน :</strong> ${project.semester}
+				<strong>ภาคเรียน :</strong>
+				<c:out value="${project.semester}" default="ไม่ระบุ" />
 			</p>
 		</div>
 
@@ -51,42 +67,334 @@
 		<div class="mb-4">
 			<a
 				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-				class="btn btn-primary btn-section"> บทคัดย่อ </a> <a
+				class="btn btn-primary btn-section"> <i class="bi bi-file-text"></i>
+				บทคัดย่อ
+			</a> <a
 				href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-				class="btn btn-primary btn-section"> วิดีโอตัวอย่างการใช้งานโปรแกรม </a>
+				class="btn btn-primary btn-section"> <i
+				class="bi bi-play-circle"></i> วิดีโอตัวอย่างการใช้งานโปรแกรม
+			</a>
+		</div>
+
+		<!-- แสดงข้อมูลการหมดอายุ -->
+		<div class="alert alert-info mb-3">
+			<i class="bi bi-info-circle-fill"></i> <strong>หมายเหตุ:</strong>
+			ไฟล์ที่ดาวน์โหลดจะมีอายุการใช้งาน <strong>14 วัน</strong>
+			หลังจากนั้นจะไม่สามารถเปิดดูได้ ต้องดาวน์โหลดใหม่เท่านั้น
 		</div>
 
 		<!-- ตารางไฟล์เอกสาร -->
-		<table class="table table-bordered">
-			<thead>
+		<table class="table table-bordered table-hover">
+			<thead class="table-light">
 				<tr>
-					<th>ลำดับ</th>
+					<th style="width: 80px;">ลำดับ</th>
 					<th>ชื่อไฟล์</th>
-					<th>เอกสาร</th>
+					<th style="width: 180px;" class="text-center">เอกสาร</th>
+					<th style="width: 200px;" class="text-center">ดาวน์โหลดแบบปลอดภัย</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="file" items="${project.documentFiles}"
-					varStatus="loop">
-					<c:if test="${file.filetype ne 'video'}">
+				<c:choose>
+					<c:when test="${not empty project.documentFiles}">
+						<c:forEach var="file" items="${project.documentFiles}"
+							varStatus="loop">
+							<c:if test="${file.filetype eq 'file'}">
+								<tr>
+									<td class="text-center"><c:out value="${loop.index + 1}" /></td>
+									<td><i class="bi bi-file-earmark-pdf text-danger"></i> <c:out
+											value="${file.filename}" default="ไม่ระบุชื่อไฟล์" /></td>
+									<td class="text-center"><a href="javascript:void(0)"
+										class="btn btn-success btn-sm"
+										onclick="openPDFViewer(${file.fileId}, '${fn:replace(fn:escapeXml(file.filename), '\'', '\\\'')}')">
+											<i class="bi bi-eye"></i> ดูไฟล์
+									</a></td>
+									<td class="text-center">
+										<button class="btn btn-download-secure btn-sm"
+											onclick="downloadSecurePDF(${file.fileId}, '${fn:escapeXml(file.filename)}')"
+											id="download-btn-${file.fileId}">
+											<i class="bi bi-shield-check"></i> ดาวน์โหลด (14 วัน)
+										</button>
+										<div class="loading-spinner" id="loading-${file.fileId}"
+											style="display: none;">
+											<div class="spinner-border spinner-border-sm text-success"
+												role="status">
+												<span class="visually-hidden">กำลังดาวน์โหลด...</span>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</c:if>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
 						<tr>
-							<td>${loop.index + 1}</td>
-							<td>${file.filename}</td>
-							<td class="text-center"><a
-								href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
-								class="btn btn-success btn-sm" target="_blank"> ดูไฟล์เอกสาร
-							</a></td>
+							<td colspan="4" class="text-center text-muted"><i
+								class="bi bi-inbox"></i> ยังไม่มีไฟล์เผยแพร่</td>
 						</tr>
-					</c:if>
-				</c:forEach>
-
-				<c:if test="${empty project.documentFiles}">
-					<tr>
-						<td colspan="3" class="text-center text-muted">ยังไม่มีไฟล์เผยแพร่</td>
-					</tr>
-				</c:if>
+					</c:otherwise>
+				</c:choose>
 			</tbody>
 		</table>
+
+		<!-- คำอธิบายเพิ่มเติม -->
+		<div class="card mt-3">
+			<div class="card-body">
+				<h6 class="card-title">
+					<i class="bi bi-question-circle text-primary"></i>
+					ข้อมูลเกี่ยวกับการดาวน์โหลดแบบปลอดภัย
+				</h6>
+				<ul class="mb-0">
+					<li><strong>ไฟล์ที่ดาวน์โหลดมีอายุ 14 วัน</strong> -
+						หลังจากนั้นจะไม่สามารถเปิดดูได้</li>
+					<li><strong>การแจ้งเตือน</strong> - เมื่อเหลือเวลาน้อยกว่า 3
+						วัน จะมีการแจ้งเตือนเมื่อเปิดไฟล์</li>
+					<li><strong>การป้องกัน</strong> -
+						ไฟล์มีระบบตรวจสอบวันที่อัตโนมัติด้วย JavaScript</li>
+					<li><strong>หมดอายุแล้ว</strong> -
+						ไฟล์จะปิดอัตโนมัติและแจ้งให้ดาวน์โหลดใหม่</li>
+				</ul>
+			</div>
+		</div>
 	</div>
+
+	<!-- PDF Viewer Modal -->
+	<div class="modal fade" id="pdfViewerModal" tabindex="-1"
+		aria-labelledby="pdfViewerModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="pdfViewerModalLabel">
+						<i class="bi bi-file-pdf text-danger"></i> PDF Viewer
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-0">
+					<div id="pdf-viewer" style="min-height: 600px;"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-circle"></i> ปิด
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Download Info Modal (ปรับปรุงแล้ว) -->
+	<div class="modal fade" id="downloadInfoModal" tabindex="-1"
+		aria-labelledby="downloadInfoModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header bg-success text-white">
+					<h5 class="modal-title" id="downloadInfoModalLabel">
+						<i class="bi bi-shield-check"></i> ดาวน์โหลดแบบปลอดภัย
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="download-info">
+						<h6>
+							<i class="bi bi-file-earmark-pdf text-danger"></i> <span
+								id="download-filename"></span>
+						</h6>
+
+						<div class="alert alert-warning mt-3">
+							<div class="mb-2">
+								<i class="bi bi-exclamation-triangle-fill text-warning"></i> <strong>เอกสารที่ดาวน์โหลดจะหมดอายุจริง!</strong>
+							</div>
+							<div class="expiry-details" id="expiry-details-container">
+								<!-- จะถูกเติมด้วย JavaScript -->
+							</div>
+							<div class="alert alert-info mt-2 mb-0">
+								<small> <i class="bi bi-info-circle"></i> <strong>วิธีการทำงาน:</strong><br>
+									• เมื่อเปิดไฟล์ PDF จะตรวจสอบวันที่อัตโนมัติ<br> •
+									ถ้าหมดอายุแล้วจะแสดงคำเตือนและปิดไฟล์ทันที<br> •
+									ถ้ายังไม่หมดอายุจะแสดงจำนวนวันที่เหลือ<br> •
+									ระบบตรวจสอบวันที่แบบเรียลไทม์ (รวมเวลา)
+								</small>
+							</div>
+						</div>
+
+						<div class="token-info mt-3">
+							<small> <i class="bi bi-info-circle"></i>
+								ไฟล์นี้ได้รับการป้องกันด้วยระบบตรวจสอบวันหมดอายุอัตโนมัติ
+								หากไฟล์หมดอายุแล้ว จะไม่สามารถเปิดดูได้
+							</small>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-circle"></i> ปิด
+					</button>
+					<button type="button" class="btn btn-success"
+						id="start-download-btn" onclick="startSecureDownload()">
+						<i class="bi bi-download"></i> เริ่มดาวน์โหลด
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// ตัวแปรเก็บ context path
+		const contextPath = '${pageContext.request.contextPath}';
+		let currentFileId = null; // เก็บ fileId ปัจจุบัน
+		
+		// เปิด PDF viewer แบบง่าย (ใช้ browser default)
+		function openPDFViewer(fileId, filename) {
+			console.log('📖 Opening PDF viewer for file:', fileId, filename);
+			
+			const pdfUrl = contextPath + "/download/file/" + fileId + "/" + encodeURIComponent(filename);
+			console.log('🔗 PDF URL:', pdfUrl);
+			
+			// ตั้งชื่อ modal
+			document.getElementById('pdfViewerModalLabel').textContent = filename;
+			
+			// ใช้ iframe แทน Adobe API
+			const pdfViewer = document.getElementById('pdf-viewer');
+			pdfViewer.innerHTML = '<iframe src="' + pdfUrl + '" width="100%" height="600px" frameborder="0" style="border-radius: 8px;"></iframe>';
+			
+			// แสดง modal
+			const modal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
+			modal.show();
+		}
+
+			// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
+			// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
+			function downloadSecurePDF(fileId, filename) {
+    console.log('🔐 Preparing secure download for file:', fileId, filename);
+    
+    currentFileId = fileId;
+    
+    // อัปเดตชื่อไฟล์ใน modal
+    const filenameDisplay = document.getElementById('download-filename');
+    if (filenameDisplay) {
+        filenameDisplay.textContent = filename || 'ไฟล์';
+    }
+    
+    // แสดงข้อมูลการหมดอายุ (ทดสอบ 1 นาที)
+    const today = new Date();
+    const expiryDate = new Date(today);
+    expiryDate.setMinutes(expiryDate.getMinutes() + 1); // เปลี่ยนเป็น 1 นาที
+    
+    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    
+    const expiryDay = expiryDate.getDate();
+    const expiryMonth = expiryDate.getMonth();
+    const expiryYear = expiryDate.getFullYear() + 543;
+    const expiryHour = String(expiryDate.getHours()).padStart(2, '0');
+    const expiryMinute = String(expiryDate.getMinutes()).padStart(2, '0');
+    const expirySecond = String(expiryDate.getSeconds()).padStart(2, '0'); // เพิ่มวินาที
+    
+    const expiryStr = expiryDay + ' ' + thaiMonths[expiryMonth] + ' ' + expiryYear + 
+                     ' เวลา ' + expiryHour + ':' + expiryMinute + ':' + expirySecond + ' น.';
+    
+    // อัปเดตข้อมูลใน modal
+    const expiryDetailsContainer = document.getElementById('expiry-details-container');
+    if (expiryDetailsContainer) {
+        expiryDetailsContainer.innerHTML = `
+            <div class="mb-1">📅 <strong>วันหมดอายุ:</strong> ${expiryStr}</div>
+            <div class="mb-1">⏰ <strong>เหลืออีก:</strong> 1 นาที</div>
+            <div class="mb-2">🔒 <strong>การป้องกัน:</strong> ไฟล์มี JavaScript ตรวจสอบวันที่อัตโนมัติ</div>
+        `;
+    }
+    
+    // แสดง modal
+    const modal = new bootstrap.Modal(document.getElementById('downloadInfoModal'));
+    modal.show();
+}
+		// เริ่มดาวน์โหลดจริง
+		function startSecureDownload() {
+			if (!currentFileId) {
+				alert('ไม่พบข้อมูลไฟล์');
+				return;
+			}
+			
+			const btn = document.getElementById('start-download-btn');
+			const originalText = btn.innerHTML;
+			
+			// แสดง loading
+			btn.disabled = true;
+			btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>กำลังดาวน์โหลด...';
+			
+			// ดาวน์โหลดไฟล์
+			window.location.href = contextPath + '/download/secure/' + currentFileId;
+			
+			// รีเซ็ตปุ่มหลัง 3 วินาที
+			setTimeout(function() {
+				btn.disabled = false;
+				btn.innerHTML = originalText;
+				
+				// ปิด modal
+				const modal = bootstrap.Modal.getInstance(document.getElementById('downloadInfoModal'));
+				if (modal) {
+					modal.hide();
+				}
+				
+				// แสดงข้อความสำเร็จ
+				showSuccessToast('ดาวน์โหลดไฟล์สำเร็จ! ไฟล์มีอายุ 14 วัน');
+			}, 3000);
+		}
+
+		// แสดง toast notification
+		function showSuccessToast(message) {
+			// สร้าง toast element ถ้ายังไม่มี
+			let toastContainer = document.getElementById('toast-container');
+			if (!toastContainer) {
+				toastContainer = document.createElement('div');
+				toastContainer.id = 'toast-container';
+				toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+				toastContainer.style.zIndex = '11';
+				document.body.appendChild(toastContainer);
+			}
+			
+			const toastId = 'toast-' + Date.now();
+			const toastHTML = `
+				<div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+					<div class="toast-header bg-success text-white">
+						<i class="bi bi-check-circle-fill me-2"></i>
+						<strong class="me-auto">สำเร็จ</strong>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+					</div>
+					<div class="toast-body">
+						${message}
+					</div>
+				</div>
+			`;
+			
+			toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+			
+			const toastElement = document.getElementById(toastId);
+			const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+			toast.show();
+			
+			// ลบ toast หลังจากซ่อน
+			toastElement.addEventListener('hidden.bs.toast', function() {
+				toastElement.remove();
+			});
+		}
+
+		// เมื่อปิด PDF modal ให้ล้าง iframe
+		const pdfModal = document.getElementById('pdfViewerModal');
+		if (pdfModal) {
+			pdfModal.addEventListener('hidden.bs.modal', function() {
+				const pdfViewer = document.getElementById('pdf-viewer');
+				if (pdfViewer) {
+					pdfViewer.innerHTML = '';
+				}
+			});
+		}
+
+		// Log สำหรับ debug
+		console.log("✅ PDF Viewer with Secure Expiring Download initialized");
+		console.log("🔧 Context Path:", contextPath);
+		console.log("📅 Expiry Period: 14 days from download");
+	</script>
 </body>
 </html>

@@ -39,7 +39,7 @@
 				<div class="d-flex align-items-center gap-3 flex-wrap mb-3">
 					<!-- เลือกภาคเรียน -->
 					<div class="d-flex align-items-center gap-2">
-						<label for="semester" class="form-label fw-bold mb-0">ภาคเรียน:</label>
+						<label for="semester" class="form-label fw-bold mb-0">เลือกภาคเรียน:</label>
 						<select name="semester" id="semester" class="form-select w-auto"
 							onchange="this.form.submit()">
 							<c:forEach var="sem" items="${semesterList}">

@@ -31,7 +31,8 @@ public class HibernateConnection {
 							.addAnnotatedClass(DocumentFile.class)
 							.addAnnotatedClass(ProgrammingLang.class)
 							.addAnnotatedClass(ProjectLangDetailId.class)
-							.addAnnotatedClass(ProjectLangDetail.class);
+							.addAnnotatedClass(ProjectLangDetail.class)
+							.addAnnotatedClass(DownloadToken.class);
 		StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties());
 		sessionFactory = cfg.buildSessionFactory(ssrb.build());
 		return sessionFactory;

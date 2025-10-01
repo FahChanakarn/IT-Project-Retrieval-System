@@ -146,10 +146,6 @@
 				<ul class="mb-0">
 					<li><strong>ไฟล์ที่ดาวน์โหลดมีอายุ 14 วัน</strong> -
 						หลังจากนั้นจะไม่สามารถเปิดดูได้</li>
-					<li><strong>การแจ้งเตือน</strong> - เมื่อเหลือเวลาน้อยกว่า 3
-						วัน จะมีการแจ้งเตือนเมื่อเปิดไฟล์</li>
-					<li><strong>การป้องกัน</strong> -
-						ไฟล์มีระบบตรวจสอบวันที่อัตโนมัติด้วย JavaScript</li>
 					<li><strong>หมดอายุแล้ว</strong> -
 						ไฟล์จะปิดอัตโนมัติและแจ้งให้ดาวน์โหลดใหม่</li>
 				</ul>
@@ -208,14 +204,6 @@
 							<div class="expiry-details" id="expiry-details-container">
 								<!-- จะถูกเติมด้วย JavaScript -->
 							</div>
-							<div class="alert alert-info mt-2 mb-0">
-								<small> <i class="bi bi-info-circle"></i> <strong>วิธีการทำงาน:</strong><br>
-									• เมื่อเปิดไฟล์ PDF จะตรวจสอบวันที่อัตโนมัติ<br> •
-									ถ้าหมดอายุแล้วจะแสดงคำเตือนและปิดไฟล์ทันที<br> •
-									ถ้ายังไม่หมดอายุจะแสดงจำนวนวันที่เหลือ<br> •
-									ระบบตรวจสอบวันที่แบบเรียลไทม์ (รวมเวลา)
-								</small>
-							</div>
 						</div>
 
 						<div class="token-info mt-3">
@@ -264,51 +252,66 @@
 			modal.show();
 		}
 
-			// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
-			// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
-			function downloadSecurePDF(fileId, filename) {
-    console.log('🔐 Preparing secure download for file:', fileId, filename);
-    
-    currentFileId = fileId;
-    
-    // อัปเดตชื่อไฟล์ใน modal
-    const filenameDisplay = document.getElementById('download-filename');
-    if (filenameDisplay) {
-        filenameDisplay.textContent = filename || 'ไฟล์';
-    }
-    
-    // แสดงข้อมูลการหมดอายุ (ทดสอบ 1 นาที)
-    const today = new Date();
-    const expiryDate = new Date(today);
-    expiryDate.setMinutes(expiryDate.getMinutes() + 1); // เปลี่ยนเป็น 1 นาที
-    
-    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-    
-    const expiryDay = expiryDate.getDate();
-    const expiryMonth = expiryDate.getMonth();
-    const expiryYear = expiryDate.getFullYear() + 543;
-    const expiryHour = String(expiryDate.getHours()).padStart(2, '0');
-    const expiryMinute = String(expiryDate.getMinutes()).padStart(2, '0');
-    const expirySecond = String(expiryDate.getSeconds()).padStart(2, '0'); // เพิ่มวินาที
-    
-    const expiryStr = expiryDay + ' ' + thaiMonths[expiryMonth] + ' ' + expiryYear + 
-                     ' เวลา ' + expiryHour + ':' + expiryMinute + ':' + expirySecond + ' น.';
-    
-    // อัปเดตข้อมูลใน modal
-    const expiryDetailsContainer = document.getElementById('expiry-details-container');
-    if (expiryDetailsContainer) {
-        expiryDetailsContainer.innerHTML = `
-            <div class="mb-1">📅 <strong>วันหมดอายุ:</strong> ${expiryStr}</div>
-            <div class="mb-1">⏰ <strong>เหลืออีก:</strong> 1 นาที</div>
-            <div class="mb-2">🔒 <strong>การป้องกัน:</strong> ไฟล์มี JavaScript ตรวจสอบวันที่อัตโนมัติ</div>
-        `;
-    }
-    
-    // แสดง modal
-    const modal = new bootstrap.Modal(document.getElementById('downloadInfoModal'));
-    modal.show();
-}
+		// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
+		function downloadSecurePDF(fileId, filename) {
+		    console.log('🔐 Preparing secure download for file:', fileId, filename);
+		    
+		    currentFileId = fileId;
+		    
+		    // อัปเดตชื่อไฟล์ใน modal
+		    const filenameDisplay = document.getElementById('download-filename');
+		    if (filenameDisplay) {
+		        filenameDisplay.textContent = filename || 'ไฟล์';
+		    }
+		    
+		    // แสดงข้อมูลการหมดอายุ (ทดสอบ 1 นาที)
+		    const today = new Date();
+		    const expiryDate = new Date(today);
+		    expiryDate.setMinutes(expiryDate.getMinutes() + 1); // เปลี่ยนเป็น 1 นาที
+		    
+		    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+		                       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+		    
+		    const expiryDay = expiryDate.getDate();
+		    const expiryMonth = expiryDate.getMonth();
+		    const expiryYear = expiryDate.getFullYear() + 543;
+		    const expiryHour = String(expiryDate.getHours()).padStart(2, '0');
+		    const expiryMinute = String(expiryDate.getMinutes()).padStart(2, '0');
+		    const expirySecond = String(expiryDate.getSeconds()).padStart(2, '0');
+		    
+		    const expiryStr = expiryDay + ' ' + thaiMonths[expiryMonth] + ' ' + expiryYear + 
+		                     ' เวลา ' + expiryHour + ':' + expiryMinute + ':' + expirySecond + ' น.';
+		    
+		    // คำนวณเวลาที่เหลือ
+		    const diffMs = expiryDate - today;
+		    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+		    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+		    const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+		    
+		    let timeLeftStr = '';
+		    if (diffDays > 0) {
+		        timeLeftStr = diffDays + ' วัน ' + diffHours + ' ชั่วโมง ' + diffMinutes + ' นาที';
+		    } else if (diffHours > 0) {
+		        timeLeftStr = diffHours + ' ชั่วโมง ' + diffMinutes + ' นาที ' + diffSeconds + ' วินาที';
+		    } else if (diffMinutes > 0) {
+		        timeLeftStr = diffMinutes + ' นาที ' + diffSeconds + ' วินาที';
+		    } else {
+		        timeLeftStr = diffSeconds + ' วินาที';
+		    }
+		    
+		    // อัปเดตข้อมูลใน modal
+		    const expiryDetailsContainer = document.getElementById('expiry-details-container');
+		    if (expiryDetailsContainer) {
+		        expiryDetailsContainer.innerHTML = 
+		            '<div class="mb-1">📅 <strong>วันหมดอายุ:</strong> ' + expiryStr + '</div>' +
+		            '<div class="mb-1">⏰ <strong>เหลืออีก:</strong> ' + timeLeftStr + '</div>';
+		    }
+		    
+		    // แสดง modal
+		    const modal = new bootstrap.Modal(document.getElementById('downloadInfoModal'));
+		    modal.show();
+		}
 		// เริ่มดาวน์โหลดจริง
 		function startSecureDownload() {
 			if (!currentFileId) {

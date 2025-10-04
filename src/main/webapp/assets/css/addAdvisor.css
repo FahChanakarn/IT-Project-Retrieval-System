@@ -22,11 +22,11 @@ label {
 }
 
 .form-label {
-	margin-top: 15px;
+	margin-top: 0;
+	margin-bottom: 5px;
 }
 
 .form-control, .form-select {
-	max-width: 400px;
 	border-radius: 0.5rem;
 	box-shadow: none;
 	border: 1px solid #ced4da;
@@ -38,6 +38,39 @@ label {
 	box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
+/* ✅ กำหนดขนาดเฉพาะ dropdown คำนำหน้า */
+#prefix {
+	max-width: 150px;
+}
+
+/* ✅ กำหนดขนาด input อื่นๆ */
+#firstName, #lastName {
+	max-width: 200px;
+	width: 200px;
+}
+
+#email, #password {
+	max-width: 400px;
+}
+
+/* ✅ จัด layout แนวนอนสำหรับแถวชื่อ */
+.name-row {
+	display: flex !important;
+	gap: 8px;
+	align-items: flex-start;
+	margin-bottom: 1rem;
+}
+
+.name-row>div {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ระยะห่างระหว่างฟิลด์ */
+form>.mb-3 {
+	margin-bottom: 1rem !important;
+}
+
 .input-group {
 	max-width: 400px;
 }
@@ -47,7 +80,7 @@ label {
 }
 
 .btn-group {
-	margin-top: 30px;
+	margin-top: 20px;
 }
 
 .btn-group .btn {
@@ -61,4 +94,12 @@ label {
 
 .btn-group .btn:hover {
 	transform: translateY(-1px);
+}
+
+.error-message {
+	color: red;
+	font-size: 0.875rem;
+	margin-top: 0.25rem;
+	display: block;
+	min-height: 1rem;
 }

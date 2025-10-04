@@ -1,13 +1,13 @@
 @charset "UTF-8";
 
-@import
-	url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
 
 body {
 	font-family: 'Kanit', sans-serif;
 	margin: 0;
 	padding-top: 80px;
 	overflow-x: hidden;
+	background-color: #ffffff;
 }
 
 .main-title {
@@ -22,27 +22,33 @@ body {
 	margin-top: 30px;
 }
 
+.search-container h3 {
+	text-align: center;
+	color: #2c3e50;
+	font-weight: 600;
+}
+
 .filter-title {
 	font-size: 0.95rem;
 	font-weight: 600;
-	color: #495057;
+	color: #212529;
 	margin-bottom: 12px;
-	padding-left: 8px;
-	border-left: 3px solid #aa1818;
+	padding-left: 10px;
+	border-left: 3px solid #4a90e2;
 }
 
 .filter-section {
 	background-color: #ffffff;
-	padding: 20px;
-	margin-bottom: 20px;
-	border-radius: 10px;
+	padding: 18px 20px;
+	margin-bottom: 15px;
+	border-radius: 8px;
 	border: 1px solid #e9ecef;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-	transition: all 0.3s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	transition: all 0.2s ease;
 }
 
 .filter-section:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	border-color: #dee2e6;
 }
 
@@ -87,9 +93,17 @@ body {
 .project-card .card-title {
 	font-size: 17px;
 	font-weight: 600;
-	color: #2c3e50;
 	margin-bottom: 8px;
 	line-height: 1.4;
+}
+
+.project-card .card-title:first-of-type {
+	color: #2c3e50;
+}
+
+.project-card .card-title:nth-of-type(2) {
+	color: #5a6c7d;
+	font-size: 16px;
 }
 
 .project-card .card-text {
@@ -132,59 +146,73 @@ body {
 	color: #999;
 }
 
+/* ===== Sidebar Header ===== */
 .filter-heading-main {
-	font-size: 1.1rem;
+	font-size: 1.05rem;
 	font-weight: 600;
-	color: #aa1818;
+	color: #ffffff;
+	background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+	margin: -25px -20px 20px -20px;
+	padding: 16px 20px;
+	border-radius: 10px 10px 0 0;
 	margin-bottom: 20px;
-	padding-bottom: 12px;
-	border-bottom: 2px solid #aa1818;
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
 }
 
 .filter-heading-main i {
-	font-size: 1.2rem;
+	font-size: 1.1rem;
+	color: #ffffff;
 }
 
 /* ===== Sidebar Styling ===== */
-.row>.col-md-3:first-child {
-	background-color: #f8f9fa;
+.row > .col-md-3:first-child {
+	background: linear-gradient(135deg, #f8fafc 0%, #eef5fb 100%);
 	padding: 25px 20px;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	border-radius: 10px;
+	box-shadow: 0 3px 12px rgba(74, 144, 226, 0.15);
+	border: 1px solid #d4e4f7;
 	height: fit-content;
 	position: sticky;
 	top: 90px;
+	max-height: calc(100vh - 110px);
+	overflow-y: auto;
 }
 
 /* Form Controls */
 .filter-section .form-select {
 	border: 1px solid #ced4da;
-	border-radius: 8px;
+	border-radius: 6px;
 	padding: 10px 12px;
 	font-size: 0.9rem;
-	transition: all 0.3s ease;
+	transition: all 0.2s ease;
 	background-color: #ffffff;
+	cursor: pointer;
+	color: #212529;
+}
+
+.filter-section .form-select:hover {
+	border-color: #4a90e2;
 }
 
 .filter-section .form-select:focus {
-	border-color: #aa1818;
-	box-shadow: 0 0 0 0.2rem rgba(170, 24, 24, 0.15);
+	border-color: #4a90e2;
+	box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.2);
 	outline: none;
 }
 
 /* Checkboxes & Radio */
 .filter-section .form-check {
 	padding: 8px 12px;
-	margin-bottom: 8px;
+	margin-bottom: 6px;
 	border-radius: 6px;
-	transition: background-color 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .filter-section .form-check:hover {
-	background-color: #f8f9fa;
+	background-color: #e8f2fb;
 }
 
 .filter-section .form-check-input {
@@ -196,19 +224,23 @@ body {
 	transition: all 0.2s ease;
 }
 
+.filter-section .form-check-input:hover {
+	border-color: #4a90e2;
+}
+
 .filter-section .form-check-input:checked {
-	background-color: #aa1818;
-	border-color: #aa1818;
+	background-color: #4a90e2;
+	border-color: #4a90e2;
 }
 
 .filter-section .form-check-input:focus {
-	border-color: #aa1818;
-	box-shadow: 0 0 0 0.2rem rgba(170, 24, 24, 0.15);
+	border-color: #4a90e2;
+	box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.2);
 }
 
 .filter-section .form-check-label {
 	font-size: 0.9rem;
-	color: #495057;
+	color: #212529;
 	cursor: pointer;
 	margin-left: 8px;
 	user-select: none;
@@ -217,37 +249,41 @@ body {
 /* Year Range Selects */
 .filter-section .row .col-6 .form-select {
 	font-size: 0.85rem;
+	padding: 8px 10px;
 }
 
 /* Scrollbar สำหรับ Sidebar */
-.row>.col-md-3:first-child::-webkit-scrollbar {
+.row > .col-md-3:first-child::-webkit-scrollbar {
 	width: 6px;
 }
 
-.row>.col-md-3:first-child::-webkit-scrollbar-track {
-	background: #f1f3f5;
+.row > .col-md-3:first-child::-webkit-scrollbar-track {
+	background: #e8f2fb;
 	border-radius: 10px;
 }
 
-.row>.col-md-3:first-child::-webkit-scrollbar-thumb {
-	background: #aa1818;
+.row > .col-md-3:first-child::-webkit-scrollbar-thumb {
+	background: #4a90e2;
 	border-radius: 10px;
 }
 
-.row>.col-md-3:first-child::-webkit-scrollbar-thumb:hover {
-	background: #8a1414;
+.row > .col-md-3:first-child::-webkit-scrollbar-thumb:hover {
+	background: #357abd;
 }
 
 /* Responsive */
-@media ( max-width : 768px) {
-	.row>.col-md-3:first-child {
+@media (max-width: 768px) {
+	.row > .col-md-3:first-child {
 		margin-bottom: 30px;
 		position: relative;
 		top: 0;
+		max-height: none;
 	}
+	
 	.filter-section {
 		padding: 15px;
 	}
+	
 	.filter-heading-main {
 		font-size: 1rem;
 	}

@@ -36,7 +36,7 @@
 			<div class="name-row">
 				<div>
 					<label class="form-label">คำนำหน้า :</label> <select id="prefix"
-						name="adv_prefix" class="form-select" required>
+						name="adv_prefix" class="form-select">
 						<option value="">-- เลือก --</option>
 						<option value="อ.ดร.">อ.ดร.</option>
 						<option value="ผศ.อ.">ผศ.อ.</option>

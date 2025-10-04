@@ -48,26 +48,26 @@
 
 				<div>
 					<label class="form-label">ชื่อ :</label> <input type="text"
-						id="firstName" name="adv_firstName" class="form-control" required>
+						id="firstName" name="adv_firstName" class="form-control">
 					<span id="firstNameError" class="error-message"></span>
 				</div>
 
 				<div>
 					<label class="form-label">นามสกุล :</label> <input type="text"
-						id="lastName" name="adv_lastName" class="form-control" required>
+						id="lastName" name="adv_lastName" class="form-control">
 					<span id="lastNameError" class="error-message"></span>
 				</div>
 			</div>
 
 			<div class="mb-3">
 				<label class="form-label">Email :</label> <input type="email"
-					id="email" name="adv_email" class="form-control" required>
+					id="email" name="adv_email" class="form-control">
 				<span id="emailError" class="error-message"></span>
 			</div>
 
 			<div class="mb-3">
 				<label class="form-label">รหัสผ่าน :</label> <input type="password"
-					id="password" name="adv_password" class="form-control" required>
+					id="password" name="adv_password" class="form-control">
 				<span id="passwordError" class="error-message"></span>
 			</div>
 

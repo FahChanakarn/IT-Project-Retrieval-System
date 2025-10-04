@@ -1,8 +1,9 @@
 package com.springmvc.controller;
 
 import java.util.Arrays;
-
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,9 +13,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.ProgrammingLangManager;
 import com.springmvc.manager.ProjectManager;
-
 import com.springmvc.model.Project;
 import com.springmvc.model.Student496;
+import com.springmvc.model.ProgrammingLang;
+import com.springmvc.model.ProjectLangDetail;
 
 @Controller
 public class EditAbstractController {
@@ -30,7 +32,6 @@ public class EditAbstractController {
 		int projectId = student.getProject().getProjectId();
 		ProjectManager projectManager = new ProjectManager();
 
-		// ใช้ method ใหม่ที่ fetch projectLangDetails, student496s และ documentFiles
 		Project project = projectManager.findProjectForEditAbstract(projectId);
 
 		if (project == null) {
@@ -49,7 +50,22 @@ public class EditAbstractController {
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
 
-		mav.addObject("programmingLangs", new ProgrammingLangManager().getAllProgrammingLanguages());
+		ProgrammingLangManager langManager = new ProgrammingLangManager();
+
+		mav.addObject("programmingLangs", langManager.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING));
+		mav.addObject("typeDBs", langManager.getLanguagesByType(ProgrammingLang.LangType.DBMS));
+
+		// หา DB ที่ถูกเลือกไว้แล้ว (DBMS)
+		Integer selectedDBId = null;
+		if (project.getProjectLangDetails() != null) {
+			for (ProjectLangDetail detail : project.getProjectLangDetails()) {
+				if (detail.getProgrammingLang().getLangType() == ProgrammingLang.LangType.DBMS) {
+					selectedDBId = detail.getProgrammingLang().getLangId();
+					break;
+				}
+			}
+		}
+		mav.addObject("selectedDBId", selectedDBId);
 
 		return mav;
 	}
@@ -71,18 +87,38 @@ public class EditAbstractController {
 
 		int projectId = student.getProject().getProjectId();
 		ProjectManager projectManager = new ProjectManager();
+		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
 
-		// ใช้ method ใหม่
 		Project project = projectManager.findProjectForEditAbstract(projectId);
 
-		// อัปเดตข้อมูลพื้นฐาน
 		project.setProj_NameTh(projNameTh);
 		project.setProj_NameEn(projNameEn);
 		project.setProjectType(projectType);
 
+		// ✅ เก็บ langId ที่ถูกเลือกไว้
+		Set<Integer> selectedLangIds = new HashSet<>();
 
-		// อัปเดต languages (Many-to-Many) โดยไม่ลบของเก่า
-		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
+		// เพิ่ม DBMS ที่เลือก
+		if (typeDBId > 0) {
+			selectedLangIds.add(typeDBId);
+		}
+
+		// เพิ่มภาษาโปรแกรมที่เลือก
+		if (languageIds != null) {
+			for (int langId : languageIds) {
+				selectedLangIds.add(langId);
+			}
+		}
+
+		// ✅ ลบภาษาที่ไม่ได้เลือก (เฉพาะ PROGRAMMING และ DBMS ที่อยู่ในระบบ)
+		programmingLangManager.removeUnselectedLanguages(projectId, selectedLangIds);
+
+		// ✅ เพิ่มภาษาที่เลือก (ถ้ายังไม่มี)
+		if (typeDBId > 0) {
+			if (!programmingLangManager.existsProjectLangDetail(projectId, typeDBId)) {
+				programmingLangManager.createProjectLangDetailAndSave(project, typeDBId);
+			}
+		}
 
 		if (languageIds != null) {
 			for (int langId : languageIds) {
@@ -103,23 +139,38 @@ public class EditAbstractController {
 			}
 		}
 
-		// อัปเดต abstract และ keyword
 		project.setAbstractTh(abstractTh);
 		project.setAbstractEn(abstractEn);
 		project.setKeywordTh(keywordTh);
 		project.setKeywordEn(keywordEn);
 
-		// บันทึก Project
 		projectManager.updateProject(project);
 
-		// โหลดกลับไปยัง editAbstract
+		// โหลด project ใหม่
+		project = projectManager.findProjectForEditAbstract(projectId);
+
 		ModelAndView mav = new ModelAndView("editAbstract");
 		mav.addObject("project", project);
 		mav.addObject("successMessage", "บันทึกข้อมูลเรียบร้อยแล้ว");
 
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
-		mav.addObject("programmingLangs", programmingLangManager.getAllProgrammingLanguages());
+
+		mav.addObject("programmingLangs",
+				programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING));
+		mav.addObject("typeDBs", programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS));
+
+		// ส่ง selectedDBId กลับไป
+		Integer selectedDBId = null;
+		if (project.getProjectLangDetails() != null) {
+			for (ProjectLangDetail detail : project.getProjectLangDetails()) {
+				if (detail.getProgrammingLang().getLangType() == ProgrammingLang.LangType.DBMS) {
+					selectedDBId = detail.getProgrammingLang().getLangId();
+					break;
+				}
+			}
+		}
+		mav.addObject("selectedDBId", selectedDBId);
 
 		return mav;
 	}

@@ -16,8 +16,7 @@
 			<div class="col text-center">
 				<div class="header-title mb-0">
 					<div class="sliding-text">
-						<span>ระบบสืบค้นโครงงานสารสนเทศ</span> <span>Information
-							Technology Project Retrieval System</span>
+						<span>ระบบสืบค้นโครงงานสารสนเทศ</span> <span>IT Project Retrieval System</span>
 					</div>
 				</div>
 			</div>
@@ -117,7 +116,6 @@
 									class="bi bi-person fs-5 me-2"></i>
 									${sessionScope.admin.adv_prefix}
 									${sessionScope.admin.adv_firstName}
-									${sessionScope.admin.adv_lastName}
 							</a>
 								<ul class="dropdown-menu dropdown-menu-end">
 									<li><a class="dropdown-item"

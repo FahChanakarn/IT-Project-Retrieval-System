@@ -8,11 +8,12 @@ body {
 
 /* หัวข้อเส้นเขียวด้านซ้าย */
 .path-title {
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	font-weight: bold;
-	color: #aa1818;
+	color: #056f00;
 	margin-bottom: 20px;
 	padding-bottom: 10px;
+	padding-top: 10px;
 	border-bottom: 2px solid #ccc; /* เปลี่ยนให้เหมือน section-title */
 	display: block; /* ให้เส้นยาวเต็ม */
 	width: 100%;

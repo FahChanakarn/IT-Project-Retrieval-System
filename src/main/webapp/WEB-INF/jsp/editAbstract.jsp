@@ -30,7 +30,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-4">
-		<div class="path-title">${project.proj_NameTh}/แก้ไขบทคัดย่อ</div>
+		<div class="path-title">แก้ไขบทคัดย่อ</div>
 
 		<form action="${pageContext.request.contextPath}/updateAbstract"
 			method="post">
@@ -91,8 +91,9 @@
 					class="form-select" name="typeDBId">
 					<option value="" disabled selected>เลือกซอฟต์แวร์ฐานข้อมูล</option>
 					<c:forEach var="db" items="${typeDBs}">
-						<option value="${db.typeId}"
-							${db.typeId == project.typeDB.typeId ? 'selected' : ''}>${db.softwareName}</option>
+						<option value="${db.langId}"
+							${db.langId == selectedDBId ? 'selected' : ''}>
+							${db.langName}</option>
 					</c:forEach>
 				</select>
 				<div class="text-danger small error-msg"></div>
@@ -114,13 +115,12 @@
 							class="form-check-label">${lang.langName}</label>
 					</div>
 				</c:forEach>
-
+				<div class="text-danger small error-msg" id="languageError"></div>
 				<div class="mt-2">
 					<label class="form-label">ภาษาอื่น ๆ:</label> <input type="text"
 						class="form-control" name="otherLanguages"
 						placeholder="ตัวอย่าง: C#, C++, Swift, PHP">
 				</div>
-				<div class="text-danger small error-msg" id="languageError"></div>
 			</div>
 
 			<!-- บทคัดย่อ -->

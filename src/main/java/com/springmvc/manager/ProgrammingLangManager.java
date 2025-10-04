@@ -2,6 +2,7 @@ package com.springmvc.manager;
 
 import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.ProgrammingLang;
+import com.springmvc.model.ProgrammingLang.LangType;
 import com.springmvc.model.Project;
 import com.springmvc.model.ProjectLangDetail;
 import com.springmvc.model.ProjectLangDetailId;
@@ -12,10 +13,10 @@ import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ProgrammingLangManager {
 
-	// ดึงข้อมูลภาษาทั้งหมด
 	public List<ProgrammingLang> getAllProgrammingLanguages() {
 		Session session = null;
 		List<ProgrammingLang> langs = null;
@@ -28,33 +29,35 @@ public class ProgrammingLangManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (session != null)
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
 		}
 		return langs;
 	}
 
-	public List<ProgrammingLang> getLanguagesByType(ProgrammingLang.LangType type) {
+	public List<ProgrammingLang> getLanguagesByType(LangType langType) {
+		List<ProgrammingLang> languages = new ArrayList<>();
 		Session session = null;
-		List<ProgrammingLang> langs = new ArrayList<>();
+
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			if (type != null) {
-				langs = session.createQuery("FROM ProgrammingLang WHERE langType = :type", ProgrammingLang.class)
-						.setParameter("type", type).getResultList();
-			} else {
-				langs = session.createQuery("FROM ProgrammingLang", ProgrammingLang.class).getResultList();
-			}
+			String hql = "FROM ProgrammingLang WHERE langType = :type ORDER BY langName ASC";
+			languages = session.createQuery(hql, ProgrammingLang.class).setParameter("type", langType).getResultList();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		} finally {
-			if (session != null && session.isOpen())
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
 		}
-		return langs;
+
+		return languages;
 	}
 
-	// ดึงข้อมูลภาษา ตาม id
 	public ProgrammingLang findProgrammingLangById(int id) {
 		Session session = null;
 		ProgrammingLang lang = null;
@@ -65,13 +68,13 @@ public class ProgrammingLangManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (session != null)
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
 		}
 		return lang;
 	}
 
-	// สร้าง ProjectLangDetail ใหม่ (สำหรับ Many-to-Many)
 	public ProjectLangDetail createProjectLangDetail(Project project, int langId) {
 		ProgrammingLang lang = findProgrammingLangById(langId);
 		if (lang == null)
@@ -83,12 +86,11 @@ public class ProgrammingLangManager {
 		detail.setId(id);
 		detail.setProject(project);
 		detail.setProgrammingLang(lang);
-		detail.setDescription(""); // ถ้าอยากใส่รายละเอียดเพิ่ม สามารถแก้ไขได้
+		detail.setDescription("");
 
 		return detail;
 	}
 
-	// ✅ เพิ่มภาษาที่กรอกเอง (otherLanguages) เข้า Project
 	public void addOtherLanguageToProject(Project project, String langName) {
 		Session session = null;
 		Transaction tx = null;
@@ -97,68 +99,77 @@ public class ProgrammingLangManager {
 			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 
-			// ตรวจสอบว่าภาษามีอยู่แล้วในฐานข้อมูลหรือยัง
 			Query<ProgrammingLang> query = session.createQuery("FROM ProgrammingLang WHERE langName = :name",
 					ProgrammingLang.class);
 			query.setParameter("name", langName);
 			ProgrammingLang lang = query.uniqueResult();
 
 			if (lang == null) {
-				// สร้าง ProgrammingLang ใหม่
 				lang = new ProgrammingLang();
 				lang.setLangName(langName);
 				lang.setLangType(ProgrammingLang.LangType.PROGRAMMING);
 				session.save(lang);
+				session.flush();
 			}
 
-			// สร้าง ProjectLangDetail และเพิ่มเข้า project
 			ProjectLangDetailId id = new ProjectLangDetailId(project.getProjectId(), lang.getLangId());
-			ProjectLangDetail detail = new ProjectLangDetail();
-			detail.setId(id);
-			detail.setProject(project);
-			detail.setProgrammingLang(lang);
-			detail.setDescription("");
+			ProjectLangDetail existing = session.get(ProjectLangDetail.class, id);
 
-			project.getProjectLangDetails().add(detail);
+			if (existing == null) {
+				ProjectLangDetail detail = new ProjectLangDetail();
+				detail.setId(id);
+				detail.setProject(project);
+				detail.setProgrammingLang(lang);
+				detail.setDescription("");
+				session.save(detail);
+			}
 
-			session.update(project);
 			tx.commit();
 		} catch (Exception e) {
-			if (tx != null)
+			if (tx != null && tx.isActive()) {
 				tx.rollback();
+			}
 			e.printStackTrace();
 		} finally {
-			if (session != null)
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
 		}
 	}
 
-	// ตรวจสอบว่าภาษาใน project ถูกบันทึกแล้วหรือยัง
 	public boolean existsProjectLangDetail(int projectId, int langId) {
 		Session session = null;
 		boolean exists = false;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
-			Query<ProjectLangDetail> query = session.createQuery(
-					"FROM ProjectLangDetail WHERE id.projectId = :pid AND id.langId = :lid", ProjectLangDetail.class);
+
+			Query<Long> query = session.createQuery(
+					"SELECT COUNT(*) FROM ProjectLangDetail WHERE id.projectId = :pid AND id.langId = :lid",
+					Long.class);
 			query.setParameter("pid", projectId);
 			query.setParameter("lid", langId);
-			exists = query.uniqueResult() != null;
+
+			Long count = query.uniqueResult();
+			exists = (count != null && count > 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (session != null)
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
 		}
 		return exists;
 	}
 
-	// สร้าง ProjectLangDetail ใหม่และบันทึกลง DB
 	public void createProjectLangDetailAndSave(Project project, int langId) {
 		Session session = null;
 		Transaction tx = null;
 		try {
+			if (existsProjectLangDetail(project.getProjectId(), langId)) {
+				return;
+			}
+
 			ProgrammingLang lang = findProgrammingLangById(langId);
 			if (lang == null)
 				return;
@@ -175,19 +186,55 @@ public class ProgrammingLangManager {
 			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 
-			session.save(detail); // บันทึกลง DB
+			session.save(detail);
 			tx.commit();
 
-			// เพิ่มเข้า project object ด้วย (เพื่อใช้ JSP)
-			project.getProjectLangDetails().add(detail);
-
 		} catch (Exception e) {
-			if (tx != null)
+			if (tx != null && tx.isActive()) {
 				tx.rollback();
+			}
 			e.printStackTrace();
 		} finally {
-			if (session != null)
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
+		}
+	}
+
+	// ✅ Method ใหม่: ลบภาษาที่ไม่ได้เลือก
+	public void removeUnselectedLanguages(int projectId, Set<Integer> selectedLangIds) {
+		Session session = null;
+		Transaction tx = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			tx = session.beginTransaction();
+
+			// ดึงภาษาทั้งหมดที่ project นี้มี (เฉพาะ PROGRAMMING และ DBMS)
+			String hql = "FROM ProjectLangDetail pld " + "WHERE pld.id.projectId = :projectId "
+					+ "AND pld.programmingLang.langType IN ('PROGRAMMING', 'DBMS')";
+
+			List<ProjectLangDetail> allDetails = session.createQuery(hql, ProjectLangDetail.class)
+					.setParameter("projectId", projectId).getResultList();
+
+			// ลบภาษาที่ไม่ได้อยู่ใน selectedLangIds
+			for (ProjectLangDetail detail : allDetails) {
+				int langId = detail.getProgrammingLang().getLangId();
+				if (!selectedLangIds.contains(langId)) {
+					session.delete(detail);
+				}
+			}
+
+			tx.commit();
+		} catch (Exception e) {
+			if (tx != null && tx.isActive()) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 	}
 }

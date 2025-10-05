@@ -62,16 +62,18 @@
 			<div class="mb-3">
 				<label class="form-label fw-bold">ชื่อโครงงานภาษาไทย :</label> <input
 					type="text" class="form-control" name="projNameTh"
-					value="${project.proj_NameTh}">
-				<div class="text-danger small error-msg"></div>
+					value="${project.proj_NameTh != null ? project.proj_NameTh : ''}"
+					placeholder="กรอกชื่อโครงงานภาษาไทย">
+				<div class="text-danger small error-msg" id="projNameThError"></div>
 			</div>
 
 			<!-- ชื่อโครงงานภาษาอังกฤษ -->
 			<div class="mb-3">
 				<label class="form-label fw-bold">ชื่อโครงงานภาษาอังกฤษ :</label> <input
 					type="text" class="form-control" name="projNameEn"
-					value="${project.proj_NameEn}">
-				<div class="text-danger small error-msg"></div>
+					value="${project.proj_NameEn != null ? project.proj_NameEn : ''}"
+					placeholder="กรอกชื่อโครงงานภาษาอังกฤษ">
+				<div class="text-danger small error-msg" id="projNameEnError"></div>
 			</div>
 
 			<!-- ประเภทโครงงาน -->
@@ -96,7 +98,7 @@
 							${db.langName}</option>
 					</c:forEach>
 				</select>
-				<div class="text-danger small error-msg"></div>
+				<div class="text-danger small error-msg" id="typeDBIdError"></div>
 			</div>
 
 			<!-- ภาษาที่ใช้ในการพัฒนา -->
@@ -120,6 +122,7 @@
 					<label class="form-label">ภาษาอื่น ๆ:</label> <input type="text"
 						class="form-control" name="otherLanguages"
 						placeholder="ตัวอย่าง: C#, C++, Swift, PHP">
+					<div class="text-danger small error-msg" id="otherLanguagesError"></div>
 				</div>
 			</div>
 
@@ -129,13 +132,13 @@
 					href="${pageContext.request.contextPath}/assets/files/sample_abstract.pdf"
 					target="_blank"> ตัวอย่างการเขียนบทคัดย่อและคำสำคัญ (PDF) </a>
 				<textarea id="thaiAbstract" class="form-control" name="abstractTh"
-					rows="5">${project.abstractTh}</textarea>
+					rows="5">${project.abstractTh != null ? project.abstractTh : ''}</textarea>
 				<div class="text-danger small error-msg" id="thaiAbstractError"></div>
 
 				<label class="form-label fw-bold mt-3">บทคัดย่อ (ภาษาอังกฤษ)
 					:</label>
 				<textarea id="engAbstract" class="form-control" name="abstractEn"
-					rows="5">${project.abstractEn}</textarea>
+					rows="5">${project.abstractEn != null ? project.abstractEn : ''}</textarea>
 				<div class="text-danger small error-msg" id="engAbstractError"></div>
 			</div>
 
@@ -143,15 +146,17 @@
 			<div class="mb-3">
 				<label class="form-label fw-bold">คำสำคัญ (ภาษาไทย) :</label> <input
 					type="text" class="form-control" name="keywordTh"
-					value="${project.keywordTh}">
-				<div class="text-danger small error-msg"></div>
+					value="${project.keywordTh != null ? project.keywordTh : ''}"
+					placeholder="กรอกคำสำคัญภาษาไทย">
+				<div class="text-danger small error-msg" id="keywordThError"></div>
 			</div>
 
 			<div class="mb-3">
 				<label class="form-label fw-bold">คำสำคัญ (ภาษาอังกฤษ) :</label> <input
 					type="text" class="form-control" name="keywordEn"
-					value="${project.keywordEn}">
-				<div class="text-danger small error-msg"></div>
+					value="${project.keywordEn != null ? project.keywordEn : ''}"
+					placeholder="กรอกคำสำคัญภาษาอังกฤษ">
+				<div class="text-danger small error-msg" id="keywordEnError"></div>
 			</div>
 
 			<!-- ปุ่ม -->
@@ -186,22 +191,37 @@ document.querySelector('form').addEventListener('submit', function(e) {
     // ชื่อโครงงานภาษาไทย
     const projNameTh = form.projNameTh.value.trim();
     const regexTh = /^[ก-๙A-Za-z0-9(),\s]+$/;
-    if (!projNameTh) { form.projNameTh.nextElementSibling.textContent = "*กรุณากรอกชื่อโครงงานภาษาไทย"; valid = false; }
-    else if (!regexTh.test(projNameTh)) { form.projNameTh.nextElementSibling.textContent = "*ชื่อโครงงานภาษาไทย สามารถเป็นภาษาไทย อังกฤษ และตัวเลขได้ อักขระพิเศษ () , เท่านั้น"; valid = false; }
+    if (!projNameTh) { 
+        document.getElementById('projNameThError').textContent = "*กรุณากรอกชื่อโครงงานภาษาไทย"; 
+        valid = false; 
+    }
+    else if (!regexTh.test(projNameTh)) { 
+        document.getElementById('projNameThError').textContent = "*ชื่อโครงงานภาษาไทย สามารถเป็นภาษาไทย อังกฤษ และตัวเลขได้ อักขระพิเศษ () , เท่านั้น"; 
+        valid = false; 
+    }
 
     // ชื่อโครงงานภาษาอังกฤษ
     const projNameEn = form.projNameEn.value.trim();
     const regexEn = /^[A-Za-z0-9(),.\s]+$/;
-    if (!projNameEn) { form.projNameEn.nextElementSibling.textContent = "*กรุณากรอกชื่อโครงงานภาษาอังกฤษ"; valid = false; }
-    else if (!regexEn.test(projNameEn)) { form.projNameEn.nextElementSibling.textContent = "*ชื่อโครงงานภาษาอังกฤษ สามารถเป็นอังกฤษ และตัวเลขได้ อักขระพิเศษ () , . เท่านั้น"; valid = false; }
+    if (!projNameEn) { 
+        document.getElementById('projNameEnError').textContent = "*กรุณากรอกชื่อโครงงานภาษาอังกฤษ"; 
+        valid = false; 
+    }
+    else if (!regexEn.test(projNameEn)) { 
+        document.getElementById('projNameEnError').textContent = "*ชื่อโครงงานภาษาอังกฤษ สามารถเป็นอังกฤษ และตัวเลขได้ อักขระพิเศษ () , . เท่านั้น"; 
+        valid = false; 
+    }
 
     // ซอฟต์แวร์ฐานข้อมูล
-    if (!form.typeDBId.value) { form.typeDBId.nextElementSibling.textContent = "*กรุณาเลือกซอฟต์แวร์ฐานข้อมูล"; valid = false; }
+    if (!form.typeDBId.value) { 
+        document.getElementById('typeDBIdError').textContent = "*กรุณาเลือกซอฟต์แวร์ฐานข้อมูล"; 
+        valid = false; 
+    }
 
     const languages = form.querySelectorAll('input[name="languageIds"]:checked');
     const otherLang = form.otherLanguages.value.trim();
     let languageError = document.getElementById('languageError');
-    languageError.textContent = ""; // เคลียร์ก่อน validate
+    languageError.textContent = "";
 
     // ภาษาที่ใช้ในการพัฒนา
     if (languages.length === 0) {
@@ -216,7 +236,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
         }
     }
 
- // บทคัดย่อ
+    // บทคัดย่อ
     const abstractTh = thaiEditor.getData().trim();
     if (abstractTh.length < 500 || abstractTh.length > 1500) { 
         document.getElementById('thaiAbstractError').textContent = "*บทคัดย่อภาษาไทย ต้องมีความยาว 500–1000 ตัวอักษร"; 
@@ -231,9 +251,16 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
     // คำสำคัญ
     const keywordTh = form.keywordTh.value.trim();
-    if (!keywordTh) { form.keywordTh.nextElementSibling.textContent = "*กรุณากรอกคำสำคัญภาษาไทย"; valid = false; }
+    if (!keywordTh) { 
+        document.getElementById('keywordThError').textContent = "*กรุณากรอกคำสำคัญภาษาไทย"; 
+        valid = false; 
+    }
+    
     const keywordEn = form.keywordEn.value.trim();
-    if (!keywordEn) { form.keywordEn.nextElementSibling.textContent = "*กรุณากรอกคำสำคัญภาษาอังกฤษ"; valid = false; }
+    if (!keywordEn) { 
+        document.getElementById('keywordEnError').textContent = "*กรุณากรอกคำสำคัญภาษาอังกฤษ"; 
+        valid = false; 
+    }
 
     if (valid) {
         Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลสำเร็จ', showConfirmButton: false, timer: 1500 })

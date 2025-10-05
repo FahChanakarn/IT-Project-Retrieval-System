@@ -128,7 +128,7 @@ public class ImportStudentManager {
 						// สร้าง Project ใหม่
 						project = new Project();
 						project.setProj_NameTh(projectNameTh);
-						project.setProj_NameEn("-");
+						project.setProj_NameEn(null);
 						project.setProjectType(projectType);
 						project.setSemester(semester);
 						project.setApproveStatus("0");

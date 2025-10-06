@@ -97,7 +97,7 @@
 										<c:otherwise>
 											<button type="submit" class="btn btn-success btn-sm"
 												onclick="return confirm('คุณต้องการอนุมัติโครงงานนี้หรือไม่?')">
-												<i class="fas fa-check-circle"></i> อนุมัติ
+												<i class="fas fa-check-circle"></i> รอดำเนินการอนุมัติ
 											</button>
 										</c:otherwise>
 									</c:choose>

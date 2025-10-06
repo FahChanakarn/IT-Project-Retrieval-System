@@ -12,39 +12,53 @@
 	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
-	rel="stylesheet">
-<!-- CSS -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/listProjectStudent.css">
+<link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body style="font-family: 'Kanit', sans-serif;">
+<body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4">
-		<h5>รายการโครงงานนักศึกษา</h5>
+	<div class="container mt-5">
+		<h5 class="fw-bold text-danger">จัดการโครงงาน /
+			รายการโครงงานทั้งหมด</h5>
 		<hr>
 
-		<form method="get"
-			action="${pageContext.request.contextPath}${baseUrl}/myAdviseeProjects"
-			class="mb-4">
-			<div class="d-flex align-items-center gap-2">
-				<label for="semester" class="form-label mb-0">ภาคเรียน:</label> <select
-					name="semester" id="semester"
-					class="form-select custom-semester-select"
-					onchange="this.form.submit()">
-					<option value="">เลือกภาคเรียน</option>
-					<c:forEach var="sem" items="${semesterList}">
-						<option value="${sem}"
-							<c:if test="${sem == selectedSemester}">selected</c:if>>${sem}</option>
-					</c:forEach>
-				</select>
+		<!-- แสดง Alert Messages -->
+		<c:if test="${not empty param.success}">
+			<div class="alert alert-success alert-dismissible fade show"
+				role="alert">
+				${param.success}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
-		</form>
+		</c:if>
+
+		<c:if test="${not empty param.error}">
+			<div class="alert alert-danger alert-dismissible fade show"
+				role="alert">
+				${param.error}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		</c:if>
+
+		<div class="mb-3"
+			style="display: flex; align-items: center; gap: 8px;">
+			<label class="form-label fw-bold">ภาคเรียน :</label> <select
+				class="form-select custom-semester-select"
+				onchange="location = '?semester=' + this.value;">
+				<c:forEach var="sem" items="${semesterList}">
+					<option value="${sem}" ${sem == selectedSemester ? 'selected' : ''}>${sem}</option>
+				</c:forEach>
+			</select>
+		</div>
 
 		<c:choose>
 			<c:when test="${empty projects}">
@@ -52,15 +66,14 @@
 					ไม่พบข้อมูลโครงงานสำหรับภาคเรียนที่เลือก</div>
 			</c:when>
 			<c:otherwise>
-				<!-- ตารางข้อมูลนักศึกษา -->
-				<table class="table table-bordered">
-					<thead class="table-primary">
+				<table class="table table-bordered align-middle text-center">
+					<thead class="table-light">
 						<tr>
-							<th>รหัสนักศึกษา</th>
-							<th>ชื่อ - สกุล</th>
-							<th>หัวข้อโครงงาน</th>
-							<th>รายละเอียด</th>
-							<th>อนุมัติการอัปโหลด</th>
+							<th style="width: 10%;">รหัสนักศึกษา</th>
+							<th style="width: 20%;">ชื่อ - สกุล</th>
+							<th style="width: 30%;">หัวข้อโครงงาน</th>
+							<th style="width: 15%;">รายละเอียด</th>
+							<th style="width: 15%;">อนุมัติการอัปโหลด</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -69,17 +82,21 @@
 								<td>${row[0]}</td>
 								<td>${row[1]} ${row[2]}</td>
 								<td>${row[3]}</td>
-								<td><a
-									href="${pageContext.request.contextPath}/viewAbstract?projectId=${row[4]}"
-									class="btn btn-primary btn-sm">รายละเอียด</a></td>
+								<td><a class="btn btn-primary btn-sm"
+									href="${pageContext.request.contextPath}/viewAbstract?projectId=${row[4]}">
+										รายละเอียด </a></td>
 								<td><c:choose>
 										<c:when test="${row[5] == 'approved'}">
-											<button class="btn btn-warning btn-sm" disabled>อนุมัติแล้ว</button>
+											<button type="button" class="btn btn-success btn-sm" disabled>
+												<i class="fas fa-check"></i> อนุมัติแล้ว
+											</button>
 										</c:when>
 										<c:otherwise>
 											<button type="button"
 												class="btn btn-success btn-sm approve-btn"
-												data-project-id="${row[4]}">รอดำเนินการอนุมัติ</button>
+												data-project-id="${row[4]}" data-project-name="${row[3]}">
+												<i class="fas fa-check-circle"></i> รอดำเนินการอนุมัติ
+											</button>
 										</c:otherwise>
 									</c:choose></td>
 							</tr>
@@ -88,15 +105,15 @@
 				</table>
 
 				<!-- Pagination -->
-				<div class="d-flex justify-content-center mt-3">
-					<ul class="pagination">
+				<nav aria-label="Page navigation">
+					<ul class="pagination justify-content-center">
 						<c:forEach var="i" begin="1" end="${totalPages}">
 							<li class="page-item ${i == currentPage ? 'active' : ''}"><a
 								class="page-link" href="?page=${i}&semester=${selectedSemester}">${i}</a>
 							</li>
 						</c:forEach>
 					</ul>
-				</div>
+				</nav>
 			</c:otherwise>
 		</c:choose>
 	</div>
@@ -109,23 +126,88 @@
 			$(".approve-btn").click(function() {
 				var btn = $(this);
 				var projectId = btn.data("project-id");
+				var projectName = btn.data("project-name") || 'ไม่ระบุชื่อ';
 
-				$.ajax({
-					url : "${pageContext.request.contextPath}" + baseUrl + "/approveUploadAjax",
-					method : "POST",
-					data : {
-						projectId : projectId},
-					success : function(response) {
-						if (response === "success") {
-							btn.text("อนุมัติแล้ว");
-							btn.prop("disabled",true);} 
-						else {
-							alert("ไม่สามารถอนุมัติได้ กรุณาลองใหม่");}
-					},
-					error : function() {
-					alert("เกิดข้อผิดพลาดในการส่งข้อมูล");}
+				Swal.fire({
+					title: 'ยืนยันการอนุมัติ',
+					html: 'คุณต้องการอนุมัติโครงงาน<br><strong>"' + projectName + '"</strong><br>หรือไม่?',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#d33',
+					cancelButtonColor: '#6c757d',
+					confirmButtonText: 'ใช่, อนุมัติเลย!',
+					cancelButtonText: 'ยกเลิก',
+					reverseButtons: true
+				}).then((result) => {
+					if (result.isConfirmed) {
+						// แสดง loading
+						Swal.fire({
+							title: 'กำลังดำเนินการ...',
+							text: 'โปรดรอสักครู่',
+							icon: 'info',
+							allowOutsideClick: false,
+							showConfirmButton: false,
+							willOpen: () => {
+								Swal.showLoading();
+							}
+						});
+
+						$.ajax({
+							url: "${pageContext.request.contextPath}" + baseUrl + "/approveUploadAjax",
+							method: "POST",
+							data: { projectId: projectId },
+							success: function(response) {
+								if (response === "success") {
+									Swal.fire({
+										title: 'สำเร็จ!',
+										text: 'อนุมัติโครงงานเรียบร้อยแล้ว',
+										icon: 'success',
+										confirmButtonText: 'ตกลง'
+									}).then(() => {
+										btn.html('<i class="fas fa-check"></i> อนุมัติแล้ว');
+										btn.prop("disabled", true);
+									});
+								} else {
+									Swal.fire({
+										title: 'เกิดข้อผิดพลาด',
+										text: 'ไม่สามารถอนุมัติได้ กรุณาลองใหม่',
+										icon: 'error',
+										confirmButtonText: 'ตกลง'
+									});
+								}
+							},
+							error: function() {
+								Swal.fire({
+									title: 'เกิดข้อผิดพลาด',
+									text: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+									icon: 'error',
+									confirmButtonText: 'ตกลง'
+								});
+							}
+						});
+					}
 				});
 			});
+		});
+
+		// แสดง Alert เมื่อกลับมาจากการอนุมัติ
+		window.addEventListener('DOMContentLoaded', function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.get('success')) {
+				Swal.fire({
+					title: 'สำเร็จ!',
+					text: urlParams.get('success'),
+					icon: 'success',
+					confirmButtonText: 'ตกลง'
+				});
+			} else if (urlParams.get('error')) {
+				Swal.fire({
+					title: 'เกิดข้อผิดพลาด',
+					text: urlParams.get('error'),
+					icon: 'error',
+					confirmButtonText: 'ตกลง'
+				});
+			}
 		});
 	</script>
 </body>

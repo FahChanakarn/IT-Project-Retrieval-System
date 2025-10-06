@@ -21,6 +21,9 @@
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/importStudent.css">
+
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -33,7 +36,7 @@
 			</h5>
 			<hr class="mb-4">
 
-			<form method="post" enctype="multipart/form-data"
+			<form method="post" enctype="multipart/form-data" id="importForm"
 				action="${pageContext.request.contextPath}/admin/importStudentFile">
 
 				<div class="d-flex align-items-center gap-3 flex-wrap mb-3">
@@ -41,7 +44,7 @@
 					<div class="d-flex align-items-center gap-2">
 						<label for="semester" class="form-label fw-bold mb-0">เลือกภาคเรียน:</label>
 						<select name="semester" id="semester" class="form-select w-auto"
-							onchange="this.form.submit()">
+							onchange="changeSemester()">
 							<c:forEach var="sem" items="${semesterList}">
 								<option value="${sem}"
 									<c:if test="${sem == selectedSemester}">selected</c:if>>
@@ -51,37 +54,156 @@
 					</div>
 				</div>
 
-				<!-- ✅ ชื่อไฟล์ -->
+				<!-- ชื่อไฟล์ -->
 				<div class="mb-3">
 					<label for="fileName" class="form-label fw-bold">ชื่อไฟล์ :</label>
-					<input type="text" id="fileName" class="form-control"
-						value="${not empty param.file ? param.file : ''}">
+					<input type="text" id="fileName" name="fileName"
+						class="form-control" placeholder="กรอกชื่อไฟล์">
+					<div id="fileNameError" class="text-danger mt-1"
+						style="display: none;">
+						<small>*กรุณากรอกชื่อไฟล์</small>
+					</div>
 				</div>
 
-				<!-- ✅ เลือกไฟล์ Excel -->
+				<!-- เลือกไฟล์ Excel -->
 				<div class="mb-4">
 					<label class="form-label fw-bold">ไฟล์ที่ต้องการนำเข้า :</label> <input
 						type="file" class="form-control" name="file" id="fileInput"
-						required>
+						accept=".xlsx,.xls">
+					<div id="fileInputError" class="text-danger mt-1"
+						style="display: none;">
+						<small>*กรุณาเลือกไฟล์ Excel ที่ต้องการนำเข้า</small>
+					</div>
 				</div>
 
-				<!-- ✅ ปุ่ม -->
+				<!-- ปุ่ม -->
 				<div class="text-center">
 					<button type="submit" class="btn btn-success me-2">นำเข้า</button>
 					<button type="button"
 						onclick="location.href='${pageContext.request.contextPath}/'"
 						class="btn btn-danger">ยกเลิก</button>
 				</div>
-
-				<!-- ✅ แสดงผลลัพธ์ -->
-				<c:if test="${not empty error}">
-					<div class="alert alert-danger mt-4">${error}</div>
-				</c:if>
-				<c:if test="${not empty success}">
-					<div class="alert alert-success mt-4">${success}</div>
-				</c:if>
 			</form>
 		</div>
 	</div>
+
+	<!-- SweetAlert สำหรับข้อผิดพลาด -->
+	<c:if test="${not empty error}">
+		<script>
+			Swal.fire({
+				icon : 'error',
+				title : 'เกิดข้อผิดพลาด',
+				text : '${error}',
+				confirmButtonText : 'ตกลง',
+				confirmButtonColor : '#d33'
+			});
+		</script>
+	</c:if>
+
+	<!-- SweetAlert สำหรับสำเร็จ (ไม่มีข้อมูลซ้ำ) -->
+	<c:if test="${not empty success and empty duplicateStudents}">
+		<script>
+			Swal.fire({
+				icon : 'success',
+				title : 'นำเข้าข้อมูลสำเร็จ',
+				text : '${success}',
+				confirmButtonText : 'ตกลง',
+				confirmButtonColor : '#28a745'
+			});
+		</script>
+	</c:if>
+
+	<!-- SweetAlert สำหรับพบรหัสนักศึกษาซ้ำ -->
+	<c:if test="${not empty duplicateStudents}">
+		<script>
+			Swal
+					.fire({
+						icon : 'warning',
+						title : 'พบรหัสนักศึกษาซ้ำ',
+						html : '<p>${success}</p><hr><p class="text-danger"><strong>รหัสนักศึกษาที่ซ้ำ:</strong></p><p>${duplicateStudents}</p>',
+						confirmButtonText : 'ตกลง',
+						confirmButtonColor : '#ffc107',
+						width : '600px'
+					});
+		</script>
+	</c:if>
+
+	<script>
+		// ฟังก์ชันสำหรับเปลี่ยนภาคเรียน (ไม่ส่งไฟล์)
+		function changeSemester() {
+			// ล้างค่าไฟล์และชื่อไฟล์
+			document.getElementById('fileInput').value = '';
+			document.getElementById('fileName').value = '';
+
+			// ซ่อน error messages
+			document.getElementById('fileNameError').style.display = 'none';
+			document.getElementById('fileInputError').style.display = 'none';
+
+			// Submit form โดยไม่ต้องตรวจสอบไฟล์
+			document.getElementById('importForm').submit();
+		}
+
+		// ซ่อน error เมื่อผู้ใช้เริ่มกรอก/เลือกไฟล์
+		document
+				.getElementById('fileName')
+				.addEventListener(
+						'input',
+						function() {
+							if (this.value.trim() !== '') {
+								document.getElementById('fileNameError').style.display = 'none';
+							}
+						});
+
+		document
+				.getElementById('fileInput')
+				.addEventListener(
+						'change',
+						function() {
+							if (this.value !== '') {
+								document.getElementById('fileInputError').style.display = 'none';
+							}
+						});
+
+		// ตรวจสอบก่อน submit form
+		document
+				.getElementById('importForm')
+				.addEventListener(
+						'submit',
+						function(e) {
+							// ถ้ามาจากการเปลี่ยน semester ให้ผ่านไปเลย
+							if (e.submitter && e.submitter.type !== 'submit') {
+								return true;
+							}
+
+							const fileName = document
+									.getElementById('fileName').value.trim();
+							const fileInput = document
+									.getElementById('fileInput').value;
+							let hasError = false;
+
+							// ซ่อน error messages ทั้งหมดก่อน
+							document.getElementById('fileNameError').style.display = 'none';
+							document.getElementById('fileInputError').style.display = 'none';
+
+							// ตรวจสอบชื่อไฟล์
+							if (fileName === '') {
+								document.getElementById('fileNameError').style.display = 'block';
+								hasError = true;
+							}
+
+							// ตรวจสอบการเลือกไฟล์
+							if (fileInput === '') {
+								document.getElementById('fileInputError').style.display = 'block';
+								hasError = true;
+							}
+
+							if (hasError) {
+								e.preventDefault();
+								return false;
+							}
+
+							return true;
+						});
+	</script>
 </body>
 </html>

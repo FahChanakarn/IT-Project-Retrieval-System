@@ -19,7 +19,7 @@ public class Project {
 	@Column(name = "projectname_th", length = 255, nullable = false)
 	private String proj_NameTh;
 
-	@Column(name = "projectname_en", length = 255, nullable = false)
+	@Column(name = "projectname_en", length = 255)
 	private String proj_NameEn;
 
 	@Column(name = "semester", length = 50, nullable = false)

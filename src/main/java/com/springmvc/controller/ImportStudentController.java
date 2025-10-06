@@ -37,13 +37,11 @@ public class ImportStudentController {
 	}
 
 	@PostMapping("/importStudentFile")
-	public ModelAndView importStudentFile(@RequestParam("file") MultipartFile file,
+	public ModelAndView importStudentFile(@RequestParam(value = "file", required = false) MultipartFile file,
 			@RequestParam("semester") String semester, HttpSession session) {
+
 		if (session.getAttribute("admin") == null)
 			return new ModelAndView("redirect:/loginAdmin");
-
-		ImportStudentManager manager = new ImportStudentManager();
-		String message = manager.importFromExcel(file, semester);
 
 		int currentYear = ThaiBuddhistDate.now().get(ChronoField.YEAR);
 		List<String> semesterList = new ArrayList<>();
@@ -54,10 +52,32 @@ public class ImportStudentController {
 		mav.addObject("semesterList", semesterList);
 		mav.addObject("selectedSemester", semester);
 
-		if (message.startsWith("นำเข้าข้อมูลสำเร็จ"))
+		// ✅ ถ้าไม่มีไฟล์ หรือไฟล์ว่าง = แสดงว่ามาจากการเปลี่ยน semester
+		if (file == null || file.isEmpty()) {
+			return mav; // แค่แสดงหน้าเปล่าๆ ไม่ต้อง import
+		}
+
+		// ✅ มีไฟล์ = ทำการ import
+		ImportStudentManager manager = new ImportStudentManager();
+		String message = manager.importFromExcel(file, semester);
+
+		// ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
+		if (message.startsWith("ERROR:")) {
+			mav.addObject("error", message.substring(6));
+		}
+		// ตรวจสอบว่ามีรหัสนักศึกษาซ้ำหรือไม่
+		else if (message.contains("|DUPLICATE:")) {
+			String[] parts = message.split("\\|DUPLICATE:");
+			String successMessage = parts[0];
+			String duplicateIds = parts[1];
+
+			mav.addObject("success", successMessage);
+			mav.addObject("duplicateStudents", duplicateIds);
+		}
+		// นำเข้าสำเร็จโดยไม่มีข้อมูลซ้ำ
+		else {
 			mav.addObject("success", message);
-		else
-			mav.addObject("error", message);
+		}
 
 		return mav;
 	}

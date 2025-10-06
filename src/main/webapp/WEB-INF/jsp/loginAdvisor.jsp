@@ -84,15 +84,17 @@
 			<c:if test="${loginSuccess}">
 				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 				<script>
-			        Swal.fire({
-			            icon: 'success',
-			            title: 'เข้าสู่ระบบสำเร็จ',
-			            showConfirmButton: false,
-			            timer: 2000
-			        }).then(() => {
-			            window.location.href = '<c:url value="/"/>';
-			        });
-			    </script>
+        Swal.fire({
+            icon: 'success',
+            title: 'เข้าสู่ระบบสำเร็จ',
+            text: 'กำลังเข้าสู่หน้าหลัก...',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+        }).then(() => {
+            window.location.href = '<c:url value="/"/>';
+        });
+    			</script>
 			</c:if>
 		</div>
 	</div>

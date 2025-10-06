@@ -153,8 +153,10 @@
         Swal.fire({
             icon: 'success',
             title: 'เข้าสู่ระบบสำเร็จ',
+            text: 'กำลังเข้าสู่หน้าหลัก...',
             showConfirmButton: false,
-            timer: 2000
+            timer: 2000,
+            timerProgressBar: true
         }).then(() => {
             window.location.href = '${redirectUrl}';
         });

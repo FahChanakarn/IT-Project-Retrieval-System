@@ -236,35 +236,56 @@ document.querySelector('form').addEventListener('submit', function(e) {
         }
     }
 
-    // บทคัดย่อ
+ // บทคัดย่อ
     const abstractTh = thaiEditor.getData().trim();
+    const abstractThPlain = abstractTh.replace(/<[^>]*>/g, '');
+    const hasEnglishInThaiAbstract = /[A-Za-z]/.test(abstractThPlain);
+    
     if (abstractTh.length < 500 || abstractTh.length > 1500) { 
         document.getElementById('thaiAbstractError').textContent = "*บทคัดย่อภาษาไทย ต้องมีความยาว 500–1000 ตัวอักษร"; 
         valid = false; 
     }
+    else if (hasEnglishInThaiAbstract) {
+        document.getElementById('thaiAbstractError').textContent = "*บทคัดย่อภาษาไทย ต้องกรอกเป็นภาษาไทยเท่านั้น"; 
+        valid = false;
+    }
 
     const abstractEn = engEditor.getData().trim();
+    const abstractEnPlain = abstractEn.replace(/<[^>]*>/g, '');
+    const hasThaiInEngAbstract = /[ก-๙]/.test(abstractEnPlain);
+    
     if (abstractEn.length < 500 || abstractEn.length > 1500) { 
         document.getElementById('engAbstractError').textContent = "*บทคัดย่อภาษาอังกฤษ ต้องมีความยาว 500–1000 ตัวอักษร"; 
         valid = false; 
     }
+    else if (hasThaiInEngAbstract) {
+        document.getElementById('engAbstractError').textContent = "*บทคัดย่อภาษาอังกฤษ ต้องกรอกเป็นภาษาอังกฤษเท่านั้น"; 
+        valid = false;
+    }
 
     // คำสำคัญ
     const keywordTh = form.keywordTh.value.trim();
+    const hasEnglishInKeywordTh = /[A-Za-z]/.test(keywordTh);
+    
     if (!keywordTh) { 
         document.getElementById('keywordThError').textContent = "*กรุณากรอกคำสำคัญภาษาไทย"; 
         valid = false; 
     }
+    else if (hasEnglishInKeywordTh) {
+        document.getElementById('keywordThError').textContent = "*คำสำคัญภาษาไทย ต้องกรอกเป็นภาษาไทยเท่านั้น"; 
+        valid = false;
+    }
     
     const keywordEn = form.keywordEn.value.trim();
+    const hasThaiInKeywordEn = /[ก-๙]/.test(keywordEn);
+    
     if (!keywordEn) { 
         document.getElementById('keywordEnError').textContent = "*กรุณากรอกคำสำคัญภาษาอังกฤษ"; 
         valid = false; 
     }
-
-    if (valid) {
-        Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลสำเร็จ', showConfirmButton: false, timer: 1500 })
-            .then(() => { form.submit(); });
+    else if (hasThaiInKeywordEn) {
+        document.getElementById('keywordEnError').textContent = "*คำสำคัญภาษาอังกฤษ ต้องกรอกเป็นภาษาอังกฤษเท่านั้น"; 
+        valid = false;
     }
 });
 </script>

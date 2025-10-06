@@ -88,7 +88,7 @@
 			</div>
 
 			<!-- ซอฟต์แวร์ฐานข้อมูล -->
-			<div class="mb-3">
+			<div class="mb-3" id="dbSoftwareSection">
 				<label class="form-label fw-bold">ซอฟต์แวร์ฐานข้อมูล :</label> <select
 					class="form-select" name="typeDBId">
 					<option value="" disabled selected>เลือกซอฟต์แวร์ฐานข้อมูล</option>
@@ -182,6 +182,25 @@ ClassicEditor
     .then(editor => { engEditor = editor; })
     .catch(error => console.error(error));
 
+// ซ่อน/แสดง ซอฟต์แวร์ฐานข้อมูลตาม projectType
+const projectTypeSelect = document.querySelector('select[name="projectType"]');
+const dbSoftwareDiv = document.getElementById('dbSoftwareSection');
+
+function toggleDBSoftware() {
+    const selectedType = projectTypeSelect.value;
+    if (selectedType === 'Testing') {
+        dbSoftwareDiv.style.display = 'none';
+    } else {
+        dbSoftwareDiv.style.display = 'block';
+    }
+}
+
+// เรียกใช้เมื่อโหลดหน้า
+toggleDBSoftware();
+
+// เรียกใช้เมื่อเปลี่ยนประเภทโครงงาน
+projectTypeSelect.addEventListener('change', toggleDBSoftware);
+
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;
@@ -212,8 +231,9 @@ document.querySelector('form').addEventListener('submit', function(e) {
         valid = false; 
     }
 
-    // ซอฟต์แวร์ฐานข้อมูล
-    if (!form.typeDBId.value) { 
+    // ซอฟต์แวร์ฐานข้อมูล (ตรวจสอบเฉพาะเมื่อไม่ใช่ Testing)
+    const selectedType = form.projectType.value;
+    if (selectedType !== 'Testing' && !form.typeDBId.value) { 
         document.getElementById('typeDBIdError').textContent = "*กรุณาเลือกซอฟต์แวร์ฐานข้อมูล"; 
         valid = false; 
     }
@@ -236,9 +256,9 @@ document.querySelector('form').addEventListener('submit', function(e) {
         }
     }
 
- // บทคัดย่อ
+    // บทคัดย่อ
     const abstractTh = thaiEditor.getData().trim();
-    const abstractThPlain = abstractTh.replace(/<[^>]*>/g, '');
+    const abstractThPlain = abstractTh.replace(/<[^>]*>/g, ''); // ลบ HTML tags
     const hasEnglishInThaiAbstract = /[A-Za-z]/.test(abstractThPlain);
     
     if (abstractTh.length < 500 || abstractTh.length > 1500) { 
@@ -251,7 +271,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 
     const abstractEn = engEditor.getData().trim();
-    const abstractEnPlain = abstractEn.replace(/<[^>]*>/g, '');
+    const abstractEnPlain = abstractEn.replace(/<[^>]*>/g, ''); // ลบ HTML tags
     const hasThaiInEngAbstract = /[ก-๙]/.test(abstractEnPlain);
     
     if (abstractEn.length < 500 || abstractEn.length > 1500) { 
@@ -286,6 +306,11 @@ document.querySelector('form').addEventListener('submit', function(e) {
     else if (hasThaiInKeywordEn) {
         document.getElementById('keywordEnError').textContent = "*คำสำคัญภาษาอังกฤษ ต้องกรอกเป็นภาษาอังกฤษเท่านั้น"; 
         valid = false;
+    }
+
+    if (valid) {
+        Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลสำเร็จ', showConfirmButton: false, timer: 1500 })
+            .then(() => { form.submit(); });
     }
 });
 </script>

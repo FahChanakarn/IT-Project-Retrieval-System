@@ -27,7 +27,7 @@ public class AdvisorProjectController {
 
 	private ProjectManager projectManager = new ProjectManager();
 
-	@RequestMapping("/listProjects")
+	@RequestMapping("/myAdviseeProjects")
 	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "semester", required = false) String semester, HttpSession session) {
 		Advisor advisor = (Advisor) session.getAttribute("advisor");

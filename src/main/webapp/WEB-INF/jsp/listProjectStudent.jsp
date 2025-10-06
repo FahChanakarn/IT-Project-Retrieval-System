@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="isAdmin" value="${userRole == 'admin'}" />
+<c:set var="baseUrl" value="${isAdmin ? '/admin' : '/advisor'}" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,7 +30,7 @@
 		<hr>
 
 		<form method="get"
-			action="${pageContext.request.contextPath}/advisor/listProjects"
+			action="${pageContext.request.contextPath}${baseUrl}/myAdviseeProjects"
 			class="mb-4">
 			<div class="d-flex align-items-center gap-2">
 				<label for="semester" class="form-label mb-0">ภาคเรียน:</label> <select
@@ -68,16 +70,16 @@
 								<td>${row[1]} ${row[2]}</td>
 								<td>${row[3]}</td>
 								<td><a
-									href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${row[4]}"
+									href="${pageContext.request.contextPath}/viewAbstract?projectId=${row[4]}"
 									class="btn btn-primary btn-sm">รายละเอียด</a></td>
 								<td><c:choose>
 										<c:when test="${row[5] == 'approved'}">
-											<button class="btn btn-success btn-sm" disabled>อนุมัติแล้ว</button>
+											<button class="btn btn-warning btn-sm" disabled>อนุมัติแล้ว</button>
 										</c:when>
 										<c:otherwise>
 											<button type="button"
 												class="btn btn-success btn-sm approve-btn"
-												data-project-id="${row[4]}">อนุมัติ</button>
+												data-project-id="${row[4]}">รอดำเนินการอนุมัติ</button>
 										</c:otherwise>
 									</c:choose></td>
 							</tr>
@@ -101,13 +103,15 @@
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
+		const baseUrl = '${baseUrl}';
+		
 		$(document).ready(function() {
 			$(".approve-btn").click(function() {
 				var btn = $(this);
 				var projectId = btn.data("project-id");
 
 				$.ajax({
-					url : "${pageContext.request.contextPath}/advisor/approveUploadAjax",
+					url : "${pageContext.request.contextPath}" + baseUrl + "/approveUploadAjax",
 					method : "POST",
 					data : {
 						projectId : projectId},

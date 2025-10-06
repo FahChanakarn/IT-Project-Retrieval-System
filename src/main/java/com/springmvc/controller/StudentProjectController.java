@@ -2,9 +2,7 @@ package com.springmvc.controller;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -12,10 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.springmvc.manager.ProjectManager;
+import com.springmvc.manager.DocumentFileManager;
 import com.springmvc.model.Advisor;
 import com.springmvc.model.Project;
+import com.springmvc.model.DocumentFile;
 
 @Controller
 @RequestMapping("/admin")
@@ -23,6 +24,7 @@ public class StudentProjectController {
 
 	private ProjectManager projectManager = new ProjectManager();
 
+	// ============== รายการโครงงานทั้งหมด ==============
 	@RequestMapping("/listProjects")
 	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "semester", required = false) String semester,
@@ -79,6 +81,85 @@ public class StudentProjectController {
 		return mav;
 	}
 
+	// ============== รายการโครงงานของนักศึกษาในที่ปรึกษา ==============
+	@RequestMapping("/myAdviseeProjects")
+	public ModelAndView listMyAdviseeProjects(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(value = "semester", required = false) String semester, HttpSession session) {
+
+		Advisor admin = (Advisor) session.getAttribute("admin");
+		if (admin == null) {
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		if (semester == null || semester.isEmpty()) {
+			semester = projectManager.getLatestSemester();
+		}
+
+		int pageSize = 10;
+		int offset = (page - 1) * pageSize;
+
+		// ดึงโครงงานของนักศึกษาที่ admin เป็นที่ปรึกษา
+		List<Object[]> projectList = projectManager.getStudentProjectsByAdvisorAndSemester(admin.getAdvisorId(),
+				semester, offset, pageSize);
+
+		int totalRecords = projectManager.countProjectsByAdvisorAndSemester(admin.getAdvisorId(), semester);
+		int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+		List<String> semesterList = new ArrayList<>();
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+		for (int y = currentYear; y >= 2562; y--) {
+			semesterList.add("2/" + y);
+		}
+
+		ModelAndView mav = new ModelAndView("listProjectStudent");
+		mav.addObject("projects", projectList);
+		mav.addObject("currentPage", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("selectedSemester", semester);
+		mav.addObject("semesterList", semesterList);
+		mav.addObject("userRole", "admin");
+		return mav;
+	}
+
+	@PostMapping("/approveUploadAjax")
+	@ResponseBody
+	public String approveUploadAjax(@RequestParam("projectId") int projectId, HttpSession session) {
+		if (session.getAttribute("admin") == null) {
+			return "unauthorized";
+		}
+
+		Project project = projectManager.findProjectById(projectId);
+		if (project != null) {
+			project.setApproveStatus("approved");
+			project.setApproveDate(new java.util.Date());
+			projectManager.updateProject(project);
+			return "success";
+		}
+		return "fail";
+	}
+
+	@PostMapping("/document/togglePublish")
+	@ResponseBody
+	public String togglePublish(@RequestParam("fileId") Integer fileId, @RequestParam("published") Boolean published,
+			HttpSession session) {
+
+		if (session.getAttribute("admin") == null) {
+			return "unauthorized";
+		}
+
+		try {
+			DocumentFile file = DocumentFileManager.findById(fileId);
+			if (file != null) {
+				file.setPublishStatus(published);
+				DocumentFileManager.updateFile(file);
+				return "success";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "fail";
+	}
+
 	@RequestMapping("/viewProjectDetail")
 	public ModelAndView viewProjectDetail(@RequestParam("projectId") int projectId, HttpSession session) {
 
@@ -103,6 +184,7 @@ public class StudentProjectController {
 
 			ModelAndView mav = new ModelAndView("viewProjectDetail");
 			mav.addObject("project", project);
+			mav.addObject("userRole", "admin");
 			return mav;
 
 		} catch (Exception e) {

@@ -40,18 +40,40 @@
 			<c:choose>
 				<c:when
 					test="${empty sessionScope.itstudent and empty sessionScope.student and empty sessionScope.advisor and empty sessionScope.admin}">
-					<a href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+					<a
+						href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
 						class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
 						วิดีโอตัวอย่างการใช้งานโปรแกรม
 					</a>
 				</c:when>
 
 				<c:otherwise>
-					<a
-						href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
-						class="btn btn-primary me-2"> <i
-						class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
-					</a>
+					<c:choose>
+						<c:when test="${not empty sessionScope.admin}">
+							<a
+								href="${pageContext.request.contextPath}/admin/viewProjectDetail?projectId=${project.projectId}"
+								class="btn btn-primary me-2"> <i
+								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+							</a>
+						</c:when>
+
+						<c:when test="${not empty sessionScope.advisor}">
+							<a
+								href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${project.projectId}"
+								class="btn btn-primary me-2"> <i
+								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+							</a>
+						</c:when>
+
+						<c:otherwise>
+							<a
+								href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
+								class="btn btn-primary me-2"> <i
+								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+							</a>
+						</c:otherwise>
+					</c:choose>
+
 					<a
 						href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
 						class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
@@ -68,7 +90,8 @@
 			</div>
 
 			<div class="info-row">
-				<span class="info-label">ชื่อโครงงาน(ภาษาอังกฤษ) :</span> <span class="info-value">${project.proj_NameEn}</span>
+				<span class="info-label">ชื่อโครงงาน(ภาษาอังกฤษ) :</span> <span
+					class="info-value">${project.proj_NameEn}</span>
 			</div>
 
 			<div class="info-row">

@@ -16,7 +16,8 @@
 			<div class="col text-center">
 				<div class="header-title mb-0">
 					<div class="sliding-text">
-						<span>ระบบสืบค้นโครงงานสารสนเทศ</span> <span>IT Project Retrieval System</span>
+						<span>ระบบสืบค้นโครงงานสารสนเทศ</span> <span>IT Project
+							Retrieval System</span>
 					</div>
 				</div>
 			</div>
@@ -88,7 +89,9 @@
 								<ul class="dropdown-menu">
 									<li><a class="dropdown-item"
 										href="${pageContext.request.contextPath}/admin/listProjects">รายการโครงงานทั้งหมด</a></li>
-									<li><a class="dropdown-item" href="">รายการโครงงานของนักศึกษาในที่ปรึกษา</a></li>
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/admin/myAdviseeProjects">
+											รายการโครงงานของนักศึกษาในที่ปรึกษา </a></li>
 								</ul></li>
 
 							<li class="nav-item dropdown"><a
@@ -134,7 +137,7 @@
 								role="button" data-bs-toggle="dropdown"> จัดการโครงงาน </a>
 								<ul class="dropdown-menu">
 									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/advisor/listProjects">
+										href="${pageContext.request.contextPath}/advisor/myAdviseeProjects">
 											รายการโครงงาน</a></li>
 								</ul></li>
 

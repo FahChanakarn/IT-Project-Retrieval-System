@@ -150,6 +150,8 @@
 							</a>
 								<ul class="dropdown-menu dropdown-menu-end">
 									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/advisor/editProfile">แก้ไขข้อมูลส่วนตัว</a></li>
+									<li><a class="dropdown-item"
 										href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
 								</ul></li>
 						</ul>

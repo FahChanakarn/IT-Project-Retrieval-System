@@ -43,24 +43,6 @@ public class AdvisorController {
 		return new ModelAndView("redirect:/admin/listAdvisors");
 	}
 
-	@RequestMapping(value = "/editAdvisorForm/{id}", method = RequestMethod.GET)
-	public ModelAndView editAdvisorForm(@PathVariable("id") String advisorId) {
-		AdvisorManager advisorManager = new AdvisorManager();
-		Advisor advisor = advisorManager.getAdvisorById(advisorId);
-
-		ModelAndView mav = new ModelAndView("editAdvisor");
-		mav.addObject("advisor", advisor);
-		return mav;
-	}
-
-	@RequestMapping(value = "/updateAdvisor", method = RequestMethod.POST)
-	public ModelAndView updateAdvisor(Advisor advisor) {
-		AdvisorManager advisorManager = new AdvisorManager();
-		advisorManager.updateAdvisor(advisor);
-
-		return new ModelAndView("redirect:/admin/listAdvisors");
-	}
-
 	@RequestMapping(value = "/deleteAdvisor/{id}", method = RequestMethod.GET)
 	public ModelAndView deleteAdvisor(@PathVariable("id") String advisorId) {
 		AdvisorManager advisorManager = new AdvisorManager();

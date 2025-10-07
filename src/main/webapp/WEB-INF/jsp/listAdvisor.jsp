@@ -28,7 +28,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold text-danger">ข้อมูลอาจารย์ / รายชื่ออาจารย์</h5>
+		<h5 class="fw-bold">ข้อมูลอาจารย์ / รายชื่ออาจารย์</h5>
 		<hr>
 		<a href="${pageContext.request.contextPath}/admin/addAdvisorForm"
 			class="btn btn-primary mb-3">เพิ่มข้อมูลอาจารย์</a>
@@ -41,7 +41,6 @@
 					<th>Email</th>
 					<th>ตำแหน่ง</th>
 					<th>สถานะ</th>
-					<th>แก้ไขข้อมูล</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -67,10 +66,6 @@
 									${advisor.adv_status}</button>
 							</form>
 						</td>
-						<td><a
-							href="${pageContext.request.contextPath}/admin/editAdvisorForm/${advisor.advisorId}"
-							class="btn btn-success"> <i class="bi bi-pencil-square"></i>
-						</a></td>
 					</tr>
 				</c:forEach>
 			</tbody>

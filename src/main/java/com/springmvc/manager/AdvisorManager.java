@@ -193,10 +193,8 @@ public class AdvisorManager {
 			session.beginTransaction();
 
 			String hql = "FROM Advisor WHERE adv_email = :email AND adv_password = :password";
-			advisor = session.createQuery(hql, Advisor.class)
-					.setParameter("email", email)
-					.setParameter("password", password)
-					.uniqueResult();
+			advisor = session.createQuery(hql, Advisor.class).setParameter("email", email)
+					.setParameter("password", password).uniqueResult();
 
 			session.getTransaction().commit();
 		} catch (Exception ex) {
@@ -240,7 +238,7 @@ public class AdvisorManager {
 			}
 		}
 	}
-	
+
 	public void togglePosition(String advisorId) {
 		Session session = null;
 		try {
@@ -251,7 +249,8 @@ public class AdvisorManager {
 			Advisor advisor = session.get(Advisor.class, advisorId);
 			if (advisor != null) {
 				String currentPosition = advisor.getAdv_position();
-				String newPosition = currentPosition.equals("อาจารย์ที่ปรึกษา") ? "อาจารย์ประสานงาน" : "อาจารย์ที่ปรึกษา";
+				String newPosition = currentPosition.equals("อาจารย์ที่ปรึกษา") ? "อาจารย์ประสานงาน"
+						: "อาจารย์ที่ปรึกษา";
 				advisor.setAdv_position(newPosition);
 				session.update(advisor);
 			}
@@ -278,8 +277,7 @@ public class AdvisorManager {
 			session.beginTransaction();
 
 			String hql = "SELECT advisorId FROM Advisor WHERE advisorId LIKE :prefix ORDER BY LENGTH(advisorId) DESC, advisorId DESC";
-			List<String> ids = session.createQuery(hql, String.class)
-					.setParameter("prefix", prefix + "%")
+			List<String> ids = session.createQuery(hql, String.class).setParameter("prefix", prefix + "%")
 					.getResultList();
 
 			if (!ids.isEmpty()) {
@@ -313,9 +311,7 @@ public class AdvisorManager {
 			session.beginTransaction();
 
 			String hql = "SELECT a.advisorId FROM Advisor a WHERE a.advisorId LIKE :prefix ORDER BY a.advisorId DESC";
-			lastId = session.createQuery(hql, String.class)
-					.setParameter("prefix", prefix + "%")
-					.setMaxResults(1)
+			lastId = session.createQuery(hql, String.class).setParameter("prefix", prefix + "%").setMaxResults(1)
 					.uniqueResult();
 
 			session.getTransaction().commit();
@@ -331,6 +327,34 @@ public class AdvisorManager {
 		}
 
 		return lastId;
+	}
+
+	public boolean updateAdvisorPosition(Advisor advisor) {
+		boolean isSuccess = false;
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			Advisor existing = session.get(Advisor.class, advisor.getAdvisorId());
+			if (existing != null) {
+				existing.setAdv_position(advisor.getAdv_position());
+				session.update(existing);
+				session.getTransaction().commit();
+				isSuccess = true;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+		return isSuccess;
 	}
 
 }

@@ -17,7 +17,14 @@ import javax.servlet.http.HttpSession;
 public class AdvisorController {
 
 	@RequestMapping(value = "/listAdvisors", method = RequestMethod.GET)
-	public ModelAndView listAdvisors() {
+	public ModelAndView listAdvisors(HttpSession session) {
+		// ตรวจสอบ session ของ admin
+		Object admin = session.getAttribute("admin");
+		if (admin == null) {
+			// ถ้า session หมดอายุหรือไม่มี admin ให้ redirect ไป login
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
 		AdvisorManager advisorManager = new AdvisorManager();
 		List<Advisor> advisors = advisorManager.getAllAdvisors();
 
@@ -38,8 +45,8 @@ public class AdvisorController {
 	@RequestMapping(value = "/addAdvisor", method = RequestMethod.POST)
 	public ModelAndView addAdvisor(Advisor advisor) {
 		AdvisorManager advisorManager = new AdvisorManager();
-		
-		advisorManager.addAdvisor(advisor); 
+
+		advisorManager.addAdvisor(advisor);
 		return new ModelAndView("redirect:/admin/listAdvisors");
 	}
 
@@ -63,15 +70,34 @@ public class AdvisorController {
 
 		return new ModelAndView("redirect:/admin/listAdvisors");
 	}
-	
+
 	@RequestMapping(value = "/togglePosition", method = RequestMethod.POST)
 	public ModelAndView togglePosition(String adv_id, HttpSession session) {
 		AdvisorManager advisorManager = new AdvisorManager();
-		advisorManager.togglePosition(adv_id);
 
-		Object admin = session.getAttribute("admin");
-		if (admin == null) {
+		Advisor currentAdmin = (Advisor) session.getAttribute("admin");
+		if (currentAdmin == null) {
 			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		Advisor targetAdvisor = advisorManager.getAdvisorById(adv_id);
+		if (targetAdvisor == null) {
+			return new ModelAndView("redirect:/admin/listAdvisors");
+		}
+
+		// ถ้า currentAdmin เป็น admin (อาจารย์ประสานงาน)
+		if ("อาจารย์ประสานงาน".equals(currentAdmin.getAdv_position())) {
+			// อัพเดตตำแหน่งใน DB
+			currentAdmin.setAdv_position("อาจารย์ที่ปรึกษา");
+			advisorManager.updateAdvisorPosition(currentAdmin);
+
+			targetAdvisor.setAdv_position("อาจารย์ประสานงาน");
+			advisorManager.updateAdvisorPosition(targetAdvisor);
+
+			// **ไม่ลบ session** → admin ยังอยู่ในระบบ
+		} else {
+			// toggle position คนเดียว
+			advisorManager.togglePosition(adv_id);
 		}
 
 		return new ModelAndView("redirect:/admin/listAdvisors");

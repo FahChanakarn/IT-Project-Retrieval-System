@@ -73,7 +73,7 @@ public class EditAbstractController {
 	@RequestMapping(value = "/updateAbstract", method = RequestMethod.POST)
 	public ModelAndView updateAbstract(@RequestParam("projNameTh") String projNameTh,
 			@RequestParam("projNameEn") String projNameEn, @RequestParam("projectType") String projectType,
-			@RequestParam("typeDBId") int typeDBId,
+			@RequestParam(value = "typeDBId", required = false, defaultValue = "0") Integer typeDBId,
 			@RequestParam(value = "languageIds", required = false) int[] languageIds,
 			@RequestParam(value = "otherLanguages", required = false) String otherLanguages,
 			@RequestParam("abstractTh") String abstractTh, @RequestParam("abstractEn") String abstractEn,
@@ -98,8 +98,8 @@ public class EditAbstractController {
 		// ✅ เก็บ langId ที่ถูกเลือกไว้
 		Set<Integer> selectedLangIds = new HashSet<>();
 
-		// เพิ่ม DBMS ที่เลือก
-		if (typeDBId > 0) {
+		// เพิ่ม DBMS ที่เลือก (เฉพาะเมื่อไม่ใช่ Testing)
+		if (typeDBId != null && typeDBId > 0) {
 			selectedLangIds.add(typeDBId);
 		}
 
@@ -114,7 +114,7 @@ public class EditAbstractController {
 		programmingLangManager.removeUnselectedLanguages(projectId, selectedLangIds);
 
 		// ✅ เพิ่มภาษาที่เลือก (ถ้ายังไม่มี)
-		if (typeDBId > 0) {
+		if (typeDBId != null && typeDBId > 0) {
 			if (!programmingLangManager.existsProjectLangDetail(projectId, typeDBId)) {
 				programmingLangManager.createProjectLangDetailAndSave(project, typeDBId);
 			}

@@ -12,6 +12,8 @@
 <!-- Bootstrap -->
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -51,6 +53,15 @@
 									${sem}</option>
 							</c:forEach>
 						</select>
+					</div>
+
+					<!-- ดูไฟล์ตัวอย่าง -->
+					<div>
+						<a
+							href="${pageContext.request.contextPath}/assets/templates/student_template.xlsx"
+							class="btn btn-outline-info btn-sm" target="_blank"> <i
+							class="bi bi-eye me-1"></i>ดูตัวอย่างไฟล์ Excel
+						</a>
 					</div>
 				</div>
 

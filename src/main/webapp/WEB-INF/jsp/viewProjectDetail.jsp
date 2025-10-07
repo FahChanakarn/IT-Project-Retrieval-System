@@ -26,8 +26,8 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4">
-		<h5>${project.proj_NameTh}/รายละเอียด</h5>
+	<div class="container mt-5">
+		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->
@@ -47,13 +47,6 @@
 			</p>
 		</div>
 
-		<!-- ปุ่ม -->
-		<div class="mb-4">
-			<a
-				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-				class="btn btn-primary btn-section">บทคัดย่อ</a>
-		</div>
-
 		<!-- ตารางไฟล์เอกสาร -->
 		<table class="table table-bordered">
 			<thead>
@@ -65,34 +58,44 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="file" items="${project.documentFiles}"
-					varStatus="loop">
-					<tr>
-						<td>${loop.index + 1}</td>
-						<td>${file.filename}</td>
-						<td class="text-center"><c:choose>
-								<c:when test="${file.filetype eq 'video'}">
-									<a
-										href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}&fileId=${file.fileId}"
-										class="btn btn-success btn-sm">ดูวิดีโอ</a>
-								</c:when>
-								<c:otherwise>
-									<a
-										href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
-										class="btn btn-success btn-sm" target="_blank">
-										ดูไฟล์เอกสาร </a>
-								</c:otherwise>
-							</c:choose></td>
-						<td class="text-center">
-							<button type="button" class="btn btn-link p-0 toggle-publish"
-								data-file-id="${file.fileId}"
-								data-published="${file.publishStatus}">
-								<i
-									class="bi fs-3 ${file.publishStatus ? 'bi-toggle-on text-success' : 'bi-toggle-off text-secondary'}"></i>
-							</button>
-						</td>
-					</tr>
-				</c:forEach>
+				<c:choose>
+					<c:when test="${empty project.documentFiles}">
+						<tr>
+							<td colspan="4" class="text-center text-muted py-4"><i
+								class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+								ขณะนี้ยังไม่มีไฟล์ที่ถูกอัปโหลด</td>
+						</tr>
+					</c:when>
+					<c:otherwise>
+						<c:forEach var="file" items="${project.documentFiles}"
+							varStatus="loop">
+							<tr>
+								<td>${loop.index + 1}</td>
+								<td>${file.filename}</td>
+								<td class="text-center"><c:choose>
+										<c:when test="${file.filetype eq 'video'}">
+											<a
+												href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}&fileId=${file.fileId}"
+												class="btn btn-success btn-sm">ดูวิดีโอ</a>
+										</c:when>
+										<c:otherwise>
+											<a
+												href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
+												class="btn btn-success btn-sm" target="_blank">ดูไฟล์เอกสาร</a>
+										</c:otherwise>
+									</c:choose></td>
+								<td class="text-center">
+									<button type="button" class="btn btn-link p-0 toggle-publish"
+										data-file-id="${file.fileId}"
+										data-published="${file.publishStatus}">
+										<i
+											class="bi fs-3 ${file.publishStatus ? 'bi-toggle-on text-success' : 'bi-toggle-off text-secondary'}"></i>
+									</button>
+								</td>
+							</tr>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
 			</tbody>
 		</table>
 	</div>
@@ -154,7 +157,6 @@
     });
 })();
 </script>
-
 
 </body>
 </html>

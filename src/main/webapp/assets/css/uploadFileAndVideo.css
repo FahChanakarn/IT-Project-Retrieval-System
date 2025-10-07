@@ -4,15 +4,17 @@ body {
 	font-family: 'Kanit', sans-serif;
 }
 
+/* ✅ Title */
 h5 {
-	color: #aa1818;
-	font-weight: bold;
+	color: #056f00;
 	margin-bottom: 1.5rem;
+	font-weight: bold;
 }
 
+/* ✅ เส้นแบ่งหัวเรื่อง */
 hr {
 	border-top: 2px solid;
-	margin-bottom: 2rem;
+	margin-bottom: 1rem;
 }
 
 label {

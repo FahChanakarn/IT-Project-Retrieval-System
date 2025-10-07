@@ -4,7 +4,7 @@ import com.springmvc.manager.ProjectManager;
 import com.springmvc.manager.UploadManager;
 import com.springmvc.model.DocumentFile;
 import com.springmvc.model.Project;
-
+import com.springmvc.model.Student496;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,18 +23,32 @@ public class UploadController {
 	@Autowired
 	private ServletContext servletContext;
 
+	// ✅ Method ตรวจสอบ session - ตรวจสอบว่ามี student object หรือไม่
+	private boolean isSessionValid(HttpSession session) {
+		if (session == null) {
+			return false;
+		}
+		Student496 student = (Student496) session.getAttribute("student");
+		Integer projectId = (Integer) session.getAttribute("projectId");
+		return student != null && projectId != null;
+	}
+
 	// 1. แสดงหน้าอัปโหลด + ไฟล์ทั้งหมดของโครงงาน
 	@RequestMapping(value = "/upload", method = RequestMethod.GET)
 	public ModelAndView showUploadPage(HttpSession session) {
+		// ✅ เช็ค session อย่างเข้มงวด
+		if (!isSessionValid(session)) {
+			return new ModelAndView("redirect:/loginStudent496");
+		}
+
 		Integer projectId = (Integer) session.getAttribute("projectId");
 		UploadManager manager = new UploadManager();
 		ProjectManager proj = new ProjectManager();
 		Project project = proj.findProjectById(projectId);
-
 		List<DocumentFile> files = manager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("uploadFileAndVideo");
-		mav.addObject("uploadList", files); // เปลี่ยนให้ตรงกับ JSP ที่ใช้ ${uploadList}
+		mav.addObject("uploadList", files);
 		mav.addObject("project", project);
 		return mav;
 	}
@@ -45,17 +59,31 @@ public class UploadController {
 			@RequestParam(value = "file", required = false) MultipartFile file,
 			@RequestParam(value = "videoLink", required = false) String videoLink, HttpSession session) {
 
+		// ✅ เช็ค session อย่างเข้มงวด
+		if (!isSessionValid(session)) {
+			return "redirect:/loginStudent496";
+		}
+
 		Integer projectId = (Integer) session.getAttribute("projectId");
 
-		UploadManager manager = new UploadManager();
-		manager.saveFile(projectId, fileType, fileName, file, videoLink, servletContext);
-
-		return "redirect:/student496/upload";
+		try {
+			UploadManager manager = new UploadManager();
+			manager.saveFile(projectId, fileType, fileName, file, videoLink, servletContext);
+			return "redirect:/student496/upload?upload=true";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/student496/upload?error=true";
+		}
 	}
 
 	// 3. ไปหน้าแก้ไขไฟล์
 	@RequestMapping(value = "/editFileAndVideo/{fileId}", method = RequestMethod.GET)
-	public ModelAndView editFile(@PathVariable("fileId") int fileId) {
+	public ModelAndView editFile(@PathVariable("fileId") int fileId, HttpSession session) {
+		// ✅ เช็ค session อย่างเข้มงวด
+		if (!isSessionValid(session)) {
+			return new ModelAndView("redirect:/loginStudent496");
+		}
+
 		UploadManager manager = new UploadManager();
 		DocumentFile file = manager.getFileById(fileId);
 
@@ -64,8 +92,14 @@ public class UploadController {
 		return mav;
 	}
 
+	// ✅ ลบ method ซ้ำ
 	@RequestMapping("/editFileAndVideo")
-	public ModelAndView editFileAndVideo(@RequestParam("id") int fileId) {
+	public ModelAndView editFileAndVideo(@RequestParam("id") int fileId, HttpSession session) {
+		// ✅ เช็ค session อย่างเข้มงวด
+		if (!isSessionValid(session)) {
+			return new ModelAndView("redirect:/loginStudent496");
+		}
+
 		UploadManager fileManager = new UploadManager();
 		DocumentFile file = fileManager.getFileById(fileId);
 
@@ -74,16 +108,24 @@ public class UploadController {
 		return mav;
 	}
 
+	// 4. อัปเดตไฟล์หรือวิดีโอ
 	@RequestMapping(value = "/updateFileAndVideo", method = RequestMethod.POST)
-	public ModelAndView updateFileAndVideo(HttpServletRequest request, @RequestParam("id") int id,
+	public String updateFileAndVideo(HttpServletRequest request, @RequestParam("id") int id,
 			@RequestParam("name") String name, @RequestParam(value = "videoLink", required = false) String videoLink,
-			@RequestParam(value = "newFile", required = false) MultipartFile newFile) {
+			@RequestParam(value = "newFile", required = false) MultipartFile newFile, HttpSession session) {
 
-		UploadManager fileManager = new UploadManager();
-		fileManager.updateFileOrVideo(id, name, videoLink, newFile, request);
+		// ✅ เช็ค session อย่างเข้มงวด
+		if (!isSessionValid(session)) {
+			return "redirect:/loginStudent496";
+		}
 
-		// แก้ไขแล้วกลับไปหน้าฟอร์มเดิมพร้อม success popup
-		return new ModelAndView("redirect:/student496/editFileAndVideo/" + id + "?success=true");
+		try {
+			UploadManager fileManager = new UploadManager();
+			fileManager.updateFileOrVideo(id, name, videoLink, newFile, request);
+			return "redirect:/student496/upload?success=true";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/student496/upload?error=true";
+		}
 	}
-
 }

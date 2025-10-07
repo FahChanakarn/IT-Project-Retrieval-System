@@ -60,32 +60,7 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4">
-		<!-- ลิงก์กลับ - แสดงตามสถานะการล็อกอิน -->
-		<div class="mb-2">
-			<c:choose>
-				<%-- กรณี login เป็น advisor --%>
-				<c:when test="${not empty sessionScope.advisor}">
-					<a class="link-back"
-						href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${project.projectId}">
-						← กลับสู่รายละเอียด </a>
-				</c:when>
-
-				<%-- กรณี login เป็น student (นักศึกษา496) --%>
-				<c:when test="${not empty sessionScope.student}">
-					<a class="link-back"
-						href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}">
-						← กลับสู่หน้าดูรายละเอียด </a>
-				</c:when>
-
-				<%-- กรณีไม่ได้ login --%>
-				<c:otherwise>
-					<a class="link-back"
-						href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}">
-						← กลับสู่บทคัดย่อ </a>
-				</c:otherwise>
-			</c:choose>
-		</div>
+	<div class="container mt-5">
 
 		<!-- หัวข้อ -->
 		<h5 class="page-title">
@@ -95,17 +70,24 @@
 		<hr />
 
 		<c:set var="videoPath" value="" />
+
+		<!-- ✅ เช็คว่าเป็นวิดีโอ + publishStatus = true (อนุมัติ) -->
 		<c:if
-			test="${not empty videoDoc and videoDoc.filetype eq 'video' and not empty videoDoc.filepath}">
+			test="${not empty videoDoc 
+              and videoDoc.filetype eq 'video' 
+              and not empty videoDoc.filepath 
+              and videoDoc.publishStatus == true}">
 			<c:set var="videoPath" value="${videoDoc.filepath}" />
 		</c:if>
 
+		<!-- ✅ ถ้ายังไม่เจอ ให้หาจาก documentFiles (เฉพาะที่ publishStatus = true) -->
 		<c:if test="${empty videoPath and not empty project.documentFiles}">
 			<c:forEach items="${project.documentFiles}" var="df">
 				<c:if
-					test="${empty videoPath 
-                     and df.filetype eq 'video' 
-                     and not empty df.filepath}">
+					test="${empty videoPath
+              and df.filetype eq 'video'
+              and not empty df.filepath
+              and df.publishStatus == true}">
 					<c:set var="videoPath" value="${df.filepath}" />
 				</c:if>
 			</c:forEach>
@@ -128,8 +110,14 @@
 				</div>
 			</c:when>
 			<c:otherwise>
-				<div class="alert alert-warning mt-4" role="alert">
-					${errorMessage}</div>
+				<div
+					class="alert alert-light border shadow-sm text-center py-5 mt-4">
+					<i class="bi bi-camera-video text-secondary fs-1 d-block mb-3"></i>
+					<h5 class="text-muted mb-2">ไม่พบข้อมูลวิดีโอ</h5>
+					<c:if test="${not empty errorMessage}">
+						<p class="text-danger mt-2 mb-0">${errorMessage}</p>
+					</c:if>
+				</div>
 			</c:otherwise>
 		</c:choose>
 	</div>

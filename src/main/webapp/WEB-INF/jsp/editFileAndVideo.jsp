@@ -16,7 +16,6 @@
 <!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
@@ -56,22 +55,11 @@
 			</c:choose>
 
 			<button type="submit" class="btn btn-success">บันทึก</button>
-			<a href="${pageContext.request.contextPath}/backToUploadPage"
+			<a
+				href="${pageContext.request.contextPath}/student496/upload"
 				class="btn btn-danger">ยกเลิก</a>
 		</form>
 	</div>
-
-	<!-- แสดง popup หากมีพารามิเตอร์ success -->
-	<c:if test="${not empty param.success}">
-		<script>
-			Swal.fire({
-				icon : 'success',
-				title : 'ไฟล์ของคุณถูกแก้ไขเรียบร้อย !',
-				showConfirmButton : false,
-				timer : 2000
-			})
-		</script>
-	</c:if>
 
 </body>
 </html>

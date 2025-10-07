@@ -16,6 +16,7 @@
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/uploadFileAndVideo.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
 <script
@@ -27,20 +28,20 @@
 		const videoGroup = document.getElementById("videoGroup");
 		const labelName = document.getElementById("fileNameLabel");
 		const fileInput = document.querySelector('input[name="file"]');
-		const fileNameInput = document.querySelector('input[name="fileName"]'); // ✅ input ชื่อไฟล์
+		const fileNameInput = document.querySelector('input[name="fileName"]');
 
 		if (type === "video") {
 			fileGroup.style.display = "none";
 			videoGroup.style.display = "block";
 			labelName.innerText = "ชื่อวิดีโอ :";
 			fileInput.removeAttribute("required");
-			fileNameInput.placeholder = "ตัวอย่างการใช้งานโปรแกรม"; // ✅ เปลี่ยน placeholder
+			fileNameInput.placeholder = "ตัวอย่างการใช้งานโปรแกรม";
 		} else {
 			fileGroup.style.display = "block";
 			videoGroup.style.display = "none";
 			labelName.innerText = "ชื่อไฟล์ :";
 			fileInput.setAttribute("required", "true");
-			fileNameInput.placeholder = "เช่น บทที่ 1 บทนำ"; // ✅ คืนค่าเดิม
+			fileNameInput.placeholder = "เช่น บทที่ 1 บทนำ";
 		}
 	}
 </script>
@@ -48,26 +49,26 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4">
-		<h5 class="fw-bold text-danger">${project.proj_NameTh}/
-			จัดการโครงงาน / อัปโหลดไฟล์เอกสาร</h5>
+	<div class="container mt-5">
+		<h5 class="fw-bold">จัดการโครงงาน / อัปโหลดไฟล์เอกสาร</h5>
 		<hr>
 
 		<form action="${pageContext.request.contextPath}/student496/upload"
 			method="post" enctype="multipart/form-data">
-			<div class="mb-3">
-				<label class="form-label">เลือกประเภทไฟล์ :</label> <select
-					class="form-select w-auto d-inline" name="fileType" id="fileType"
-					onchange="toggleUploadType()" required>
-					<option value="file">ไฟล์เอกสาร</option>
-					<option value="video">ลิงก์วิดีโอ</option>
-				</select>
-			</div>
-
-			<div class="mb-3">
-				<label class="form-label" id="fileNameLabel">ชื่อไฟล์ :</label> <input
-					type="text" name="fileName" class="form-control"
-					placeholder="เช่น บทที่ 1 บทนำ" required>
+			<div class="row mb-3">
+				<div class="col-md-4">
+					<label class="form-label">เลือกประเภทไฟล์ :</label> <select
+						class="form-select" name="fileType" id="fileType"
+						onchange="toggleUploadType()" required>
+						<option value="file">ไฟล์เอกสาร</option>
+						<option value="video">ลิงก์วิดีโอ</option>
+					</select>
+				</div>
+				<div class="col-md-8">
+					<label class="form-label" id="fileNameLabel">ชื่อไฟล์ :</label> <input
+						type="text" name="fileName" class="form-control"
+						placeholder="เช่น บทที่ 1 บทนำ" required>
+				</div>
 			</div>
 
 			<div class="mb-3" id="fileGroup">
@@ -104,34 +105,79 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="item" items="${uploadList}" varStatus="loop">
-					<tr>
-						<td>${loop.index + 1}</td>
-						<td>${item.filename}</td>
-						<!-- ✅ แก้ตรงนี้ -->
-						<td><c:choose>
-								<c:when test="${item.filetype == 'file'}">
-									<a class="btn btn-primary btn-sm"
-										href="${pageContext.request.contextPath}/download/file/${item.fileId}/${item.filename}"
-										target="_blank">ดูเอกสาร</a>
-								</c:when>
-								<c:otherwise>
-									<a class="btn btn-primary btn-sm" href="${item.filepath}"
-										target="_blank">ดูวิดีโอ</a>
-								</c:otherwise>
-							</c:choose></td>
-						<td class="text-success fw-bold">${item.status}</td>
-						<!-- ✅ สถานะจาก Model -->
-						<td><a
-							href="${pageContext.request.contextPath}/student496/editFileAndVideo/${item.fileId}"
-							class="btn btn-success btn-sm"> <i
-								class="bi bi-pencil-square"></i>
-						</a></td>
-					</tr>
-				</c:forEach>
+				<c:choose>
+					<c:when test="${empty uploadList}">
+						<tr>
+							<td colspan="5" class="text-center text-muted py-4"><i
+								class="bi bi-file-earmark-x fs-1 d-block mb-2"></i>
+								ยังไม่มีไฟล์ที่อัปโหลด</td>
+						</tr>
+					</c:when>
+					<c:otherwise>
+						<c:forEach var="item" items="${uploadList}" varStatus="loop">
+							<tr>
+								<td>${loop.index + 1}</td>
+								<td>${item.filename}</td>
+								<td><c:choose>
+										<c:when test="${item.filetype == 'file'}">
+											<a class="btn btn-primary btn-sm"
+												href="${pageContext.request.contextPath}/download/file/${item.fileId}/${item.filename}"
+												target="_blank">ดูเอกสาร</a>
+										</c:when>
+										<c:otherwise>
+											<a class="btn btn-primary btn-sm" href="${item.filepath}"
+												target="_blank">ดูวิดีโอ</a>
+										</c:otherwise>
+									</c:choose></td>
+								<td class="text-success fw-bold">${item.status}</td>
+								<td><a
+									href="${pageContext.request.contextPath}/student496/editFileAndVideo/${item.fileId}"
+									class="btn btn-success btn-sm"> <i
+										class="bi bi-pencil-square"></i>
+								</a></td>
+							</tr>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
 			</tbody>
 		</table>
 
 	</div>
+	<!-- แสดง popup หากมีพารามิเตอร์ success -->
+	<c:if test="${not empty param.success}">
+		<script>
+			Swal.fire({
+				icon : 'success',
+				title : 'ไฟล์ของคุณถูกแก้ไขเรียบร้อย !',
+				showConfirmButton : false,
+				timer : 2000
+			})
+		</script>
+	</c:if>
+
+	<!-- แสดง popup หากอัปโหลดสำเร็จ -->
+	<c:if test="${not empty param.upload}">
+		<script>
+			Swal.fire({
+				icon : 'success',
+				title : 'อัปโหลดไฟล์สำเร็จ !',
+				text : 'ไฟล์ของคุณถูกอัปโหลดเรียบร้อยแล้ว',
+				showConfirmButton : false,
+				timer : 2000
+			})
+		</script>
+	</c:if>
+
+	<!-- แสดง popup หากอัปโหลดไม่สำเร็จ -->
+	<c:if test="${not empty param.error}">
+		<script>
+			Swal.fire({
+				icon : 'error',
+				title : 'เกิดข้อผิดพลาด !',
+				text : 'ไม่สามารถอัปโหลดไฟล์ได้ กรุณาลองใหม่อีกครั้ง',
+				showConfirmButton : true
+			})
+		</script>
+	</c:if>
 </body>
 </html>

@@ -31,29 +31,43 @@ public class HomeController {
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> semesters = projectManager.getAllSemesters();
 
-		// ใช้ method ใหม่แยก type จาก manager
 		List<ProgrammingLang> programmingLangs = programmingLangManager
 				.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING);
 		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
 
-		// ดึงโปรเจคทั้งหมดและคำนวณ pagination
+		// ดึงโปรเจคทั้งหมด
 		List<Project> allProjects = projectManager.getAllProjects();
-		int totalProjects = allProjects != null ? allProjects.size() : 0;
+
+		// ✅ กรองเฉพาะโครงงานที่มีบทคัดย่อทั้งภาษาไทยและภาษาอังกฤษ
+		List<Project> projectsWithAbstract = allProjects.stream().filter(p -> {
+			// Debug: แสดงข้อมูลของแต่ละ project
+			System.out.println("Project ID: " + p.getProjectId());
+			System.out.println("Abstract TH: [" + p.getAbstractTh() + "]");
+			System.out.println("Abstract EN: [" + p.getAbstractEn() + "]");
+
+			boolean hasTh = p.getAbstractTh() != null && !p.getAbstractTh().trim().isEmpty();
+			boolean hasEn = p.getAbstractEn() != null && !p.getAbstractEn().trim().isEmpty();
+
+			System.out.println("Has TH: " + hasTh + ", Has EN: " + hasEn);
+			System.out.println("---");
+
+			return hasTh && hasEn;
+		}).toList();
+
+		int totalProjects = projectsWithAbstract.size();
 		int totalPages = (int) Math.ceil((double) totalProjects / PROJECTS_PER_PAGE);
 
-		// ตรวจสอบหน้าที่ขอมา
 		if (page < 1)
 			page = 1;
 		if (page > totalPages && totalPages > 0)
 			page = totalPages;
 
-		// คำนวณ index สำหรับ subList
 		int fromIndex = (page - 1) * PROJECTS_PER_PAGE;
 		int toIndex = Math.min(fromIndex + PROJECTS_PER_PAGE, totalProjects);
 
-		List<Project> projects = (allProjects != null && !allProjects.isEmpty())
-				? allProjects.subList(fromIndex, toIndex)
-				: allProjects;
+		List<Project> projects = (projectsWithAbstract != null && !projectsWithAbstract.isEmpty())
+				? projectsWithAbstract.subList(fromIndex, toIndex)
+				: List.of(); // ถ้าไม่มีโปรเจค ให้เป็น empty list
 
 		ModelAndView mav = new ModelAndView("Home");
 		mav.addObject("advisors", activeAdvisors);
@@ -66,11 +80,11 @@ public class HomeController {
 		mav.addObject("totalPages", totalPages);
 		mav.addObject("totalProjects", totalProjects);
 
-		// ✅ ตรวจสอบว่าต้องแสดง popup หรือไม่
+		// ✅ แสดง popup ถ้าต้องการ
 		Boolean showPopup = (Boolean) session.getAttribute("showWelcomePopup");
 		if (showPopup != null && showPopup) {
 			mav.addObject("showWelcomePopup", true);
-			session.removeAttribute("showWelcomePopup"); // ลบออกหลังแสดงครั้งเดียว
+			session.removeAttribute("showWelcomePopup");
 		}
 
 		return mav;

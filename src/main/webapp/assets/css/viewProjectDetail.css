@@ -6,15 +6,17 @@ body {
 	margin-top: 40px;
 }
 
+/* ✅ Title */
 h5 {
-	color: #aa1818;
-	font-weight: bold;
+	color: #056f00;
 	margin-bottom: 1.5rem;
+	font-weight: bold;
 }
 
+/* ✅ เส้นแบ่งหัวเรื่อง */
 hr {
-	border-top: 2px solid #ccc;
-	margin-bottom: 2rem;
+	border-top: 2px solid;
+	margin-bottom: 1rem;
 }
 
 .project-info {

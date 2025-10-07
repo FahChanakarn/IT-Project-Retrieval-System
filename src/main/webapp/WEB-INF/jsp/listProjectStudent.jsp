@@ -135,7 +135,7 @@
 					showCancelButton: true,
 					confirmButtonColor: '#d33',
 					cancelButtonColor: '#6c757d',
-					confirmButtonText: 'ใช่, อนุมัติเลย!',
+					confirmButtonText: 'ยืนยัน',
 					cancelButtonText: 'ยกเลิก',
 					reverseButtons: true
 				}).then((result) => {

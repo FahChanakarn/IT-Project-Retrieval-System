@@ -13,9 +13,10 @@ public class AdvisorManager {
 
 	public boolean addAdvisor(Advisor advisor) {
 		boolean isSuccess = false;
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			// ใช้ prefix เดียว T เสมอ
@@ -40,40 +41,60 @@ public class AdvisorManager {
 
 			session.save(advisor);
 			session.getTransaction().commit();
-			session.close();
 			isSuccess = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 		return isSuccess;
 	}
 
 	public List<Advisor> getAllAdvisors() {
 		List<Advisor> advisors = new ArrayList<>();
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 			advisors = session.createQuery("FROM Advisor", Advisor.class).getResultList();
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 		return advisors;
 	}
 
 	public Advisor getAdvisorById(String advisorId) {
 		Advisor advisor = null;
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 			advisor = session.get(Advisor.class, advisorId); // ดึงข้อมูลตาม ID
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 		return advisor;
 	}
@@ -100,18 +121,23 @@ public class AdvisorManager {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
 		} finally {
-			if (session != null)
+			if (session != null && session.isOpen()) {
 				session.close();
+			}
 		}
 		return isSuccess;
 	}
 
 	public boolean deleteAdvisor(String advisorId) {
 		boolean isSuccess = false;
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 			Advisor advisor = session.get(Advisor.class, advisorId);
 			if (advisor != null) {
@@ -119,43 +145,58 @@ public class AdvisorManager {
 				session.getTransaction().commit();
 				isSuccess = true;
 			}
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 		return isSuccess;
 	}
 
 	public List<Advisor> getActiveAdvisors() {
 		List<Advisor> advisors = null;
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			String hql = "FROM Advisor WHERE adv_status = 'ปฏิบัติราชการ'";
 			advisors = session.createQuery(hql, Advisor.class).getResultList();
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 		return advisors;
 	}
 
 	public Advisor findByEmailAndPassword(String email, String password) {
 		Advisor advisor = null;
-		SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 		Session session = null;
 
 		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			String hql = "FROM Advisor WHERE adv_email = :email AND adv_password = :password";
-			advisor = session.createQuery(hql, Advisor.class).setParameter("email", email)
-					.setParameter("password", password).uniqueResult();
+			advisor = session.createQuery(hql, Advisor.class)
+					.setParameter("email", email)
+					.setParameter("password", password)
+					.uniqueResult();
 
 			session.getTransaction().commit();
 		} catch (Exception ex) {
@@ -173,9 +214,10 @@ public class AdvisorManager {
 	}
 
 	public void toggleStatus(String advisorId) {
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			Advisor advisor = session.get(Advisor.class, advisorId);
@@ -187,42 +229,57 @@ public class AdvisorManager {
 			}
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 	}
 	
 	public void togglePosition(String advisorId) {
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			Advisor advisor = session.get(Advisor.class, advisorId);
 			if (advisor != null) {
 				String currentPosition = advisor.getAdv_position();
 				String newPosition = currentPosition.equals("อาจารย์ที่ปรึกษา") ? "อาจารย์ประสานงาน" : "อาจารย์ที่ปรึกษา";
-				advisor.setAdv_position(newPosition);;
+				advisor.setAdv_position(newPosition);
 				session.update(advisor);
 			}
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 	}
 
 	public String generateNextAdvisorId(String prefix) {
 		String nextId = prefix + "1"; // default ถ้ายังไม่มีข้อมูลเลย
+		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			String hql = "SELECT advisorId FROM Advisor WHERE advisorId LIKE :prefix ORDER BY LENGTH(advisorId) DESC, advisorId DESC";
-			List<String> ids = session.createQuery(hql, String.class).setParameter("prefix", prefix + "%")
+			List<String> ids = session.createQuery(hql, String.class)
+					.setParameter("prefix", prefix + "%")
 					.getResultList();
 
 			if (!ids.isEmpty()) {
@@ -232,9 +289,15 @@ public class AdvisorManager {
 			}
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 
 		return nextId;
@@ -242,20 +305,29 @@ public class AdvisorManager {
 
 	public String getLastAdvisorIdWithPrefix(String prefix) {
 		String lastId = null;
+		Session session = null;
 
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-			Session session = sessionFactory.openSession();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 
 			String hql = "SELECT a.advisorId FROM Advisor a WHERE a.advisorId LIKE :prefix ORDER BY a.advisorId DESC";
-			lastId = session.createQuery(hql, String.class).setParameter("prefix", prefix + "%").setMaxResults(1)
+			lastId = session.createQuery(hql, String.class)
+					.setParameter("prefix", prefix + "%")
+					.setMaxResults(1)
 					.uniqueResult();
 
 			session.getTransaction().commit();
-			session.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 
 		return lastId;

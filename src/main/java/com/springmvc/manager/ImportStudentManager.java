@@ -37,22 +37,21 @@ public class ImportStudentManager {
 		int skippedCount = 0;
 		duplicateStudents.clear();
 
-		// Map เก็บ Project ที่สร้างแล้ว (key = ชื่อโครงงาน + semester + advisorId)
 		Map<String, Project> projectMap = new HashMap<>();
-
-		// Map เก็บประเภทที่พบในแต่ละโปรเจค เพื่อใช้ตัดสินใจว่าควรเป็น "Web and Mobile"
-		// หรือไม่
 		Map<String, Set<String>> projectTypesFound = new HashMap<>();
+
+		Session session = null;
+		Transaction tx = null;
 
 		try (Workbook workbook = new XSSFWorkbook(excelFile)) {
 			Sheet sheet = workbook.getSheetAt(0);
 
 			SessionFactory factory = HibernateConnection.doHibernateConnection();
-			Session session = factory.openSession();
-			Transaction tx = session.beginTransaction();
+			session = factory.openSession();
+			tx = session.beginTransaction();
 
 			System.out.println("========== Pass 1: Scanning Excel ==========");
-			// ✅ Pass 1: สแกนทั้งไฟล์เพื่อรวบรวมประเภทที่พบในแต่ละโปรเจค
+			// Pass 1: สแกนทั้งไฟล์เพื่อรวบรวมประเภทที่พบในแต่ละโปรเจค
 			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
 				Row row = sheet.getRow(i);
 				if (row == null)
@@ -65,7 +64,6 @@ public class ImportStudentManager {
 				if (projectNameTh.isEmpty() || advisorFullName.isEmpty())
 					continue;
 
-				// ✅ ตัด prefix ใน Pass 1 ด้วย เพื่อให้ key ตรงกับ Pass 2
 				String[] unwantedPrefixes = { "ผศ.ดร.", "อ.ดร.", "อ." };
 				for (String p : unwantedPrefixes) {
 					if (advisorFullName.startsWith(p)) {
@@ -73,15 +71,12 @@ public class ImportStudentManager {
 					}
 				}
 
-				// สร้าง unique key สำหรับโปรเจค
 				String projectKey = projectNameTh + "_" + semester + "_" + advisorFullName;
 
-				// เก็บประเภทที่พบ
 				if (!projectTypesFound.containsKey(projectKey)) {
 					projectTypesFound.put(projectKey, new HashSet<>());
 				}
 
-				// Normalize ประเภท
 				String normalizedType = normalizeType(studentType);
 				if (!normalizedType.isEmpty()) {
 					projectTypesFound.get(projectKey).add(normalizedType);
@@ -90,7 +85,6 @@ public class ImportStudentManager {
 				}
 			}
 
-			// แสดงสรุปประเภทที่พบในแต่ละโปรเจค
 			System.out.println("\n========== Project Types Summary ==========");
 			for (Map.Entry<String, Set<String>> entry : projectTypesFound.entrySet()) {
 				String finalType = determineFinalProjectType(entry.getKey(), projectTypesFound);
@@ -100,7 +94,7 @@ public class ImportStudentManager {
 			}
 
 			System.out.println("\n========== Pass 2: Importing Data ==========");
-			// ✅ Pass 2: Import ข้อมูลจริง
+			// Pass 2: Import ข้อมูลจริง
 			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
 				Row row = sheet.getRow(i);
 				if (row == null)
@@ -114,14 +108,12 @@ public class ImportStudentManager {
 
 				String password = "mju" + stuId;
 
-				// --- ตรวจสอบข้อมูลพื้นฐาน ---
 				if (stuId.isEmpty() || projectNameTh.isEmpty()) {
 					skippedCount++;
 					System.out.println("Skipped Row " + (i + 1) + ": Missing required data");
 					continue;
 				}
 
-				// --- จัดการ Advisor ---
 				if (advisorFullName == null || advisorFullName.isEmpty()) {
 					skippedCount++;
 					System.out.println("Skipped Row " + (i + 1) + ": Advisor empty for student - " + stuId);
@@ -151,7 +143,6 @@ public class ImportStudentManager {
 					continue;
 				}
 
-				// --- แยก prefix / firstname / lastname ของ Student ---
 				int lastSpace = fullName.lastIndexOf(" ");
 				String lastName = lastSpace >= 0 ? fullName.substring(lastSpace + 1).trim() : "";
 				String firstAndPrefix = lastSpace >= 0 ? fullName.substring(0, lastSpace).trim() : fullName;
@@ -167,7 +158,6 @@ public class ImportStudentManager {
 					}
 				}
 
-				// --- ตรวจสอบ Student496 ซ้ำ ---
 				if (session.get(Student496.class, stuId) != null) {
 					skippedCount++;
 					duplicateStudents.add(stuId);
@@ -175,22 +165,18 @@ public class ImportStudentManager {
 					continue;
 				}
 
-				// --- จัดการ Project ---
 				String projectKey = projectNameTh + "_" + semester + "_" + advisorFullName;
 				Project project = projectMap.get(projectKey);
 
 				if (project == null) {
-					// ตรวจสอบใน Database ก่อน
 					project = (Project) session.createQuery(
 							"FROM Project WHERE proj_NameTh = :name AND semester = :sem AND advisor.advisorId = :advisorId")
 							.setParameter("name", projectNameTh).setParameter("sem", semester)
 							.setParameter("advisorId", advisor.getAdvisorId()).uniqueResult();
 
 					if (project == null) {
-						// กำหนด projectType อัตโนมัติ
 						String finalProjectType = determineFinalProjectType(projectKey, projectTypesFound);
 
-						// สร้าง Project ใหม่
 						project = new Project();
 						project.setProj_NameTh(projectNameTh);
 						project.setProj_NameEn(null);
@@ -211,7 +197,6 @@ public class ImportStudentManager {
 					projectMap.put(projectKey, project);
 				}
 
-				// สร้าง Student496
 				Student496 stu496 = new Student496();
 				stu496.setStuId(stuId);
 				stu496.setStu_prefix(prefix);
@@ -237,12 +222,17 @@ public class ImportStudentManager {
 			}
 
 			tx.commit();
-			session.close();
-			workbook.close();
 
 		} catch (Exception e) {
+			if (tx != null && tx.isActive()) {
+				tx.rollback();
+			}
 			e.printStackTrace();
 			return "ERROR:" + e.getMessage();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
 
 		String result = "นำเข้าข้อมูลสำเร็จ " + insertedCount + " แถว, ข้าม " + skippedCount + " แถว";

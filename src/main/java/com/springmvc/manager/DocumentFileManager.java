@@ -5,9 +5,6 @@ import com.springmvc.model.HibernateConnection;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentFileManager {
@@ -37,23 +34,26 @@ public class DocumentFileManager {
 
 	// อัปเดตไฟล์
 	public static void updateFile(DocumentFile file) {
-        Session session = null;
-        Transaction tx = null;
-        try {
-            SessionFactory sf = HibernateConnection.doHibernateConnection();
-            session = sf.openSession();
-            tx = session.beginTransaction();
+		Session session = null;
+		Transaction tx = null;
+		try {
+			SessionFactory sf = HibernateConnection.doHibernateConnection();
+			session = sf.openSession();
+			tx = session.beginTransaction();
 
-            session.merge(file);
+			session.merge(file);
 
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw e;
-        } finally {
-            if (session != null) session.close();
-        }
-    }
+			tx.commit();
+		} catch (Exception e) {
+			if (tx != null && tx.isActive())
+				tx.rollback();
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (session != null && session.isOpen())
+				session.close();
+		}
+	}
 
 	// บันทึกไฟล์ใหม่
 	public static void saveFile(DocumentFile file) {

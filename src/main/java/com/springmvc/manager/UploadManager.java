@@ -16,119 +16,139 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class UploadManager {
 
-	// ✅ ใช้ path เดียวกันทั้งการอัปโหลดและแก้ไข
 	private static final String UPLOAD_BASE_PATH = "D:/Project496Uploads/uploadsFile";
 
 	public List<DocumentFile> getFilesByProject(int projectId) {
-		SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-		Session session = sessionFactory.openSession();
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
 
-		Query<DocumentFile> query = session.createQuery(
-				"FROM DocumentFile WHERE project.projectId = :pid ORDER BY file_no ASC", DocumentFile.class);
-		query.setParameter("pid", projectId);
+			Query<DocumentFile> query = session.createQuery(
+					"FROM DocumentFile WHERE project.projectId = :pid ORDER BY file_no ASC", DocumentFile.class);
+			query.setParameter("pid", projectId);
 
-		List<DocumentFile> list = query.list();
-		session.close();
-		return list;
+			List<DocumentFile> list = query.list();
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
 	}
 
 	public void saveFile(int projectId, String fileType, String fileName, MultipartFile file, String videoLink,
 			ServletContext context) {
 
-		SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
 
-		DocumentFile doc = new DocumentFile();
-		Project project = session.get(Project.class, projectId);
-		doc.setProject(project);
-		doc.setFiletype(fileType);
-		doc.setFilename(fileName);
+			DocumentFile doc = new DocumentFile();
+			Project project = session.get(Project.class, projectId);
+			doc.setProject(project);
+			doc.setFiletype(fileType);
+			doc.setFilename(fileName);
 
-		LocalDateTime localDateTime = LocalDateTime.now();
-		Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-		doc.setSendDate(date);
-		doc.setStatus("อัปโหลดสำเร็จ");
+			LocalDateTime localDateTime = LocalDateTime.now();
+			Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+			doc.setSendDate(date);
+			doc.setStatus("อัปโหลดสำเร็จ");
 
-		// ✅ เซ็ต path จริงบนเครื่อง
-		new File(UPLOAD_BASE_PATH).mkdirs(); // เผื่อยังไม่มี
+			new File(UPLOAD_BASE_PATH).mkdirs();
 
-		if ("file".equals(fileType) && file != null && !file.isEmpty()) {
-			try {
-				// ✅ ตั้งชื่อไฟล์ไม่ซ้ำ
-				String safeFilename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-				String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
+			if ("file".equals(fileType) && file != null && !file.isEmpty()) {
+				try {
+					String safeFilename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+					String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
 
-				// ✅ debug log
-				System.out.println("📂 Saving file to: " + fullPath);
+					System.out.println("📂 Saving file to: " + fullPath);
 
-				file.transferTo(new File(fullPath));
+					file.transferTo(new File(fullPath));
+					doc.setFilepath(safeFilename);
 
-				// ✅ เก็บแค่ชื่อไฟล์ไว้ (ไม่ใช่ path จริง)
-				doc.setFilepath(safeFilename);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-				doc.setStatus("เกิดข้อผิดพลาด");
+				} catch (IOException e) {
+					e.printStackTrace();
+					doc.setStatus("เกิดข้อผิดพลาด");
+				}
+			} else if ("video".equals(fileType)) {
+				doc.setFilepath(videoLink);
 			}
-		} else if ("video".equals(fileType)) {
-			doc.setFilepath(videoLink); // เก็บลิงก์โดยตรง
+
+			Query<Integer> maxQuery = session
+					.createQuery("SELECT MAX(fileno) FROM DocumentFile WHERE project.projectId = :pid", Integer.class);
+			maxQuery.setParameter("pid", projectId);
+			Integer maxNo = maxQuery.uniqueResult();
+			doc.setFileno(maxNo == null ? 1 : maxNo + 1);
+
+			session.save(doc);
+			session.getTransaction().commit();
+
+		} catch (Exception e) {
+			if (session != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
 		}
-
-		// ลำดับไฟล์
-		Query<Integer> maxQuery = session
-				.createQuery("SELECT MAX(fileno) FROM DocumentFile WHERE project.projectId = :pid", Integer.class);
-		maxQuery.setParameter("pid", projectId);
-		Integer maxNo = maxQuery.uniqueResult();
-		doc.setFileno(maxNo == null ? 1 : maxNo + 1);
-
-		session.save(doc);
-		session.getTransaction().commit();
-		session.close();
 	}
 
 	public DocumentFile getFileById(int fileId) {
-		Session session = HibernateConnection.doHibernateConnection().openSession();
-		DocumentFile file = session.get(DocumentFile.class, fileId);
-		session.close();
-		return file;
+		Session session = null;
+		try {
+			session = HibernateConnection.doHibernateConnection().openSession();
+			DocumentFile file = session.get(DocumentFile.class, fileId);
+			return file;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
 	}
 
-	// ✅ แก้ไข method updateFileOrVideo
 	public void updateFileOrVideo(int id, String filename, String videoLink, MultipartFile newFile,
 			HttpServletRequest request) {
-		Session session = HibernateConnection.doHibernateConnection().openSession();
+		Session session = null;
 		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
 			session.beginTransaction();
+
 			DocumentFile file = session.get(DocumentFile.class, id);
 
 			if (file == null) {
 				throw new RuntimeException("ไม่พบไฟล์ที่ต้องการแก้ไข");
 			}
 
-			// อัปเดตชื่อไฟล์
 			file.setFilename(filename);
 
 			if ("video".equals(file.getFiletype())) {
-				// ✅ แก้ไขวิดีโอ - อัปเดตลิงก์
 				file.setFilepath(videoLink);
 				System.out.println("🎥 Updated video link: " + videoLink);
 
 			} else if ("file".equals(file.getFiletype()) && newFile != null && !newFile.isEmpty()) {
-				// ✅ แก้ไขไฟล์ PDF - อัปโหลดไฟล์ใหม่
-
-				// สร้างโฟลเดอร์ถ้ายังไม่มี
 				File uploadDir = new File(UPLOAD_BASE_PATH);
 				if (!uploadDir.exists()) {
 					uploadDir.mkdirs();
 				}
 
-				// ลบไฟล์เก่า (ถ้ามี)
 				String oldFilePath = file.getFilepath();
 				if (oldFilePath != null && !oldFilePath.isEmpty()) {
 					File oldFile = new File(UPLOAD_BASE_PATH + File.separator + oldFilePath);
@@ -139,13 +159,12 @@ public class UploadManager {
 					}
 				}
 
-				// บันทึกไฟล์ใหม่
 				String safeFilename = System.currentTimeMillis() + "_" + newFile.getOriginalFilename();
 				String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
 
 				try {
 					newFile.transferTo(new File(fullPath));
-					file.setFilepath(safeFilename); // อัปเดต path ใหม่
+					file.setFilepath(safeFilename);
 
 					System.out.println("📄 Updated PDF file: " + fullPath);
 					System.out.println("💾 New filepath in DB: " + safeFilename);
@@ -156,12 +175,11 @@ public class UploadManager {
 				}
 			}
 
-			// อัปเดต timestamp
 			LocalDateTime localDateTime = LocalDateTime.now();
 			Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 			file.setSendDate(date);
 
-			session.merge(file); // ใช้ merge แทน update เพื่อความปลอดภัย
+			session.merge(file);
 			session.getTransaction().commit();
 
 			System.out.println("✅ File updated successfully - ID: " + id);
@@ -169,7 +187,7 @@ public class UploadManager {
 		} catch (Exception e) {
 			System.err.println("❌ Error updating file: " + e.getMessage());
 			e.printStackTrace();
-			if (session.getTransaction().isActive()) {
+			if (session != null && session.getTransaction().isActive()) {
 				session.getTransaction().rollback();
 			}
 			throw new RuntimeException("เกิดข้อผิดพลาดในการแก้ไขไฟล์: " + e.getMessage());

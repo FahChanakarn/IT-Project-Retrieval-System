@@ -1,18 +1,18 @@
-
 .fix-import-student-content {
 	height: calc(100vh - 157px);
 }
 
-/* ✅ สีหัวเรื่อง */
+/* ✅ Title */
 h5 {
-	color: #aa1818;
+	color: #056f00;
 	margin-bottom: 1.5rem;
-	font-weight: 600;
+	font-weight: bold;
 }
 
 /* ✅ เส้นแบ่งหัวเรื่อง */
 hr {
-	border-top: 2px solid
+	border-top: 2px solid;
+	margin-bottom: 2rem;
 }
 
 /* ✅ ปรับ label ให้ดูเด่น */

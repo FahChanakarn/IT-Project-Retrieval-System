@@ -26,7 +26,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold text-danger">จัดการโครงงาน /
+		<h5 class="fw-bold">จัดการโครงงาน /
 			รายการโครงงานทั้งหมด</h5>
 		<hr>
 

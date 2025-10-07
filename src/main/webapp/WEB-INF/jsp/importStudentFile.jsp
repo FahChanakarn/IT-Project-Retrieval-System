@@ -32,7 +32,7 @@
 	<div class="container mt-4 pt-4 fix-import-student-content">
 		<div class="mx-auto">
 			<h5>
-				<strong>ข้อมูลนักศึกษา / Import Excel File</strong>
+				<strong>ข้อมูลนักศึกษา / เพิ่มข้อมูลโครงงาน</strong>
 			</h5>
 			<hr class="mb-4">
 

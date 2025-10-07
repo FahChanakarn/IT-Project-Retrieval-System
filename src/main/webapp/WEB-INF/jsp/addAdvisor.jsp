@@ -25,7 +25,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold text-danger">อาจารย์ / เพิ่มข้อมูลอาจารย์</h5>
+		<h5 class="fw-bold">อาจารย์ / เพิ่มข้อมูลอาจารย์</h5>
 		<hr>
 
 		<form id="advisorForm"

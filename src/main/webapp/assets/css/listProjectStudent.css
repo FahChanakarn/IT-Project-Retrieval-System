@@ -3,16 +3,16 @@ body {
 	font-family: 'Kanit', sans-serif;
 }
 
-/* Header */
+/* ✅ Title */
 h5 {
-	color: #aa1818;
-	font-weight: bold;
+	color: #056f00;
 	margin-bottom: 1.5rem;
+	font-weight: bold;
 }
 
-/* เส้นคั่น */
+/* ✅ เส้นแบ่งหัวเรื่อง */
 hr {
-	border-top: 2px solid #ccc;
+	border-top: 2px solid;
 	margin-bottom: 2rem;
 }
 
@@ -23,15 +23,9 @@ select.form-select {
 
 /* ปรับ dropdown ภาคเรียน */
 .custom-semester-select {
-	width: 130px; 
-	font-size: 16px; 
+	width: 130px;
+	font-size: 16px;
 	padding: 6px 8px;
-}
-
-/* Container spacing */
-.container {
-	padding-top: 30px;
-	padding-bottom: 40px;
 }
 
 /* ================== ตาราง ================== */

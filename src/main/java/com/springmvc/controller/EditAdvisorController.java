@@ -39,9 +39,18 @@ public class EditAdvisorController {
 		// ป้องกันแก้ไขข้อมูลคนอื่น
 		advisor.setAdvisorId(sessionAdvisor.getAdvisorId());
 
+		// ถ้า password เว้นว่าง = ไม่เปลี่ยน
+		if (advisor.getAdv_password() == null || advisor.getAdv_password().isEmpty()) {
+			advisor.setAdv_password(sessionAdvisor.getAdv_password());
+		}
+
 		AdvisorManager advisorManager = new AdvisorManager();
 		advisorManager.updateAdvisor(advisor);
 
+		// อัปเดต session ด้วยข้อมูลใหม่
+		session.setAttribute("advisor", advisorManager.getAdvisorById(advisor.getAdvisorId()));
+
+		// redirect ไปหน้า profile
 		return new ModelAndView("redirect:/advisor/profile");
 	}
 

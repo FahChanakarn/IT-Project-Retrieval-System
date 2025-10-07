@@ -22,7 +22,7 @@ public class HomeController {
 	private static final int PROJECTS_PER_PAGE = 10;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public ModelAndView home(@RequestParam(value = "page", defaultValue = "1") int page) {
+	public ModelAndView home(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) {
 		AdvisorManager advisorManager = new AdvisorManager();
 		ProjectManager projectManager = new ProjectManager();
 		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
@@ -37,7 +37,7 @@ public class HomeController {
 		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
 
 		// ดึงโปรเจคทั้งหมดและคำนวณ pagination
-		List<Project> allProjects = projectManager.getAllProjects(); // ต้องมี method นี้ใน ProjectManager
+		List<Project> allProjects = projectManager.getAllProjects();
 		int totalProjects = allProjects != null ? allProjects.size() : 0;
 		int totalPages = (int) Math.ceil((double) totalProjects / PROJECTS_PER_PAGE);
 
@@ -65,6 +65,13 @@ public class HomeController {
 		mav.addObject("currentPage", page);
 		mav.addObject("totalPages", totalPages);
 		mav.addObject("totalProjects", totalProjects);
+
+		// ✅ ตรวจสอบว่าต้องแสดง popup หรือไม่
+		Boolean showPopup = (Boolean) session.getAttribute("showWelcomePopup");
+		if (showPopup != null && showPopup) {
+			mav.addObject("showWelcomePopup", true);
+			session.removeAttribute("showWelcomePopup"); // ลบออกหลังแสดงครั้งเดียว
+		}
 
 		return mav;
 	}

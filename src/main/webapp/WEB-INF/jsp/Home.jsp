@@ -35,6 +35,7 @@ request.setAttribute("currentYear", thisYear);
 	href="${pageContext.request.contextPath}/assets/css/Home.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/header.css">
+
 </head>
 <body>
 
@@ -263,8 +264,77 @@ request.setAttribute("currentYear", thisYear);
 			</div>
 		</div>
 	</div>
-	<jsp:include page="/WEB-INF/jsp/includes/footer.jsp" />
 
+	<!-- ✅ Welcome Popup Modal -->
+	<div class="modal fade" id="welcomeModal" tabindex="-1"
+		aria-labelledby="welcomeModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" id="welcomeModalLabel">
+						<i class="bi bi-info-circle-fill me-2"></i>ขั้นตอนการดำเนินการ
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="alert alert-info mb-4">
+						<i class="bi bi-hand-thumbs-up-fill me-2"></i> <strong>ยินดีต้อนรับ!</strong>
+						กรุณาดำเนินการตามขั้นตอนด้านล่าง
+					</div>
+
+					<div class="steps-container">
+						<div class="step-item mb-3">
+							<div class="d-flex align-items-start">
+								<div class="step-number">1</div>
+								<div class="step-content">
+									<h6 class="fw-bold mb-2">แก้ไขบทคัดย่อและข้อมูลโครงงาน</h6>
+									<p class="text-muted mb-0">เมื่อเข้าสู่ระบบแล้ว
+										กรุณาแก้ไขบทคัดย่อและข้อมูลโครงงานของท่าน</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="step-item mb-3">
+							<div class="d-flex align-items-start">
+								<div class="step-number">2</div>
+								<div class="step-content">
+									<h6 class="fw-bold mb-2">รอการอนุมัติจากอาจารย์ที่ปรึกษา</h6>
+									<p class="text-muted mb-0">เมื่อแก้ไขเสร็จสิ้น
+										ต้องรอดำเนินการอนุมัติในการอัปโหลดไฟล์เอกสารจากอาจารย์ที่ปรึกษาของท่าน</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="step-item mb-3">
+							<div class="d-flex align-items-start">
+								<div class="step-number">3</div>
+								<div class="step-content">
+									<h6 class="fw-bold mb-2">อัปโหลดไฟล์เอกสารและวิดีโอ</h6>
+									<p class="text-muted mb-0">หากอาจารย์ที่ปรึกษาของท่านได้ทำการอนุมัติแล้ว
+										ท่านจึงจะสามารถอัปโหลดไฟล์เอกสาร
+										และวิดีโอตัวอย่างการใช้งานโปรแกรมได้</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="alert alert-warning mt-4 mb-0">
+						<i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>หมายเหตุ:</strong>
+						ท่านสามารถแก้ไขข้อมูลส่วนตัวของตนเองได้ ตรงเมนู <strong>"แก้ไขข้อมูลส่วนตัว"</strong>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-check-circle me-2"></i>เข้าใจแล้ว
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<jsp:include page="/WEB-INF/jsp/includes/footer.jsp" />
 
 	<script>
 // เก็บค่า keyword สำหรับ search pagination
@@ -324,10 +394,31 @@ function goToPage(page) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+  console.log("DOMContentLoaded fired");
+  
+  // ✅ Debug: ตรวจสอบว่ามี showWelcomePopup หรือไม่
+  const showPopup = "${showWelcomePopup}";
+  console.log("showWelcomePopup value:", showPopup);
+  
+  // ✅ แสดง popup เมื่อ login เข้ามาใหม่
+  <c:if test="${showWelcomePopup}">
+    console.log("Attempting to show welcome modal...");
+    const modalElement = document.getElementById('welcomeModal');
+    if (modalElement) {
+      console.log("Modal element found, showing modal...");
+      var welcomeModal = new bootstrap.Modal(modalElement);
+      welcomeModal.show();
+    } else {
+      console.error("Modal element not found!");
+    }
+  </c:if>
+  
+  // Filter form auto submit
   document.querySelectorAll(".form-select, .form-check-input").forEach(el => {
     el.addEventListener("change", () => document.getElementById("filterForm").submit());
   });
 
+  // Search functionality
   const searchInput = document.getElementById("searchInput");
   const searchIcon = document.getElementById("searchIcon");
 
@@ -351,5 +442,3 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
-</body>
-</html>

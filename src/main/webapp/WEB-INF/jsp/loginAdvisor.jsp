@@ -47,7 +47,7 @@
 				<div class="mb-3">
 					<label for="email" class="form-label text-danger">อีเมล</label> <input
 						type="text" name="email" id="email" class="form-control"
-						placeholder="example@email.com" required>
+						placeholder="example@email.com">
 					<!-- error message -->
 					<div id="emailError" class="text-danger mt-1 small"></div>
 				</div>

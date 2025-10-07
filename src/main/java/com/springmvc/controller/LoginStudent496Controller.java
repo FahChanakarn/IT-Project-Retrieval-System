@@ -39,7 +39,6 @@ public class LoginStudent496Controller {
 			if (student == null) {
 				mav.addObject("loginFailed", true);
 				mav.addObject("errorMessage", "ไม่พบรหัสนักศึกษานี้ในระบบ");
-				// ✅ โหลด studentList กลับมาเพื่อแสดงใน dropdown
 				List<Student496> studentList = manager.getAllStudents();
 				mav.addObject("studentList", studentList);
 				return mav;
@@ -49,16 +48,19 @@ public class LoginStudent496Controller {
 				HttpSession session = request.getSession();
 				session.setAttribute("student", student);
 
+				// ✅ เพิ่มบรรทัดนี้เพื่อบอกว่าเพิ่ง login เข้ามาใหม่
+				session.setAttribute("showWelcomePopup", true);
+
 				if (student.getProject() != null) {
 					session.setAttribute("projectId", student.getProject().getProjectId());
 				}
 
 				mav.addObject("loginSuccess", true);
-				mav.addObject("redirectUrl", request.getContextPath() + "/searchProjects");
+				// ✅ แก้ไข redirect ไปที่หน้าแรก (/) แทน /searchProjects
+				mav.addObject("redirectUrl", request.getContextPath() + "/");
 			} else {
 				mav.addObject("loginFailed", true);
 				mav.addObject("errorMessage", "รหัสผ่านไม่ถูกต้อง");
-				// ✅ โหลด studentList กลับมาเพื่อแสดงใน dropdown
 				List<Student496> studentList = manager.getAllStudents();
 				mav.addObject("studentList", studentList);
 			}
@@ -67,7 +69,6 @@ public class LoginStudent496Controller {
 			e.printStackTrace();
 			mav.addObject("loginFailed", true);
 			mav.addObject("errorMessage", "เกิดข้อผิดพลาดในระบบ: " + e.getMessage());
-			// ✅ โหลด studentList กลับมาเพื่อแสดงใน dropdown
 			List<Student496> studentList = manager.getAllStudents();
 			mav.addObject("studentList", studentList);
 		}

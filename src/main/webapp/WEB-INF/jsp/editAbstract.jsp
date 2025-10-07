@@ -29,8 +29,9 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4">
-		<div class="path-title">แก้ไขบทคัดย่อ</div>
+	<div class="container mt-5">
+		<h5 class="fw-bold">แก้ไขบทคัดย่อ</h5>
+		<hr>
 
 		<form action="${pageContext.request.contextPath}/updateAbstract"
 			method="post">
@@ -50,12 +51,6 @@
 					</c:choose>
 					<br />
 				</c:forEach>
-			</div>
-
-			<!-- ภาคเรียน -->
-			<div class="mb-3">
-				<label class="form-label fw-bold">ภาคเรียน :</label>
-				${project.semester}
 			</div>
 
 			<!-- ชื่อโครงงานภาษาไทย -->

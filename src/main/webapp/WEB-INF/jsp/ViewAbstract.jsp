@@ -33,55 +33,9 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">${project.proj_NameTh} / 
-			ดูรายละเอียด</h5>
+		<h5 class="fw-bold">${project.proj_NameTh} / ดูรายละเอียด</h5>
 		<hr>
-		<div class="mb-3">
-			<c:choose>
-				<c:when
-					test="${empty sessionScope.itstudent and empty sessionScope.student and empty sessionScope.advisor and empty sessionScope.admin}">
-					<a
-						href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-						class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
-						วิดีโอตัวอย่างการใช้งานโปรแกรม
-					</a>
-				</c:when>
 
-				<c:otherwise>
-					<c:choose>
-						<c:when test="${not empty sessionScope.admin}">
-							<a
-								href="${pageContext.request.contextPath}/admin/viewProjectDetail?projectId=${project.projectId}"
-								class="btn btn-primary me-2"> <i
-								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
-							</a>
-						</c:when>
-
-						<c:when test="${not empty sessionScope.advisor}">
-							<a
-								href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${project.projectId}"
-								class="btn btn-primary me-2"> <i
-								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
-							</a>
-						</c:when>
-
-						<c:otherwise>
-							<a
-								href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
-								class="btn btn-primary me-2"> <i
-								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
-							</a>
-						</c:otherwise>
-					</c:choose>
-
-					<a
-						href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-						class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
-						วิดีโอตัวอย่างการใช้งานโปรแกรม
-					</a>
-				</c:otherwise>
-			</c:choose>
-		</div>
 		<div class="abstract-card">
 			<!-- Project Information -->
 			<div class="info-row">
@@ -117,6 +71,52 @@
 
 			<div class="info-row">
 				<span class="info-label">ภาคเรียน :</span> <span class="info-value">${project.semester}</span>
+			</div>
+			<div class="mb-3">
+				<c:choose>
+					<c:when
+						test="${empty sessionScope.itstudent and empty sessionScope.student and empty sessionScope.advisor and empty sessionScope.admin}">
+						<a
+							href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+							class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+							วิดีโอตัวอย่างการใช้งานโปรแกรม
+						</a>
+					</c:when>
+
+					<c:otherwise>
+						<c:choose>
+							<c:when test="${not empty sessionScope.admin}">
+								<a
+									href="${pageContext.request.contextPath}/admin/viewProjectDetail?projectId=${project.projectId}"
+									class="btn btn-primary me-2"> <i
+									class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+								</a>
+							</c:when>
+
+							<c:when test="${not empty sessionScope.advisor}">
+								<a
+									href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${project.projectId}"
+									class="btn btn-primary me-2"> <i
+									class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+								</a>
+							</c:when>
+
+							<c:otherwise>
+								<a
+									href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
+									class="btn btn-primary me-2"> <i
+									class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
+								</a>
+							</c:otherwise>
+						</c:choose>
+
+						<a
+							href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+							class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+							วิดีโอตัวอย่างการใช้งานโปรแกรม
+						</a>
+					</c:otherwise>
+				</c:choose>
 			</div>
 
 			<!-- Abstract Section -->

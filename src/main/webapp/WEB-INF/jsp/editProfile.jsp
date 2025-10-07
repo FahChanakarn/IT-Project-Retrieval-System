@@ -35,7 +35,7 @@
 			<form action="${pageContext.request.contextPath}/updateProfile"
 				method="post" enctype="multipart/form-data">
 				<div class="profile-section">
-					<!-- ✅ แก้ไขการแสดงรูปโปรไฟล์ -->
+					<!-- ✅ แสดงรูปโปรไฟล์ -->
 					<c:choose>
 						<c:when test="${not empty sessionScope.student.stu_image}">
 							<img
@@ -81,11 +81,10 @@
 
 				<div class="row mt-3">
 					<div class="col-md-6">
-						<label>รหัสผ่าน</label>
+						<label>รหัสผ่านใหม่ (ถ้าต้องการเปลี่ยน)</label>
 						<div class="input-group">
 							<input type="password" class="form-control" name="stu_password"
-								id="password" value="${sessionScope.student.stu_password}"
-								required>
+								id="password" placeholder="เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน">
 							<button class="btn btn-outline-secondary" type="button"
 								onclick="togglePassword('password')">
 								<i class="bi bi-eye"></i>
@@ -93,10 +92,10 @@
 						</div>
 					</div>
 					<div class="col-md-6">
-						<label>ยืนยันรหัสผ่าน</label>
+						<label>ยืนยันรหัสผ่านใหม่</label>
 						<div class="input-group">
 							<input type="password" class="form-control" id="confirmPassword"
-								required>
+								placeholder="เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน">
 							<button class="btn btn-outline-secondary" type="button"
 								onclick="togglePassword('confirmPassword')">
 								<i class="bi bi-eye"></i>
@@ -120,20 +119,42 @@
 document.addEventListener('DOMContentLoaded', function() {
     function togglePassword(id) {
         const input = document.getElementById(id);
-        input.type = input.type === "password" ? "text" : "password";
+        const icon = input.nextElementSibling.querySelector('i');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
     }
 
     function validatePasswords() {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
-        if (password !== confirmPassword) {
-            Swal.fire({
-                icon: 'error',
-                title: 'รหัสผ่านไม่ตรงกัน',
-                confirmButtonText: 'ตกลง'
-            });
-            return false;
+        // ถ้ากรอกรหัสผ่านใดรหัสหนึ่ง ต้องกรอกทั้ง 2 ช่องให้ตรงกัน
+        if (password || confirmPassword) {
+            if (password !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'รหัสผ่านไม่ตรงกัน',
+                    text: 'กรุณากรอกรหัสผ่านและยืนยันรหัสผ่านให้ตรงกัน',
+                    confirmButtonText: 'ตกลง'
+                });
+                return false;
+            }
+            if (password.length < 6) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'รหัสผ่านสั้นเกินไป',
+                    text: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร',
+                    confirmButtonText: 'ตกลง'
+                });
+                return false;
+            }
         }
         return true;
     }
@@ -149,7 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!allowedTypes.includes(file.type)) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'กรุณาเลือกไฟล์ JPG หรือ PNG เท่านั้น',
+                        title: 'ไฟล์ไม่ถูกต้อง',
+                        text: 'กรุณาเลือกไฟล์ JPG หรือ PNG เท่านั้น',
                         confirmButtonText: 'ตกลง'
                     });
                     e.target.value = '';
@@ -160,7 +182,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (file.size > maxSize) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB',
+                        title: 'ไฟล์ใหญ่เกินไป',
+                        text: 'ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB',
                         confirmButtonText: 'ตกลง'
                     });
                     e.target.value = '';

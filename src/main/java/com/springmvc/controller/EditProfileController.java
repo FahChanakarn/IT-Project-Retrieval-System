@@ -56,23 +56,38 @@ public class EditProfileController {
 		String lastName = request.getParameter("stu_lastName");
 		String password = request.getParameter("stu_password");
 
-		// ✅ ตรวจสอบว่าข้อมูลไม่ว่าง
-		if (firstName == null || lastName == null || password == null || firstName.trim().isEmpty()
-				|| lastName.trim().isEmpty() || password.trim().isEmpty()) {
+		// ✅ ตรวจสอบว่าข้อมูลพื้นฐานไม่ว่าง (ไม่รวม password)
+		if (firstName == null || lastName == null || firstName.trim().isEmpty() || lastName.trim().isEmpty()) {
 
 			String projectName = getProjectName(student);
 			ModelAndView mav = new ModelAndView("editProfile");
 			mav.addObject("projectName", projectName);
-			mav.addObject("error", "กรุณากรอกข้อมูลให้ครบถ้วน");
+			mav.addObject("error", "กรุณากรอกชื่อและนามสกุลให้ครบถ้วน");
 			return mav;
 		}
 
 		// ✅ อัปเดตข้อมูลนักศึกษา
 		student.setStu_firstName(firstName.trim());
 		student.setStu_lastName(lastName.trim());
-		student.setStu_password(password.trim());
 
-		// ✅ จัดการอัปโหลดไฟล์ (ปรับปรุง)
+		// ✅ เปลี่ยนรหัสผ่านเฉพาะเมื่อมีการกรอกมา
+		if (password != null && !password.trim().isEmpty()) {
+			if (password.trim().length() < 6) {
+				String projectName = getProjectName(student);
+				ModelAndView mav = new ModelAndView("editProfile");
+				mav.addObject("projectName", projectName);
+				mav.addObject("error", "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+				return mav;
+			}
+			String hashedPassword = PasswordUtil.hashPassword(password.trim());
+			student.setStu_password(hashedPassword);
+			System.out.println("🔐 Password updated and hashed for student: " + student.getStuId());
+		} else {
+			System.out.println("ℹ️ Password not changed for student: " + student.getStuId());
+		}
+		// ถ้าไม่กรอก password รหัสผ่านเดิมจะยังคงอยู่ใน object student
+
+		// ✅ จัดการอัปโหลดไฟล์
 		if (imageFile != null && !imageFile.isEmpty()) {
 			String uploadResult = handleImageUpload(imageFile, student);
 			if (uploadResult != null) { // มี error
@@ -101,12 +116,12 @@ public class EditProfileController {
 			String projectName = getProjectName(student);
 			ModelAndView mav = new ModelAndView("editProfile");
 			mav.addObject("projectName", projectName);
-			mav.addObject("error", "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+			mav.addObject("error", "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + e.getMessage());
 			return mav;
 		}
 	}
 
-	// ✅ แก้ไข method สำหรับจัดการรูปให้ใช้ absolute path
+	// ✅ จัดการการอัปโหลดรูปภาพ
 	private String handleImageUpload(MultipartFile imageFile, Student496 student) {
 		try {
 			// ตรวจสอบประเภทไฟล์
@@ -128,11 +143,15 @@ public class EditProfileController {
 				System.out.println("📁 Created profile upload directory: " + PROFILE_UPLOAD_PATH);
 			}
 
-			// ลบไฟล์เก่าถ้ามี (ใช้ absolute path)
+			// ลบไฟล์เก่าถ้ามี
 			String oldImagePath = student.getStu_image();
-			if (oldImagePath != null && !oldImagePath.contains("default-profile.png")) {
-				// แยกชื่อไฟล์จาก path ในฐานข้อมูล
-				String oldFileName = oldImagePath.substring(oldImagePath.lastIndexOf('/') + 1);
+			if (oldImagePath != null && !oldImagePath.isEmpty() && !oldImagePath.contains("default-profile.png")) {
+				String oldFileName = oldImagePath;
+				// ถ้า oldImagePath เป็น path เต็ม ให้แยกเฉพาะชื่อไฟล์
+				if (oldImagePath.contains("/") || oldImagePath.contains("\\")) {
+					oldFileName = oldImagePath
+							.substring(Math.max(oldImagePath.lastIndexOf('/'), oldImagePath.lastIndexOf('\\')) + 1);
+				}
 				File oldFile = new File(PROFILE_UPLOAD_PATH + File.separator + oldFileName);
 				if (oldFile.exists()) {
 					boolean deleted = oldFile.delete();
@@ -157,11 +176,11 @@ public class EditProfileController {
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "ไม่สามารถอัปโหลดรูปภาพได้";
+			return "ไม่สามารถอัปโหลดรูปภาพได้: " + e.getMessage();
 		}
 	}
 
-	// ✅ แยก method สำหรับดึงชื่อโปรเจค
+	// ✅ ดึงชื่อโปรเจค
 	private String getProjectName(Student496 student) {
 		if (student.getProject() != null) {
 			return student.getProject().getProj_NameTh();
@@ -169,6 +188,7 @@ public class EditProfileController {
 		return "";
 	}
 
+	// ✅ ส่งรูปภาพโปรไฟล์
 	@RequestMapping(value = "/profileImage/{filename}", method = RequestMethod.GET)
 	public void getProfileImage(@PathVariable("filename") String filename, HttpServletResponse response)
 			throws IOException {
@@ -182,6 +202,7 @@ public class EditProfileController {
 		File imageFile = new File(PROFILE_UPLOAD_PATH + File.separator + filename);
 
 		if (!imageFile.exists()) {
+			System.err.println("❌ Profile image not found: " + imageFile.getAbsolutePath());
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Profile image not found");
 			return;
 		}
@@ -210,7 +231,7 @@ public class EditProfileController {
 			}
 			response.getOutputStream().flush();
 		} catch (IOException e) {
-			System.err.println("Error serving profile image: " + filename + " - " + e.getMessage());
+			System.err.println("❌ Error serving profile image: " + filename + " - " + e.getMessage());
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error serving image");
 		}
 	}

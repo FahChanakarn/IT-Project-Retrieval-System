@@ -29,11 +29,10 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
-	<div class="container mt-4">
-		<h5>${project.proj_NameTh}/รายละเอียด</h5>
+	<div class="container mt-5">
+		<h5 class="fw bold">${project.proj_NameTh} / รายละเอียด</h5>
 		<hr>
-
-		<!-- ข้อมูลโครงงาน -->
+		
 		<div class="mb-3">
 			<p>
 				<strong>ชื่อโครงงาน :</strong>
@@ -67,12 +66,12 @@
 		<div class="mb-4">
 			<a
 				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-				class="btn btn-primary btn-section"> <i class="bi bi-file-text"></i>
+				class="btn btn-primary me-2"> <i class="bi bi-file-earmark-text me-1"></i>
 				บทคัดย่อ
 			</a> <a
 				href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-				class="btn btn-primary btn-section"> <i
-				class="bi bi-play-circle"></i> วิดีโอตัวอย่างการใช้งานโปรแกรม
+				class="btn btn-success"> <i
+				class="bi bi-play-circle me-1"></i> วิดีโอตัวอย่างการใช้งานโปรแกรม
 			</a>
 		</div>
 

@@ -33,7 +33,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold text-danger">${project.proj_NameTh}/
+		<h5 class="fw-bold">${project.proj_NameTh} / 
 			ดูรายละเอียด</h5>
 		<hr>
 		<div class="mb-3">

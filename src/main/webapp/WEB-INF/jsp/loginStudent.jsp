@@ -103,8 +103,8 @@
 	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
 	        return false;
 	    } 
-	    else if (password.length > 12) {
-	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
+	    else if (password.length > 15) {
+	        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 15 ตัวอักษร";
 	        return false;
 	    } 
 	    // เช็คห้ามมีช่องว่าง

@@ -1,15 +1,17 @@
 /* abstractView.css - CSS สำหรับหน้าแสดงบทคัดย่อ */
 body {
 	font-family: 'Kanit', sans-serif;
-	background-color: #f8f9fa;
+	background-color: #ffffff;
 }
 
+/* ✅ Title */
 h5 {
-	color: #aa1818;
+	color: #056f00;
 	margin-bottom: 1.5rem;
 	font-weight: bold;
 }
 
+/* ✅ เส้นแบ่งหัวเรื่อง */
 hr {
 	border-top: 2px solid;
 	margin-bottom: 2rem;

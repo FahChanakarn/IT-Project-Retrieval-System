@@ -272,15 +272,6 @@ public class StudentProjectController {
 				return mav;
 			}
 
-			// ตรวจสอบว่านักศึกษาแก้ไขบทคัดย่อแล้วหรือไม่
-			boolean hasEditedAbstract = projectManager.hasStudentEditedAbstract(projectId);
-
-			if (hasEditedAbstract) {
-				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
-				mav.addObject("error", "ไม่สามารถลบได้ เนื่องจากนักศึกษาได้ทำการแก้ไขบทคัดย่อแล้ว");
-				return mav;
-			}
-
 			boolean deleted = projectManager.deleteProjectAndStudents(projectId);
 
 			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");

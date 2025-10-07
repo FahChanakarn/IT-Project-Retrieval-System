@@ -57,8 +57,7 @@
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
-						class="form-control" placeholder="รหัสผ่าน (5-15 ตัวอักษร)"
-						maxlength="15">
+						class="form-control" maxlength="15">
 					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 

@@ -42,10 +42,10 @@ request.setAttribute("currentYear", thisYear);
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<!-- Main Content -->
-	<div class="container mt-4">
-		<div class="row">
+	<div class="main-wrapper">
+		<div class="row g-0">
 			<!-- Sidebar -->
-			<div class="col-md-3">
+			<div class="col-md-3 sidebar-wrapper">
 				<form id="filterForm"
 					action="${pageContext.request.contextPath}/filterProjects"
 					method="get">
@@ -148,113 +148,117 @@ request.setAttribute("currentYear", thisYear);
 				</form>
 			</div>
 
-			<!-- Main -->
+			<!-- Main Content -->
 			<div class="col-md-9">
-				<div class="search-container">
-					<h3 class="mb-4">ค้นหาโครงงาน</h3>
-					<form id="searchForm"
-						action="${pageContext.request.contextPath}/searchProjects"
-						method="get">
-						<div class="position-relative mb-5">
-							<input type="text" id="searchInput"
-								class="form-control search-box"
-								placeholder="ระบุชื่อโครงงาน หรือคำค้นหา" name="keyword">
-							<i class="bi bi-search search-icon" id="searchIcon"
-								style="cursor: pointer;"></i>
-						</div>
-					</form>
+				<div class="container">
+					<div class="search-container">
+						<h3 class="mb-4">ค้นหาโครงงาน</h3>
+						<form id="searchForm"
+							action="${pageContext.request.contextPath}/searchProjects"
+							method="get">
+							<div class="position-relative mb-5">
+								<input type="text" id="searchInput"
+									class="form-control search-box"
+									placeholder="ระบุชื่อโครงงาน หรือคำค้นหา" name="keyword">
+								<i class="bi bi-search search-icon" id="searchIcon"
+									style="cursor: pointer;"></i>
+							</div>
+						</form>
 
-					<!-- แสดงจำนวนโปรเจค -->
-					<c:if test="${not empty projects}">
-						<div class="mb-3">
-							<small class="text-muted">แสดง ${projects.size()} จาก
-								${totalProjects} โครงงาน (หน้า ${currentPage} จาก ${totalPages})</small>
-						</div>
-					</c:if>
+						<!-- แสดงจำนวนโปรเจค -->
+						<c:if test="${not empty projects}">
+							<div class="mb-3">
+								<small class="text-muted">แสดง ${projects.size()} จาก
+									${totalProjects} โครงงาน (หน้า ${currentPage} จาก
+									${totalPages})</small>
+							</div>
+						</c:if>
 
-					<c:forEach var="project" items="${projects}">
-						<div class="card mb-3 project-card">
-							<div class="card-body">
-								<div class="row">
-									<div class="col-md-9">
-										<h5 class="card-title">${project.proj_NameTh}</h5>
-										<h5 class="card-title">${project.proj_NameEn}</h5>
+						<c:forEach var="project" items="${projects}">
+							<div class="card mb-3 project-card">
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-9">
+											<h5 class="card-title">${project.proj_NameTh}</h5>
+											<h5 class="card-title">${project.proj_NameEn}</h5>
 
-										<c:forEach var="student" items="${project.student496s}">
-											<p class="card-text mb-0">ผู้จัดทำ: ${student.stuId}
-												${student.stu_prefix}${student.stu_firstName}
-												${student.stu_lastName}</p>
-										</c:forEach>
+											<c:forEach var="student" items="${project.student496s}">
+												<p class="card-text mb-0">ผู้จัดทำ: ${student.stuId}
+													${student.stu_prefix}${student.stu_firstName}
+													${student.stu_lastName}</p>
+											</c:forEach>
 
-										<p class="card-text mb-0">ประเภทโครงงาน:
-											${project.projectType}</p>
+											<p class="card-text mb-0">ประเภทโครงงาน:
+												${project.projectType}</p>
 
-										<p class="card-text mb-0">อาจารย์ที่ปรึกษา:
-											${project.advisor.adv_prefix}
-											${project.advisor.adv_firstName}
-											${project.advisor.adv_lastName}</p>
+											<p class="card-text mb-0">อาจารย์ที่ปรึกษา:
+												${project.advisor.adv_prefix}
+												${project.advisor.adv_firstName}
+												${project.advisor.adv_lastName}</p>
 
-										<p class="card-text mb-0">ภาคเรียน: ${project.semester}</p>
-									</div>
+											<p class="card-text mb-0">ภาคเรียน: ${project.semester}</p>
+										</div>
 
-									<div class="col-md-3 text-end align-self-center">
-										<a
-											href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-											class="btn btn-primary btn-sm">ดูรายละเอียด</a>
+										<div class="col-md-3 text-end align-self-center">
+											<a
+												href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
+												class="btn btn-primary btn-sm">ดูรายละเอียด</a>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					</c:forEach>
+						</c:forEach>
 
-					<!-- Pagination -->
-					<c:if test="${totalPages > 1}">
-						<nav aria-label="Project pagination">
-							<ul class="pagination justify-content-center">
-								<!-- Previous Button -->
-								<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-									<a class="page-link" href="#"
-									onclick="goToPage(${currentPage - 1}); return false;"
-									aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
-								</a>
-								</li>
+						<!-- Pagination -->
+						<c:if test="${totalPages > 1}">
+							<nav aria-label="Project pagination">
+								<ul class="pagination justify-content-center">
+									<!-- Previous Button -->
+									<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+										<a class="page-link" href="#"
+										onclick="goToPage(${currentPage - 1}); return false;"
+										aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+									</a>
+									</li>
 
-								<!-- Page Numbers -->
-								<c:forEach var="i" begin="1" end="${totalPages}">
-									<c:choose>
-										<c:when test="${i == currentPage}">
-											<li class="page-item active"><span class="page-link">${i}</span>
-											</li>
-										</c:when>
-										<c:when
-											test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
-											<li class="page-item"><a class="page-link" href="#"
-												onclick="goToPage(${i}); return false;">${i}</a></li>
-										</c:when>
-										<c:when test="${i == currentPage - 3 || i == currentPage + 3}">
-											<li class="page-item disabled"><span class="page-link">...</span>
-											</li>
-										</c:when>
-									</c:choose>
-								</c:forEach>
+									<!-- Page Numbers -->
+									<c:forEach var="i" begin="1" end="${totalPages}">
+										<c:choose>
+											<c:when test="${i == currentPage}">
+												<li class="page-item active"><span class="page-link">${i}</span>
+												</li>
+											</c:when>
+											<c:when
+												test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+												<li class="page-item"><a class="page-link" href="#"
+													onclick="goToPage(${i}); return false;">${i}</a></li>
+											</c:when>
+											<c:when
+												test="${i == currentPage - 3 || i == currentPage + 3}">
+												<li class="page-item disabled"><span class="page-link">...</span>
+												</li>
+											</c:when>
+										</c:choose>
+									</c:forEach>
 
-								<!-- Next Button -->
-								<li
-									class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-									<a class="page-link" href="#"
-									onclick="goToPage(${currentPage + 1}); return false;"
-									aria-label="Next"> <span aria-hidden="true">&raquo;</span>
-								</a>
-								</li>
-							</ul>
-						</nav>
-					</c:if>
+									<!-- Next Button -->
+									<li
+										class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+										<a class="page-link" href="#"
+										onclick="goToPage(${currentPage + 1}); return false;"
+										aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+									</a>
+									</li>
+								</ul>
+							</nav>
+						</c:if>
 
-					<c:if test="${empty projects}">
-						<div class="alert alert-warning mt-3">
-							<strong>ไม่พบข้อมูลโครงงานที่ค้นหา</strong>
-						</div>
-					</c:if>
+						<c:if test="${empty projects}">
+							<div class="alert alert-warning mt-3">
+								<strong>ไม่พบข้อมูลโครงงานที่ค้นหา</strong>
+							</div>
+						</c:if>
+					</div>
 				</div>
 			</div>
 		</div>

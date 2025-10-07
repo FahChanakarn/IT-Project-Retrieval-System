@@ -40,13 +40,14 @@ public class ImportStudentManager {
 		Map<String, Project> projectMap = new HashMap<>();
 		Map<String, Set<String>> projectTypesFound = new HashMap<>();
 
+		SessionFactory factory = null;
 		Session session = null;
 		Transaction tx = null;
 
 		try (Workbook workbook = new XSSFWorkbook(excelFile)) {
 			Sheet sheet = workbook.getSheetAt(0);
 
-			SessionFactory factory = HibernateConnection.doHibernateConnection();
+			factory = HibernateConnection.doHibernateConnection();
 			session = factory.openSession();
 			tx = session.beginTransaction();
 
@@ -64,10 +65,12 @@ public class ImportStudentManager {
 				if (projectNameTh.isEmpty() || advisorFullName.isEmpty())
 					continue;
 
-				String[] unwantedPrefixes = { "ผศ.ดร.", "อ.ดร.", "อ." };
+				// ✅ ตัดคำนำหน้า
+				String[] unwantedPrefixes = { "ผศ.ดร.", "รศ.ดร.", "อ.ดร.", "ผศ.", "รศ.", "อ.", "ดร." };
 				for (String p : unwantedPrefixes) {
 					if (advisorFullName.startsWith(p)) {
 						advisorFullName = advisorFullName.substring(p.length()).trim();
+						break;
 					}
 				}
 
@@ -101,9 +104,9 @@ public class ImportStudentManager {
 					continue;
 
 				String stuId = getStringCell(row.getCell(0)).trim().replaceAll("\\s+", "");
-				String fullName = getStringCell(row.getCell(1));
-				String advisorFullName = getStringCell(row.getCell(2));
-				String projectNameTh = getStringCell(row.getCell(3));
+				String fullName = getStringCell(row.getCell(1)).trim();
+				String advisorFullName = getStringCell(row.getCell(2)).trim();
+				String projectNameTh = getStringCell(row.getCell(3)).trim();
 				String studentType = getStringCell(row.getCell(4)).trim();
 
 				String password = "mju" + stuId;
@@ -114,35 +117,64 @@ public class ImportStudentManager {
 					continue;
 				}
 
-				if (advisorFullName == null || advisorFullName.isEmpty()) {
+				if (advisorFullName.isEmpty()) {
 					skippedCount++;
 					System.out.println("Skipped Row " + (i + 1) + ": Advisor empty for student - " + stuId);
 					continue;
 				}
 
-				String[] unwantedPrefixes = { "ผศ.ดร.", "อ.ดร.", "อ." };
+				// ✅ เก็บชื่อเดิมไว้ก่อน (สำหรับ log)
+				String originalAdvisorName = advisorFullName;
+
+				// ✅ ตัดคำนำหน้าออก
+				String[] unwantedPrefixes = { "ผศ.ดร.", "รศ.ดร.", "อ.ดร.", "ผศ.", "รศ.", "อ.", "ดร." };
 				for (String p : unwantedPrefixes) {
 					if (advisorFullName.startsWith(p)) {
 						advisorFullName = advisorFullName.substring(p.length()).trim();
+						break;
 					}
 				}
 
+				// ✅ แยกชื่อ-นามสกุล
 				String[] nameParts = advisorFullName.split("\\s+");
-				String advisorLastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
-				String advisorFirstName = nameParts.length > 1
-						? String.join(" ", java.util.Arrays.copyOf(nameParts, nameParts.length - 1))
-						: nameParts[0];
 
-				Advisor advisor = (Advisor) session
-						.createQuery("FROM Advisor WHERE adv_firstName = :first AND adv_lastName = :last")
-						.setParameter("first", advisorFirstName).setParameter("last", advisorLastName).uniqueResult();
-
-				if (advisor == null) {
+				if (nameParts.length < 2) {
 					skippedCount++;
-					System.out.println("Skipped Row " + (i + 1) + ": Advisor not found - " + advisorFullName);
+					System.out
+							.println("Skipped Row " + (i + 1) + ": Cannot parse advisor name - " + originalAdvisorName);
 					continue;
 				}
 
+				String advisorLastName = nameParts[nameParts.length - 1].trim();
+				String advisorFirstName = String.join(" ", java.util.Arrays.copyOf(nameParts, nameParts.length - 1))
+						.trim();
+
+				// ✅ ค้นหาอาจารย์ด้วย TRIM
+				Advisor advisor = (Advisor) session
+						.createQuery("FROM Advisor WHERE TRIM(adv_firstName) = :first AND TRIM(adv_lastName) = :last")
+						.setParameter("first", advisorFirstName).setParameter("last", advisorLastName).uniqueResult();
+
+				// ✅ ถ้าหาไม่เจอ ลองหาแบบ LIKE
+				if (advisor == null) {
+					advisor = (Advisor) session.createQuery(
+							"FROM Advisor WHERE LOWER(CONCAT(TRIM(adv_firstName), ' ', TRIM(adv_lastName))) LIKE :name")
+							.setParameter("name", "%" + advisorFullName.toLowerCase() + "%").setMaxResults(1)
+							.uniqueResult();
+				}
+
+				if (advisor == null) {
+					skippedCount++;
+					System.out.println("❌ Skipped Row " + (i + 1) + ": Advisor not found");
+					System.out.println("   Original: '" + originalAdvisorName + "'");
+					System.out.println(
+							"   Searched: firstName='" + advisorFirstName + "', lastName='" + advisorLastName + "'");
+					continue;
+				}
+
+				System.out.println("✅ Row " + (i + 1) + " | Found advisor: " + advisor.getAdv_firstName() + " "
+						+ advisor.getAdv_lastName());
+
+				// ✅ แยกชื่อนักศึกษา
 				int lastSpace = fullName.lastIndexOf(" ");
 				String lastName = lastSpace >= 0 ? fullName.substring(lastSpace + 1).trim() : "";
 				String firstAndPrefix = lastSpace >= 0 ? fullName.substring(0, lastSpace).trim() : fullName;
@@ -158,6 +190,7 @@ public class ImportStudentManager {
 					}
 				}
 
+				// ✅ เช็คว่านักศึกษามีในระบบแล้วหรือยัง
 				if (session.get(Student496.class, stuId) != null) {
 					skippedCount++;
 					duplicateStudents.add(stuId);
@@ -165,6 +198,7 @@ public class ImportStudentManager {
 					continue;
 				}
 
+				// ✅ สร้างหรือหา Project
 				String projectKey = projectNameTh + "_" + semester + "_" + advisorFullName;
 				Project project = projectMap.get(projectKey);
 
@@ -197,6 +231,7 @@ public class ImportStudentManager {
 					projectMap.put(projectKey, project);
 				}
 
+				// ✅ สร้างนักศึกษา
 				Student496 stu496 = new Student496();
 				stu496.setStuId(stuId);
 				stu496.setStu_prefix(prefix);
@@ -211,6 +246,7 @@ public class ImportStudentManager {
 				insertedCount++;
 				System.out.println("Inserted Student: " + stuId + " | Project: " + projectNameTh);
 
+				// ✅ Flush ทุก 20 แถว
 				if (i % 20 == 0) {
 					session.flush();
 					session.clear();
@@ -233,6 +269,9 @@ public class ImportStudentManager {
 			if (session != null && session.isOpen()) {
 				session.close();
 			}
+			if (factory != null && !factory.isClosed()) {
+				factory.close();
+			}
 		}
 
 		String result = "นำเข้าข้อมูลสำเร็จ " + insertedCount + " แถว, ข้าม " + skippedCount + " แถว";
@@ -250,7 +289,9 @@ public class ImportStudentManager {
 
 		String lower = type.toLowerCase().trim();
 
-		if (lower.contains("mobile") || lower.contains("app") || lower.equals("m") || lower.contains("android")
+		if (lower.contains("testing") || lower.contains("test") || lower.equals("t")) {
+			return "Testing";
+		} else if (lower.contains("mobile") || lower.contains("app") || lower.equals("m") || lower.contains("android")
 				|| lower.contains("ios") || lower.contains("application")) {
 			return "Mobile";
 		} else if (lower.contains("web") || lower.equals("w") || lower.contains("website") || lower.contains("site")) {
@@ -268,8 +309,13 @@ public class ImportStudentManager {
 			return "Web";
 		}
 
+		boolean hasTesting = types.contains("Testing");
 		boolean hasWeb = types.contains("Web");
 		boolean hasMobile = types.contains("Mobile");
+
+		if (hasTesting && !hasWeb && !hasMobile) {
+			return "Testing";
+		}
 
 		if (hasWeb && hasMobile) {
 			return "Web and Mobile";
@@ -279,7 +325,7 @@ public class ImportStudentManager {
 			return "Web";
 		}
 
-		return "Web";
+		return "Testing";
 	}
 
 	private String getStringCell(Cell cell) {

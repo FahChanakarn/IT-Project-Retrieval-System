@@ -27,7 +27,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
+		<h5>${project.proj_NameTh}/รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->
@@ -74,14 +74,18 @@
 								<td>${file.filename}</td>
 								<td class="text-center"><c:choose>
 										<c:when test="${file.filetype eq 'video'}">
-											<a
-												href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}&fileId=${file.fileId}"
-												class="btn btn-success btn-sm">ดูวิดีโอ</a>
+											<!-- ✅ เปิดลิงก์ YouTube โดยตรง -->
+											<a href="${file.filepath}" class="btn btn-success btn-sm"
+												target="_blank" rel="noopener noreferrer"> <i
+												class="bi bi-youtube"></i> ดูวิดีโอ
+											</a>
 										</c:when>
 										<c:otherwise>
 											<a
 												href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
-												class="btn btn-success btn-sm" target="_blank">ดูไฟล์เอกสาร</a>
+												class="btn btn-success btn-sm" target="_blank"> <i
+												class="bi bi-file-earmark-pdf"></i> ดูไฟล์เอกสาร
+											</a>
 										</c:otherwise>
 									</c:choose></td>
 								<td class="text-center">

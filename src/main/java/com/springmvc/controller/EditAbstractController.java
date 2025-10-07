@@ -55,9 +55,9 @@ public class EditAbstractController {
 		mav.addObject("programmingLangs", langManager.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING));
 		mav.addObject("typeDBs", langManager.getLanguagesByType(ProgrammingLang.LangType.DBMS));
 
-		// หา DB ที่ถูกเลือกไว้แล้ว (DBMS)
+		// ✅ หา DB ที่ถูกเลือกไว้แล้ว (DBMS) - เพิ่มการเช็ค null
 		Integer selectedDBId = null;
-		if (project.getProjectLangDetails() != null) {
+		if (project != null && project.getProjectLangDetails() != null) {
 			for (ProjectLangDetail detail : project.getProjectLangDetails()) {
 				if (detail.getProgrammingLang().getLangType() == ProgrammingLang.LangType.DBMS) {
 					selectedDBId = detail.getProgrammingLang().getLangId();
@@ -90,6 +90,13 @@ public class EditAbstractController {
 		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
 
 		Project project = projectManager.findProjectForEditAbstract(projectId);
+
+		// ✅ เพิ่มการเช็ค project null
+		if (project == null) {
+			ModelAndView mav = new ModelAndView("editAbstract");
+			mav.addObject("errorMessage", "ไม่พบข้อมูลโครงงาน กรุณาลองใหม่อีกครั้ง");
+			return mav;
+		}
 
 		project.setProj_NameTh(projNameTh);
 		project.setProj_NameEn(projNameEn);
@@ -160,9 +167,9 @@ public class EditAbstractController {
 				programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING));
 		mav.addObject("typeDBs", programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS));
 
-		// ส่ง selectedDBId กลับไป
+		// ✅ ส่ง selectedDBId กลับไป - เพิ่มการเช็ค null
 		Integer selectedDBId = null;
-		if (project.getProjectLangDetails() != null) {
+		if (project != null && project.getProjectLangDetails() != null) {
 			for (ProjectLangDetail detail : project.getProjectLangDetails()) {
 				if (detail.getProgrammingLang().getLangType() == ProgrammingLang.LangType.DBMS) {
 					selectedDBId = detail.getProgrammingLang().getLangId();

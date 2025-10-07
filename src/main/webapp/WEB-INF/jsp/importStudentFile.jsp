@@ -58,7 +58,7 @@
 					<!-- ดูไฟล์ตัวอย่าง -->
 					<div>
 						<a
-							href="${pageContext.request.contextPath}/assets/templates/student_template.xlsx"
+							href="${pageContext.request.contextPath}/assets/files/example_excel.xlsx"
 							class="btn btn-outline-info btn-sm" target="_blank"> <i
 							class="bi bi-eye me-1"></i>ดูตัวอย่างไฟล์ Excel
 						</a>

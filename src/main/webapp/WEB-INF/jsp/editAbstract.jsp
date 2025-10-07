@@ -204,7 +204,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
     // ชื่อโครงงานภาษาไทย
     const projNameTh = form.projNameTh.value.trim();
-    const regexTh = /^[ก-๙A-Za-z0-9(),\s]+$/;
+    const regexTh = /^[ก-๙A-Za-z0-9(),.\s]+$/;
     if (!projNameTh) { 
         document.getElementById('projNameThError').textContent = "*กรุณากรอกชื่อโครงงานภาษาไทย"; 
         valid = false; 

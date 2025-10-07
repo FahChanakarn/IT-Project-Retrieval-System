@@ -1,28 +1,35 @@
 package com.springmvc.controller;
 
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
 import com.springmvc.manager.Student496Manager;
+import com.springmvc.manager.StudentProjectManager;
 import com.springmvc.model.Student496;
-import com.springmvc.controller.PasswordUtil;
 
 @Controller
 public class LoginStudent496Controller {
 
 	@RequestMapping(value = "/loginStudent496", method = RequestMethod.GET)
 	public ModelAndView showLoginPage() {
-		Student496Manager manager = new Student496Manager();
-		List<Student496> studentList = manager.getAllStudents();
+		StudentProjectManager manager = new StudentProjectManager();
+
+		// ✅ ใช้เทอมล่าสุดในระบบแทน
+		List<String> allTerms = manager.getAllTerms();
+		String currentTerm = (allTerms != null && !allTerms.isEmpty()) ? allTerms.get(0) // เทอมล่าสุด
+				: StudentProjectManager.getCurrentTerm();
+
+		List<Student496> studentList = manager.getStudentsByTerm(currentTerm);
+
+		System.out.println("🔍 Using Term: " + currentTerm);
+		System.out.println("🔍 Student Count: " + studentList.size());
 
 		ModelAndView mav = new ModelAndView("loginStudent496");
 		mav.addObject("studentList", studentList);
+		mav.addObject("currentTerm", currentTerm);
 		return mav;
 	}
 
@@ -30,25 +37,32 @@ public class LoginStudent496Controller {
 	public ModelAndView loginStudent496(@RequestParam("stuId") String stuId, @RequestParam("password") String password,
 			HttpServletRequest request) {
 
-		Student496Manager manager = new Student496Manager();
+		Student496Manager studentManager = new Student496Manager();
+		StudentProjectManager projectManager = new StudentProjectManager();
 		ModelAndView mav = new ModelAndView("loginStudent496");
 
+		// ✅ ดึงเทอมปัจจุบัน
+		List<String> allTerms = projectManager.getAllTerms();
+		String currentTerm = (allTerms != null && !allTerms.isEmpty()) ? allTerms.get(0)
+				: StudentProjectManager.getCurrentTerm();
+
+		// ✅ โหลด studentList ไว้ก่อนเลย (ใช้ในทุกกรณี)
+		List<Student496> studentList = projectManager.getStudentsByTerm(currentTerm);
+		mav.addObject("studentList", studentList);
+		mav.addObject("currentTerm", currentTerm);
+
 		try {
-			Student496 student = manager.findByStuId(stuId);
+			Student496 student = studentManager.findByStuId(stuId);
 
 			if (student == null) {
 				mav.addObject("loginFailed", true);
 				mav.addObject("errorMessage", "ไม่พบรหัสนักศึกษานี้ในระบบ");
-				List<Student496> studentList = manager.getAllStudents();
-				mav.addObject("studentList", studentList);
 				return mav;
 			}
 
 			if (PasswordUtil.verifyPassword(password, student.getStu_password())) {
 				HttpSession session = request.getSession();
 				session.setAttribute("student", student);
-
-				// ✅ เพิ่มบรรทัดนี้เพื่อบอกว่าเพิ่ง login เข้ามาใหม่
 				session.setAttribute("showWelcomePopup", true);
 
 				if (student.getProject() != null) {
@@ -56,21 +70,15 @@ public class LoginStudent496Controller {
 				}
 
 				mav.addObject("loginSuccess", true);
-				// ✅ แก้ไข redirect ไปที่หน้าแรก (/) แทน /searchProjects
 				mav.addObject("redirectUrl", request.getContextPath() + "/");
 			} else {
 				mav.addObject("loginFailed", true);
 				mav.addObject("errorMessage", "รหัสผ่านไม่ถูกต้อง");
-				List<Student496> studentList = manager.getAllStudents();
-				mav.addObject("studentList", studentList);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			mav.addObject("loginFailed", true);
 			mav.addObject("errorMessage", "เกิดข้อผิดพลาดในระบบ: " + e.getMessage());
-			List<Student496> studentList = manager.getAllStudents();
-			mav.addObject("studentList", studentList);
 		}
 
 		return mav;

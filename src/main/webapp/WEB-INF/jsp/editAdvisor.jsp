@@ -180,113 +180,148 @@
 			}
 			return true;
 		}
-
+		// Validate first name
 		function validateFirstName() {
-			const val = firstNameInput.value.trim();
-			firstNameError.textContent = "";
-			if (!val) { 
-				firstNameError.textContent = "*กรุณากรอกชื่อ"; 
-				return false; 
-			}
-			if (/\s/.test(val)) { 
-				firstNameError.textContent = "*ห้ามมีช่องว่าง"; 
-				return false; 
-			}
-			if (!/^[ก-๙a-zA-Z]+$/.test(val)) { 
-				firstNameError.textContent = "*ต้องเป็นภาษาไทยหรืออังกฤษเท่านั้น"; 
-				return false; 
-			}
-			firstNameInput.value = val;
-			return true;
+		    const firstName = firstNameInput.value.trim();
+		    firstNameError.textContent = "";
+		    
+		    if (firstName === "") {
+		        firstNameError.textContent = "*กรุณากรอกชื่อ";
+		        return false;
+		    } 
+		    // เช็คว่าเป็นช่องว่างทั้งหมดหรือไม่
+		    else if (firstName.replace(/\s/g, '') === "") {
+		        firstNameError.textContent = "*ชื่อต้องมีตัวอักษร ไม่สามารถเป็นช่องว่างเท่านั้น";
+		        return false;
+		    }
+		    // เช็คห้ามมีช่องว่างคั่นกลาง
+		    else if (/\s/.test(firstName)) {
+		        firstNameError.textContent = "*ชื่อห้ามมีช่องว่าง";
+		        return false;
+		    }
+		    else if (firstName.length < 1 || firstName.length > 50) {
+		        firstNameError.textContent = "*ชื่อต้องมีความยาวระหว่าง 1-50 ตัวอักษร";
+		        return false;
+		    }
+		    // เช็คว่ามีแต่ตัวอักษรไทยหรืออังกฤษเท่านั้น (ไม่อนุญาตให้มีช่องว่าง)
+		    else if (!/^[ก-๙]+$/.test(firstName)) {
+		        firstNameError.textContent = "*ชื่อต้องเป็นภาษาไทยเท่านั้น";
+		        return false;
+		    }
+		    
+		    // อัพเดทค่าที่ trim แล้วกลับไปที่ input
+		    firstNameInput.value = firstName;
+		    return true;
 		}
 
+		// Validate last name
 		function validateLastName() {
-			const val = lastNameInput.value.trim();
-			lastNameError.textContent = "";
-			if (!val) { 
-				lastNameError.textContent = "*กรุณากรอกนามสกุล"; 
-				return false; 
-			}
-			if (/\s/.test(val)) { 
-				lastNameError.textContent = "*ห้ามมีช่องว่าง"; 
-				return false; 
-			}
-			if (!/^[ก-๙a-zA-Z]+$/.test(val)) { 
-				lastNameError.textContent = "*ต้องเป็นภาษาไทยหรืออังกฤษเท่านั้น"; 
-				return false; 
-			}
-			lastNameInput.value = val;
-			return true;
+		    const lastName = lastNameInput.value.trim();
+		    lastNameError.textContent = "";
+		    
+		    if (lastName === "") {
+		        lastNameError.textContent = "*กรุณากรอกนามสกุล";
+		        return false;
+		    }
+		    // เช็คว่าเป็นช่องว่างทั้งหมดหรือไม่
+		    else if (lastName.replace(/\s/g, '') === "") {
+		        lastNameError.textContent = "*นามสกุลต้องมีตัวอักษร ไม่สามารถเป็นช่องว่างเท่านั้น";
+		        return false;
+		    }
+		    // เช็คห้ามมีช่องว่างคั่นกลาง
+		    else if (/\s/.test(lastName)) {
+		        lastNameError.textContent = "*นามสกุลห้ามมีช่องว่าง";
+		        return false;
+		    }
+		    else if (lastName.length < 1 || lastName.length > 50) {
+		        lastNameError.textContent = "*นามสกุลต้องมีความยาวระหว่าง 1-50 ตัวอักษร";
+		        return false;
+		    }
+		    // เช็คว่ามีแต่ตัวอักษรไทยหรืออังกฤษเท่านั้น (ไม่อนุญาตให้มีช่องว่าง)
+		    else if (!/^[ก-๙]+$/.test(lastName)) {
+		        lastNameError.textContent = "*นามสกุลต้องเป็นภาษาไทยเท่านั้น";
+		        return false;
+		    }
+		    
+		    // อัพเดทค่าที่ trim แล้วกลับไปที่ input
+		    lastNameInput.value = lastName;
+		    return true;
 		}
 
+		// Validate email
 		function validateEmail() {
-			const val = emailInput.value.trim();
-			emailError.textContent = "";
-			if (!val) { 
-				emailError.textContent = "*กรุณากรอกอีเมล"; 
-				return false; 
-			}
-			if (/\s/.test(val)) { 
-				emailError.textContent = "*ห้ามมีช่องว่าง"; 
-				return false; 
-			}
-			if (/[ก-๙]/.test(val)) { 
-				emailError.textContent = "*ห้ามมีภาษาไทย"; 
-				return false; 
-			}
-			const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			if (!regex.test(val)) { 
-				emailError.textContent = "*รูปแบบอีเมลไม่ถูกต้อง"; 
-				return false; 
-			}
-			const local = val.split("@")[0];
-			if (local.length < 4 || local.length > 16) { 
-				emailError.textContent = "*ชื่อผู้ใช้อีเมลต้อง 4-16 ตัว"; 
-				return false; 
-			}
-			emailInput.value = val;
-			return true;
+		    const email = emailInput.value.trim();
+		    emailError.textContent = "";
+		    
+		    if (email === "") {
+		        emailError.textContent = "*กรุณากรอกอีเมล";
+		        return false;
+		    }
+		    // เช็คห้ามมีช่องว่าง
+		    else if (/\s/.test(email)) {
+		        emailError.textContent = "*อีเมลห้ามมีช่องว่าง";
+		        return false;
+		    }
+		    // เช็คห้ามมีภาษาไทย
+		    else if (/[ก-๙]/.test(email)) {
+		        emailError.textContent = "*อีเมลห้ามมีตัวอักษรภาษาไทย";
+		        return false;
+		    }
+		    
+		    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		    if (!emailRegex.test(email)) {
+		        emailError.textContent = "*กรุณากรอกอีเมลให้ถูกต้อง";
+		        return false;
+		    }
+		    
+		    // ดึงเฉพาะส่วนหน้า @
+		    const localPart = email.split("@")[0];
+		    if (localPart.length < 4) {
+		        emailError.textContent = "*ชื่ออีเมลต้องมีความยาวอย่างน้อย 4 ตัวอักษร";
+		        return false;
+		    } else if (localPart.length > 16) {
+		        emailError.textContent = "*ชื่ออีเมลต้องมีความยาวไม่เกิน 16 ตัวอักษร";
+		        return false;
+		    }
+		    
+		    // อัพเดทค่าที่ trim แล้วกลับไปที่ input
+		    emailInput.value = email;
+		    return true;
 		}
-
+		
+		// Validate password
 		function validatePassword() {
-			const pass = passwordInput.value;
-			const confirm = confirmPasswordInput.value;
-			passwordError.textContent = "";
-			confirmPasswordError.textContent = "";
-
-			// ถ้าทั้งสองช่องว่าง = ไม่เปลี่ยน password
-			if (!pass && !confirm) {
-				return true;
-			}
-
-			const passTrim = pass.trim();
-
-			if (!passTrim) { 
-				passwordError.textContent = "*กรุณากรอกรหัสผ่าน"; 
-				return false; 
-			}
-			if (/\s/.test(pass)) { 
-				passwordError.textContent = "*ห้ามมีช่องว่าง"; 
-				return false; 
-			}
-			if (/[ก-๙]/.test(pass)) { 
-				passwordError.textContent = "*ห้ามมีภาษาไทย"; 
-				return false; 
-			}
-			if (pass.length < 5 || pass.length > 12) { 
-				passwordError.textContent = "*ความยาว 5-12 ตัว"; 
-				return false; 
-			}
-			if (!confirm) { 
-				confirmPasswordError.textContent = "*กรุณายืนยันรหัสผ่าน"; 
-				return false; 
-			}
-			if (pass !== confirm) { 
-				confirmPasswordError.textContent = "*รหัสผ่านไม่ตรงกัน"; 
-				return false; 
-			}
-
-			return true;
+		    const password = passwordInput.value.trim();
+		    passwordError.textContent = "";
+		    
+		    // เช็คห้ามว่าง
+		    if (password === "") {
+		        passwordError.textContent = "*กรุณากรอกรหัสผ่าน";
+		        return false;
+		    }
+		    // เช็คห้ามมีช่องว่าง
+		    else if (/\s/.test(password)) {
+		        passwordError.textContent = "*รหัสผ่านห้ามมีช่องว่าง";
+		        return false;
+		    }
+		    // เช็คห้ามมีภาษาไทย
+		    else if (/[ก-๙]/.test(password)) {
+		        passwordError.textContent = "*รหัสผ่านห้ามเป็นตัวอักษรภาษาไทย";
+		        return false;
+		    }
+		    // เช็คความยาว
+		    else if (password.length < 5) {
+		        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
+		        return false;
+		    }
+		    else if (password.length > 12) {
+		        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
+		        return false;
+		    }
+		    
+		    // อัพเดทค่าที่ trim แล้วกลับไปที่ input
+		    passwordInput.value = password;
+		    return true;
 		}
 
 		// Event listeners

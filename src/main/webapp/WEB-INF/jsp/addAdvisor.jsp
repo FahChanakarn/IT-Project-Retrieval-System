@@ -122,7 +122,7 @@
 	    }
 	    // เช็คห้ามมีช่องว่างคั่นกลาง
 	    else if (/\s/.test(firstName)) {
-	        firstNameError.textContent = "*ชื่อห้ามมีช่องว่าง กรุณากรอกเป็นคำเดียว";
+	        firstNameError.textContent = "*ชื่อห้ามมีช่องว่าง";
 	        return false;
 	    }
 	    else if (firstName.length < 1 || firstName.length > 50) {
@@ -130,8 +130,8 @@
 	        return false;
 	    }
 	    // เช็คว่ามีแต่ตัวอักษรไทยหรืออังกฤษเท่านั้น (ไม่อนุญาตให้มีช่องว่าง)
-	    else if (!/^[ก-๙a-zA-Z]+$/.test(firstName)) {
-	        firstNameError.textContent = "*ชื่อสามารถเป็นภาษาไทยหรืออังกฤษเท่านั้น";
+	    else if (!/^[ก-๙]+$/.test(firstName)) {
+	        firstNameError.textContent = "*ชื่อต้องเป็นภาษาไทยเท่านั้น";
 	        return false;
 	    }
 	    
@@ -156,7 +156,7 @@
 	    }
 	    // เช็คห้ามมีช่องว่างคั่นกลาง
 	    else if (/\s/.test(lastName)) {
-	        lastNameError.textContent = "*นามสกุลห้ามมีช่องว่าง กรุณากรอกเป็นคำเดียว";
+	        lastNameError.textContent = "*นามสกุลห้ามมีช่องว่าง";
 	        return false;
 	    }
 	    else if (lastName.length < 1 || lastName.length > 50) {
@@ -164,8 +164,8 @@
 	        return false;
 	    }
 	    // เช็คว่ามีแต่ตัวอักษรไทยหรืออังกฤษเท่านั้น (ไม่อนุญาตให้มีช่องว่าง)
-	    else if (!/^[ก-๙a-zA-Z]+$/.test(lastName)) {
-	        lastNameError.textContent = "*นามสกุลสามารถเป็นภาษาไทยหรืออังกฤษเท่านั้น";
+	    else if (!/^[ก-๙]+$/.test(lastName)) {
+	        lastNameError.textContent = "*นามสกุลต้องเป็นภาษาไทยเท่านั้น";
 	        return false;
 	    }
 	    

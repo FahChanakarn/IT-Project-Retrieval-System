@@ -55,7 +55,7 @@ body {
 }
 
 .logo-img {
-    width: 240px;
+    width: 270px;
     height: auto;
     max-width: 100%;
 }
@@ -68,6 +68,14 @@ body {
 
 .university-title {
     font-size: 0.9rem;
+}
+
+.profile-avatar {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    image-rendering: -webkit-optimize-contrast; /* ช่วยให้ภาพคมชัดขึ้น */
+    image-rendering: crisp-edges;
 }
 
 .nav-link {

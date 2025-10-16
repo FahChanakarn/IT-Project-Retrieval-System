@@ -59,7 +59,7 @@
 									<c:when test="${not empty sessionScope.student.stu_image}">
 										<img
 											src="${pageContext.request.contextPath}/profileImage/${sessionScope.student.stu_image}"
-											width="30" height="30" class="rounded-circle me-2">
+											class="profile-avatar rounded-circle me-2">
 									</c:when>
 									<c:otherwise>
 										<img

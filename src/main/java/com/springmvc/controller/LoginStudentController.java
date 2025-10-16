@@ -1,6 +1,5 @@
 package com.springmvc.controller;
 
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -18,9 +17,8 @@ public class LoginStudentController {
 
 	@RequestMapping(value = "/loginStudent", method = RequestMethod.GET)
 	public ModelAndView showLoginPage() {
-		List<Student> studentList = manager.getStudentsWithoutProject();
+		// ไม่ต้องส่ง studentList ไปแล้ว เพราะไม่มี dropdown
 		ModelAndView mav = new ModelAndView("loginStudent");
-		mav.addObject("studentList", studentList);
 		return mav;
 	}
 
@@ -30,14 +28,12 @@ public class LoginStudentController {
 			HttpServletRequest request) {
 
 		Student student = manager.findByStuIdAndPassword(stuId.trim(), password.trim());
-		List<Student> studentList = manager.getStudentsWithoutProject();
 		ModelAndView mav = new ModelAndView("loginStudent");
-		mav.addObject("studentList", studentList);
 
 		if (student != null) {
 			HttpSession session = request.getSession();
 			session.setAttribute("itstudent", student);
-			
+
 			mav.addObject("loginSuccess", true);
 			mav.addObject("redirectUrl", request.getContextPath() + "/searchProjects");
 		} else {

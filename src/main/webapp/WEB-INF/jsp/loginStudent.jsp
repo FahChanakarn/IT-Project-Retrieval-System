@@ -45,24 +45,15 @@
 			<form id="loginForm" action="loginStudent" method="post">
 				<div class="mb-3">
 					<label for="stuId" class="form-label text-danger">รหัสนักศึกษา</label>
-					<select class="form-select" name="stuId" id="stuId">
-						<option value="">เลือกรหัสนักศึกษา</option>
-						<c:if test="${not empty studentList}">
-							<c:forEach var="stu" items="${studentList}">
-								<option value="${stu.stuId}">${stu.stuId}</option>
-							</c:forEach>
-						</c:if>
-						<c:if test="${empty studentList}">
-							<option disabled>ไม่มีนักศึกษาที่ว่าง</option>
-						</c:if>
-					</select>
+					<input type="text" name="stuId" id="stuId" class="form-control"
+						placeholder="กรอกรหัสนักศึกษา">
 					<div id="stuIdError" class="text-danger mt-1 small"></div>
 				</div>
 
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
-						class="form-control">
+						class="form-control" placeholder="กรอกรหัสผ่าน">
 					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 
@@ -73,18 +64,44 @@
 
 	<script>
 	// Elements
-	const stuSelect = document.getElementById("stuId");
+	const stuInput = document.getElementById("stuId");
 	const passwordInput = document.getElementById("password");
 	const stuIdError = document.getElementById("stuIdError");
 	const passwordError = document.getElementById("passwordError");
 
-	// Validate dropdown
+	// Validate student ID
 	function validateStuId() {
+	    const stuId = stuInput.value.trim();
 	    stuIdError.textContent = "";
-	    if (!stuSelect.value) {
-	        stuIdError.textContent = "*กรุณาเลือกรหัสนักศึกษา";
+	    
+	    // เช็คห้ามว่าง
+	    if (stuId === "") {
+	        stuIdError.textContent = "*กรุณากรอกรหัสนักศึกษา";
 	        return false;
 	    }
+	    // เช็คว่าเป็นช่องว่างทั้งหมดหรือไม่
+	    else if (stuId.replace(/\s/g, '') === "") {
+	        stuIdError.textContent = "*รหัสนักศึกษาต้องมีตัวอักษร ไม่สามารถเป็นช่องว่างเท่านั้น";
+	        return false;
+	    }
+	    // เช็คห้ามมีช่องว่าง
+	    else if (/\s/.test(stuId)) {
+	        stuIdError.textContent = "*รหัสนักศึกษาห้ามมีช่องว่าง";
+	        return false;
+	    }
+	    // เช็คว่าเป็นตัวเลขเท่านั้น
+	    else if (!/^\d+$/.test(stuId)) {
+	        stuIdError.textContent = "*รหัสนักศึกษาต้องเป็นตัวเลขเท่านั้น";
+	        return false;
+	    }
+	    // เช็คความยาว (ปรับตามระบบของคุณ เช่น 10 หลัก)
+	    else if (stuId.length !== 10) {
+	        stuIdError.textContent = "*รหัสนักศึกษาต้องมี 10 หลัก";
+	        return false;
+	    }
+	    
+	    // อัพเดทค่าที่ trim แล้วกลับไปที่ input
+	    stuInput.value = stuId;
 	    return true;
 	}
 
@@ -121,10 +138,9 @@
 	    return true;
 	}
 
-
 	// Real-time validation
-	stuSelect.addEventListener("change", validateStuId);
-	passwordInput.addEventListener("input", validatePassword);
+	stuInput.addEventListener("blur", validateStuId);
+	passwordInput.addEventListener("blur", validatePassword);
 
 	// Validate before submit
 	document.getElementById("loginForm").addEventListener("submit", function(event) {
@@ -162,7 +178,6 @@
         });
     </script>
 	</c:if>
-
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

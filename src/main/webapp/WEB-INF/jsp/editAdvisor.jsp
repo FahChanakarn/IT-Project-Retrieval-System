@@ -291,16 +291,18 @@
 		
 		// Validate password
 		function validatePassword() {
-		    const password = passwordInput.value.trim();
+		    const password = passwordInput.value;
 		    passwordError.textContent = "";
 		    
-		    // เช็คห้ามว่าง
+		    // ถ้าไม่ได้กรอก (เว้นว่างไว้) ให้ผ่าน เพราะอาจจะไม่ต้องการเปลี่ยนรหัสผ่าน
 		    if (password === "") {
-		        passwordError.textContent = "*กรุณากรอกรหัสผ่าน";
-		        return false;
+		        return true;
 		    }
+		    
+		    const trimmedPassword = password.trim();
+		    
 		    // เช็คห้ามมีช่องว่าง
-		    else if (/\s/.test(password)) {
+		    if (/\s/.test(password)) {
 		        passwordError.textContent = "*รหัสผ่านห้ามมีช่องว่าง";
 		        return false;
 		    }
@@ -310,17 +312,47 @@
 		        return false;
 		    }
 		    // เช็คความยาว
-		    else if (password.length < 5) {
+		    else if (trimmedPassword.length < 5) {
 		        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวอย่างน้อย 5 ตัวอักษร";
 		        return false;
 		    }
-		    else if (password.length > 12) {
+		    else if (trimmedPassword.length > 12) {
 		        passwordError.textContent = "*กรุณากรอกรหัสผ่านความยาวไม่เกิน 12 ตัวอักษร";
 		        return false;
 		    }
 		    
-		    // อัพเดทค่าที่ trim แล้วกลับไปที่ input
-		    passwordInput.value = password;
+		    return true;
+		}
+
+		// Validate confirm password
+		function validateConfirmPassword() {
+		    const password = passwordInput.value;
+		    const confirmPassword = confirmPasswordInput.value;
+		    confirmPasswordError.textContent = "";
+		    
+		    // ถ้าไม่ได้กรอกรหัสผ่านทั้งคู่ ให้ผ่าน
+		    if (password === "" && confirmPassword === "") {
+		        return true;
+		    }
+		    
+		    // ถ้ากรอกรหัสผ่านใหม่แล้ว ต้องกรอกยืนยันรหัสผ่านด้วย
+		    if (password !== "" && confirmPassword === "") {
+		        confirmPasswordError.textContent = "*กรุณายืนยันรหัสผ่าน";
+		        return false;
+		    }
+		    
+		    // ถ้ากรอกยืนยันรหัสผ่าน แต่ไม่ได้กรอกรหัสผ่านใหม่
+		    if (password === "" && confirmPassword !== "") {
+		        confirmPasswordError.textContent = "*กรุณากรอกรหัสผ่านใหม่ก่อน";
+		        return false;
+		    }
+		    
+		    // เช็คว่าตรงกันหรือไม่
+		    if (password !== confirmPassword) {
+		        confirmPasswordError.textContent = "*รหัสผ่านไม่ตรงกัน";
+		        return false;
+		    }
+		    
 		    return true;
 		}
 
@@ -329,8 +361,14 @@
 		firstNameInput.addEventListener('blur', validateFirstName);
 		lastNameInput.addEventListener('blur', validateLastName);
 		emailInput.addEventListener('blur', validateEmail);
-		passwordInput.addEventListener('blur', validatePassword);
-		confirmPasswordInput.addEventListener('blur', validatePassword);
+		passwordInput.addEventListener('blur', function() {
+		    validatePassword();
+		    // ถ้ามีการกรอกยืนยันรหัสผ่านแล้ว ให้ตรวจสอบใหม่
+		    if (confirmPasswordInput.value) {
+		        validateConfirmPassword();
+		    }
+		});
+		confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
 
 		// Form submit handler
 		form.addEventListener('submit', function(e) {
@@ -342,7 +380,8 @@
 							validateFirstName() && 
 							validateLastName() &&
 							validateEmail() && 
-							validatePassword();
+							validatePassword() &&
+							validateConfirmPassword();
 			
 			console.log("Validation result:", isValid);
 

@@ -1,13 +1,11 @@
 package com.springmvc.controller;
 
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import com.springmvc.manager.Student496Manager;
-import com.springmvc.manager.StudentProjectManager;
 import com.springmvc.model.Student496;
 
 @Controller
@@ -15,21 +13,8 @@ public class LoginStudent496Controller {
 
 	@RequestMapping(value = "/loginStudent496", method = RequestMethod.GET)
 	public ModelAndView showLoginPage() {
-		StudentProjectManager manager = new StudentProjectManager();
-
-		// ✅ ใช้เทอมล่าสุดในระบบแทน
-		List<String> allTerms = manager.getAllTerms();
-		String currentTerm = (allTerms != null && !allTerms.isEmpty()) ? allTerms.get(0) // เทอมล่าสุด
-				: StudentProjectManager.getCurrentTerm();
-
-		List<Student496> studentList = manager.getStudentsByTerm(currentTerm);
-
-		System.out.println("🔍 Using Term: " + currentTerm);
-		System.out.println("🔍 Student Count: " + studentList.size());
-
+		// ไม่ต้องส่ง studentList ไปแล้ว เพราะไม่มี dropdown
 		ModelAndView mav = new ModelAndView("loginStudent496");
-		mav.addObject("studentList", studentList);
-		mav.addObject("currentTerm", currentTerm);
 		return mav;
 	}
 
@@ -38,21 +23,10 @@ public class LoginStudent496Controller {
 			HttpServletRequest request) {
 
 		Student496Manager studentManager = new Student496Manager();
-		StudentProjectManager projectManager = new StudentProjectManager();
 		ModelAndView mav = new ModelAndView("loginStudent496");
 
-		// ✅ ดึงเทอมปัจจุบัน
-		List<String> allTerms = projectManager.getAllTerms();
-		String currentTerm = (allTerms != null && !allTerms.isEmpty()) ? allTerms.get(0)
-				: StudentProjectManager.getCurrentTerm();
-
-		// ✅ โหลด studentList ไว้ก่อนเลย (ใช้ในทุกกรณี)
-		List<Student496> studentList = projectManager.getStudentsByTerm(currentTerm);
-		mav.addObject("studentList", studentList);
-		mav.addObject("currentTerm", currentTerm);
-
 		try {
-			Student496 student = studentManager.findByStuId(stuId);
+			Student496 student = studentManager.findByStuId(stuId.trim());
 
 			if (student == null) {
 				mav.addObject("loginFailed", true);
@@ -60,7 +34,7 @@ public class LoginStudent496Controller {
 				return mav;
 			}
 
-			if (PasswordUtil.verifyPassword(password, student.getStu_password())) {
+			if (PasswordUtil.verifyPassword(password.trim(), student.getStu_password())) {
 				HttpSession session = request.getSession();
 				session.setAttribute("student", student);
 				session.setAttribute("showWelcomePopup", true);

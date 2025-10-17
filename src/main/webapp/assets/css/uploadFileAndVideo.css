@@ -60,3 +60,22 @@ label {
 .table td .btn i {
 	font-size: 1rem;
 }
+
+.error-message {
+	color: #dc3545;
+	font-size: 0.875rem;
+	margin-top: 0.25rem;
+	display: none;
+}
+
+.error-message.show {
+	display: block;
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+	border-color: #dc3545;
+}
+
+.form-control.is-valid, .form-select.is-valid {
+	border-color: #198754;
+}

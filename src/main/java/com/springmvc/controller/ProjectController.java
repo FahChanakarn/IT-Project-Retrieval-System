@@ -12,7 +12,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.springmvc.manager.AdvisorManager;
 import com.springmvc.manager.ProgrammingLangManager;
 import com.springmvc.manager.ProjectManager;
+import com.springmvc.manager.UploadManager;
 import com.springmvc.model.Advisor;
+import com.springmvc.model.DocumentFile;
 import com.springmvc.model.ProgrammingLang;
 import com.springmvc.model.Project;
 
@@ -147,6 +149,8 @@ public class ProjectController {
 	@RequestMapping(value = "/viewAbstract", method = RequestMethod.GET)
 	public ModelAndView viewAbstract(@RequestParam("projectId") int projectId) {
 		ProjectManager projectManager = new ProjectManager();
+		UploadManager uploadManager = new UploadManager();
+
 		Project project = projectManager.getProjectDetail(projectId);
 
 		if (project == null) {
@@ -156,8 +160,12 @@ public class ProjectController {
 			return mv;
 		}
 
+		// ดึงข้อมูลไฟล์และวิดีโอของโครงงาน
+		List<DocumentFile> uploadList = uploadManager.getFilesByProject(projectId);
+
 		ModelAndView mav = new ModelAndView("ViewAbstract");
 		mav.addObject("project", project);
+		mav.addObject("uploadList", uploadList); // ✅ ส่งไปแล้ว
 		return mav;
 	}
 }

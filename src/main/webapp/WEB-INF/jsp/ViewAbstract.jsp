@@ -9,23 +9,16 @@
 <title>ดูรายละเอียดบทคัดย่อ</title>
 <link rel="icon" type="image/png"
 	href="${pageContext.request.contextPath}/assets/images/ITLOGO.jpg">
-
-<!-- Bootstrap CSS -->
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-<!-- Bootstrap JS -->
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/viewAbstract.css">
-
-<!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
 </head>
@@ -33,7 +26,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">${project.proj_NameTh} / ดูรายละเอียด</h5>
+		<h5 class="fw-bold">${project.proj_NameTh}/ ดูรายละเอียด</h5>
 		<hr>
 
 		<div class="abstract-card">
@@ -72,15 +65,27 @@
 			<div class="info-row">
 				<span class="info-label">ภาคเรียน :</span> <span class="info-value">${project.semester}</span>
 			</div>
+
 			<div class="mb-3">
 				<c:choose>
 					<c:when
 						test="${empty sessionScope.itstudent and empty sessionScope.student and empty sessionScope.advisor and empty sessionScope.admin}">
-						<a
-							href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-							class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
-							วิดีโอตัวอย่างการใช้งานโปรแกรม
-						</a>
+						<!-- ตรวจสอบว่ามีวิดีโอที่ได้รับอนุมัติให้เผยแพร่หรือไม่ -->
+						<c:set var="hasApprovedVideo" value="false" />
+						<c:forEach items="${uploadList}" var="file">
+							<c:if
+								test="${file.filetype == 'video' and file.publishStatus == true}">
+								<c:set var="hasApprovedVideo" value="true" />
+							</c:if>
+						</c:forEach>
+
+						<c:if test="${hasApprovedVideo}">
+							<a
+								href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+								class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+								วิดีโอตัวอย่างการใช้งานโปรแกรม
+							</a>
+						</c:if>
 					</c:when>
 
 					<c:otherwise>
@@ -110,11 +115,22 @@
 							</c:otherwise>
 						</c:choose>
 
-						<a
-							href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
-							class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
-							วิดีโอตัวอย่างการใช้งานโปรแกรม
-						</a>
+						<!-- ตรวจสอบว่ามีวิดีโอที่ได้รับอนุมัติให้เผยแพร่หรือไม่ สำหรับผู้ใช้ที่ล็อกอิน -->
+						<c:set var="hasApprovedVideo" value="false" />
+						<c:forEach items="${uploadList}" var="file">
+							<c:if
+								test="${file.filetype == 'video' and file.publishStatus == true}">
+								<c:set var="hasApprovedVideo" value="true" />
+							</c:if>
+						</c:forEach>
+
+						<c:if test="${hasApprovedVideo}">
+							<a
+								href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+								class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+								วิดีโอตัวอย่างการใช้งานโปรแกรม
+							</a>
+						</c:if>
 					</c:otherwise>
 				</c:choose>
 			</div>

@@ -153,7 +153,7 @@ request.setAttribute("currentYear", thisYear);
 			<div class="col-md-9">
 				<div class="container">
 					<div class="search-container">
-						<h3 class="mb-4">ค้นหาโครงงาน</h3>
+						<h3 class="mb-3">ค้นหาโครงงาน</h3>
 						<form id="searchForm"
 							action="${pageContext.request.contextPath}/searchProjects"
 							method="get">

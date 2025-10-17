@@ -20,3 +20,80 @@ hr {
 label {
 	font-weight: bold;
 }
+
+.current-file-info {
+	background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+	border: 1px solid #bbdefb;
+	border-radius: 8px;
+	padding: 1rem 1.25rem;
+	margin-bottom: 1rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	transition: all 0.2s ease;
+}
+
+.current-file-info:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.current-file-info i {
+	color: #1976d2;
+	font-size: 1.5rem;
+	margin-right: 0.5rem;
+}
+
+.current-file-name {
+	color: #424242;
+	font-weight: 500;
+	font-size: 0.95rem;
+}
+
+.current-file-info .btn {
+	background-color: #1976d2;
+	border: none;
+	color: #ffffff;
+	font-weight: 500;
+	padding: 0.5rem 1rem;
+	transition: all 0.2s ease;
+	border-radius: 6px;
+}
+
+.current-file-info .btn:hover {
+	background-color: #1565c0;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.current-file-info .btn i {
+	font-size: 1rem;
+	margin-right: 0.25rem;
+	color: #ffffff;
+}
+
+.file-size-note {
+	font-size: 0.875rem;
+	color: #6c757d;
+	margin-top: 0.25rem;
+}
+
+.file-size-note i {
+	color: #0d6efd;
+}
+
+.error-message {
+	color: #dc3545;
+	font-size: 0.875rem;
+	margin-top: 0.25rem;
+	display: none;
+}
+
+.error-message.show {
+	display: block;
+}
+
+.form-control.is-invalid {
+	border-color: #dc3545;
+}
+
+.form-control.is-valid {
+	border-color: #198754;
+}F

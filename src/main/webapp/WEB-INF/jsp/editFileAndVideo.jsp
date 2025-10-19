@@ -34,7 +34,7 @@
 			input.classList.remove('is-valid');
 			const errorElement = document.getElementById(errorId);
 			if (errorElement) {
-				errorElement.textContent = '*' + message;
+				errorElement.textContent = message;
 				errorElement.classList.add('show');
 			}
 		}
@@ -66,14 +66,14 @@
 				if (file) {
 					const fileName = file.name.toLowerCase();
 					if (!fileName.endsWith('.pdf')) {
-						showError(fileInput, 'fileError', 'กรุณาเลือกไฟล์ .pdf เท่านั้น');
+						showError(fileInput, 'fileError', '*กรุณาเลือกไฟล์ .pdf เท่านั้น');
 						e.target.value = '';
 						return;
 					}
 
 					const maxSize = 10 * 1024 * 1024; // 10MB
 					if (file.size > maxSize) {
-						showError(fileInput, 'fileError', 'ขนาดไฟล์ต้องไม่เกิน 10 MB');
+						showError(fileInput, 'fileError', '*ขนาดไฟล์ต้องไม่เกิน 10 MB');
 						e.target.value = '';
 					} else {
 						clearError(fileInput, 'fileError');
@@ -88,17 +88,33 @@
 				const value = e.target.value.trim();
 				if (value.length > 0 && value.length < 10) {
 					showError(filenameInput, 'filenameError', 
-						'ชื่อไฟล์ต้องมีความยาวอย่างน้อย 10 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
+						'*ชื่อไฟล์ต้องมีความยาวอย่างน้อย 10 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
 				} else if (value.length > 100) {
 					showError(filenameInput, 'filenameError', 
-						'ชื่อไฟล์ต้องไม่เกิน 100 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
+						'*ชื่อไฟล์ต้องไม่เกิน 100 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
 				} else if (value.length >= 10) {
 					const namePattern = /^[ก-๙a-zA-Z0-9\s().]+$/;
 					if (!namePattern.test(value)) {
 						showError(filenameInput, 'filenameError', 
-							'ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
+							'*ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
 					} else {
 						clearError(filenameInput, 'filenameError');
+					}
+				}
+			});
+		}
+
+		// Real-time validation สำหรับลิงก์วิดีโอ
+		if (videoLinkInput) {
+			videoLinkInput.addEventListener('input', function(e) {
+				const value = e.target.value.trim();
+				if (value.length > 0) {
+					try {
+						new URL(value);
+						clearError(videoLinkInput, 'videoError');
+					} catch (error) {
+						showError(videoLinkInput, 'videoError', 
+							'*โปรดระบุ URL ที่ถูกต้อง เช่น https://youtube.com/watch?v=xxxxx');
 					}
 				}
 			});
@@ -115,18 +131,20 @@
 			// ตรวจสอบชื่อไฟล์
 			if (!filename) {
 				showError(filenameInput, 'filenameError', 
-					fileType === 'video' ? 'กรุณากรอกชื่อวิดีโอ' : 'กรุณากรอกชื่อไฟล์');
+					fileType === 'video' ? '*กรุณากรอกชื่อวิดีโอ' : '*กรุณากรอกชื่อไฟล์');
 				isValid = false;
 			} else if (filename.length < 10 || filename.length > 100) {
 				showError(filenameInput, 'filenameError', 
-					'ชื่อไฟล์ต้องมีความยาว 10-100 ตัวอักษร (ปัจจุบัน: ' + filename.length + ' ตัวอักษร)');
+					'*ชื่อไฟล์ต้องมีความยาว 10-100 ตัวอักษร (ปัจจุบัน: ' + filename.length + ' ตัวอักษร)');
 				isValid = false;
 			} else {
 				const namePattern = /^[ก-๙a-zA-Z0-9\s().]+$/;
 				if (!namePattern.test(filename)) {
 					showError(filenameInput, 'filenameError', 
-						'ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
+						'*ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
 					isValid = false;
+				} else {
+					clearError(filenameInput, 'filenameError');
 				}
 			}
 
@@ -134,7 +152,7 @@
 			if (fileType === 'video' && videoLinkInput) {
 				const videoLink = videoLinkInput.value.trim();
 				if (!videoLink) {
-					showError(videoLinkInput, 'videoError', 'กรุณากรอกลิงก์วิดีโอ');
+					showError(videoLinkInput, 'videoError', '*กรุณากรอกลิงก์วิดีโอ');
 					isValid = false;
 				} else {
 					try {
@@ -142,7 +160,7 @@
 						clearError(videoLinkInput, 'videoError');
 					} catch (error) {
 						showError(videoLinkInput, 'videoError', 
-							'โปรดระบุ URL ที่ถูกต้อง เช่น https://youtube.com/watch?v=xxxxx');
+							'*โปรดระบุ URL ที่ถูกต้อง เช่น https://youtube.com/watch?v=xxxxx');
 						isValid = false;
 					}
 				}
@@ -186,7 +204,7 @@
 			<c:choose>
 				<c:when test="${file.filetype == 'video'}">
 					<div class="mb-3">
-						<label class="form-label">ลิงก์วิดีโอ :</label> <input type="url"
+						<label class="form-label">ลิงก์วิดีโอ :</label> <input type="text"
 							class="form-control" name="videoLink" value="${file.filepath}">
 						<div id="videoError" class="error-message"></div>
 						<small class="text-muted">*กรุณาระบุ URL ที่ถูกต้อง เช่น

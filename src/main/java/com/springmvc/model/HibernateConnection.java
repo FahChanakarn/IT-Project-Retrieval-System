@@ -38,8 +38,7 @@ public class HibernateConnection {
 								.addPackage("com.springmvc.model").addAnnotatedClass(Advisor.class)
 								.addAnnotatedClass(Student.class).addAnnotatedClass(Student496.class)
 								.addAnnotatedClass(Project.class).addAnnotatedClass(DocumentFile.class)
-								.addAnnotatedClass(ProgrammingLang.class).addAnnotatedClass(ProjectLangDetailId.class)
-								.addAnnotatedClass(ProjectLangDetail.class);
+								.addAnnotatedClass(Tools.class);
 
 						StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder()
 								.applySettings(cfg.getProperties());

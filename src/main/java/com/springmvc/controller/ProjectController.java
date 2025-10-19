@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.AdvisorManager;
-import com.springmvc.manager.ProgrammingLangManager;
+import com.springmvc.manager.ToolsManager;
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.manager.UploadManager;
 import com.springmvc.model.Advisor;
 import com.springmvc.model.DocumentFile;
-import com.springmvc.model.ProgrammingLang;
+import com.springmvc.model.Tools;
 import com.springmvc.model.Project;
 
 @Controller
@@ -29,16 +29,15 @@ public class ProjectController {
 
 		ProjectManager projectManager = new ProjectManager();
 		AdvisorManager advisorManager = new AdvisorManager();
-		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
+		ToolsManager toolsManager = new ToolsManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> semesters = projectManager.getAllSemesters();
 
 		// แยกภาษาตาม type
-		List<ProgrammingLang> programmingLangs = programmingLangManager
-				.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING);
-		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
+		List<Tools> programmingLangs = toolsManager.getToolsByType(Tools.ToolsType.PROGRAMMING);
+		List<Tools> dbmsLangs = toolsManager.getToolsByType(Tools.ToolsType.DBMS);
 
 		// ค้นหาโปรเจคทั้งหมด
 		List<Project> allProjects = projectManager.searchProjects(keyword);
@@ -109,16 +108,15 @@ public class ProjectController {
 				: allProjects;
 
 		AdvisorManager advisorManager = new AdvisorManager();
-		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
+		ToolsManager toolsManager = new ToolsManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> allSemesters = projectManager.getAllSemesters();
 
 		// แยกภาษาตาม type
-		List<ProgrammingLang> programmingLangs = programmingLangManager
-				.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING);
-		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
+		List<Tools> programmingLangs = toolsManager.getToolsByType(Tools.ToolsType.PROGRAMMING);
+		List<Tools> dbmsLangs = toolsManager.getToolsByType(Tools.ToolsType.DBMS);
 
 		ModelAndView mav = new ModelAndView("Home");
 		mav.addObject("projects", projects);
@@ -165,7 +163,7 @@ public class ProjectController {
 
 		ModelAndView mav = new ModelAndView("ViewAbstract");
 		mav.addObject("project", project);
-		mav.addObject("uploadList", uploadList); // ✅ ส่งไปแล้ว
+		mav.addObject("uploadList", uploadList);
 		return mav;
 	}
 }

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.manager.AdvisorManager;
-import com.springmvc.manager.ProgrammingLangManager;
+import com.springmvc.manager.ToolsManager;
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.model.Advisor;
-import com.springmvc.model.ProgrammingLang;
+import com.springmvc.model.Tools;
 import com.springmvc.model.Project;
 
 @Controller
@@ -25,15 +25,14 @@ public class HomeController {
 	public ModelAndView home(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) {
 		AdvisorManager advisorManager = new AdvisorManager();
 		ProjectManager projectManager = new ProjectManager();
-		ProgrammingLangManager programmingLangManager = new ProgrammingLangManager();
+		ToolsManager toolsManager = new ToolsManager();
 
 		List<Advisor> activeAdvisors = advisorManager.getActiveAdvisors();
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		List<String> semesters = projectManager.getAllSemesters();
 
-		List<ProgrammingLang> programmingLangs = programmingLangManager
-				.getLanguagesByType(ProgrammingLang.LangType.PROGRAMMING);
-		List<ProgrammingLang> dbmsLangs = programmingLangManager.getLanguagesByType(ProgrammingLang.LangType.DBMS);
+		List<Tools> programmingLangs = toolsManager.getToolsByType(Tools.ToolsType.PROGRAMMING);
+		List<Tools> dbmsLangs = toolsManager.getToolsByType(Tools.ToolsType.DBMS);
 
 		// ดึงโปรเจคทั้งหมด
 		List<Project> allProjects = projectManager.getAllProjects();

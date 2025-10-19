@@ -73,8 +73,9 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
+			// ✅ เปลี่ยนจาก projectLangDetails เป็น tools
 			StringBuilder hql = new StringBuilder("SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
-					+ "LEFT JOIN p.projectLangDetails pld " + "LEFT JOIN pld.programmingLang lang " + "WHERE 1=1");
+					+ "LEFT JOIN p.tools t " + "WHERE 1=1");
 
 			if (projectType != null && !projectType.isEmpty()) {
 				hql.append(" AND p.projectType = :projectType");
@@ -86,10 +87,10 @@ public class ProjectManager {
 				hql.append(" AND p.semester IN (:semesters)");
 			}
 			if (languages != null && !languages.isEmpty()) {
-				hql.append(" AND lang.langName IN (:languages) AND lang.langType = 'PROGRAMMING'");
+				hql.append(" AND t.toolsName IN (:languages) AND t.toolType = 'PROGRAMMING'");
 			}
 			if (databases != null && !databases.isEmpty()) {
-				hql.append(" AND lang.langName IN (:databases) AND lang.langType = 'DBMS'");
+				hql.append(" AND t.toolsName IN (:databases) AND t.toolType = 'DBMS'");
 			}
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				hql.append(" AND p.testing_status = :testingStatus");
@@ -142,14 +143,14 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			String hql = "SELECT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
+			String hql = "SELECT p FROM Project p " + "LEFT JOIN FETCH p.student496s " + "LEFT JOIN FETCH p.tools "
 					+ "WHERE p.projectId = :projectId";
 
 			Project project = session.createQuery(hql, Project.class).setParameter("projectId", projectId)
 					.uniqueResult();
 
 			if (project != null) {
-				project.getProjectLangDetails().size();
+				project.getTools().size(); // ✅ Initialize tools
 				project.getDocumentFiles().size();
 			}
 
@@ -285,7 +286,7 @@ public class ProjectManager {
 			session = sessionFactory.openSession();
 
 			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.advisor a "
-					+ "LEFT JOIN FETCH p.student496s s " + "WHERE p.projectId = :pid";
+					+ "LEFT JOIN FETCH p.student496s s " + "LEFT JOIN FETCH p.tools " + "WHERE p.projectId = :pid";
 
 			return session.createQuery(hql, Project.class).setParameter("pid", projectId).uniqueResult();
 
@@ -429,6 +430,7 @@ public class ProjectManager {
 		}
 	}
 
+	// ✅ แก้ไข findProjectForEditAbstract ให้ใช้ tools แทน projectLangDetails
 	public Project findProjectForEditAbstract(int projectId) {
 		Session session = null;
 		try {
@@ -442,8 +444,9 @@ public class ProjectManager {
 					.setMaxResults(1).uniqueResult();
 
 			if (project != null) {
-				String hql2 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.projectLangDetails pld "
-						+ "LEFT JOIN FETCH pld.programmingLang " + "WHERE p.projectId = :projectId";
+				// ✅ เปลี่ยนจาก projectLangDetails เป็น tools
+				String hql2 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.tools "
+						+ "WHERE p.projectId = :projectId";
 				session.createQuery(hql2, Project.class).setParameter("projectId", projectId).uniqueResult();
 
 				String hql3 = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.documentFiles "
@@ -451,12 +454,12 @@ public class ProjectManager {
 				session.createQuery(hql3, Project.class).setParameter("projectId", projectId).uniqueResult();
 
 				project.getStudent496s().size();
-				project.getProjectLangDetails().size();
+				project.getTools().size(); // ✅ เปลี่ยน
 				project.getDocumentFiles().size();
 
 				System.out.println("✅ Loaded Project: ID=" + project.getProjectId() + ", NameTH="
-						+ project.getProj_NameTh() + ", Students=" + project.getStudent496s().size() + ", LangDetails="
-						+ project.getProjectLangDetails().size() + ", Files=" + project.getDocumentFiles().size());
+						+ project.getProj_NameTh() + ", Students=" + project.getStudent496s().size() + ", Tools="
+						+ project.getTools().size() + ", Files=" + project.getDocumentFiles().size());
 			} else {
 				System.out.println("⚠️ Project not found with ID = " + projectId);
 			}
@@ -498,6 +501,7 @@ public class ProjectManager {
 		}
 	}
 
+	// ✅ แก้ไข deleteProjectAndStudents ให้ลบ project_tools แทน projectLangDetails
 	public boolean deleteProjectAndStudents(int projectId) {
 		Session session = null;
 		try {
@@ -505,8 +509,8 @@ public class ProjectManager {
 			session = sessionFactory.openSession();
 			session.beginTransaction();
 
-			String deleteLangDetailHql = "DELETE FROM ProjectLangDetail pld WHERE pld.project.projectId = :projectId";
-			session.createQuery(deleteLangDetailHql).setParameter("projectId", projectId).executeUpdate();
+			// ✅ ไม่ต้องลบ project_tools เพราะ cascade จะจัดการให้
+			// Hibernate จะลบ relationship ใน project_tools อัตโนมัติ
 
 			String deleteDocumentHql = "DELETE FROM DocumentFile df WHERE df.project.projectId = :projectId";
 			session.createQuery(deleteDocumentHql).setParameter("projectId", projectId).executeUpdate();

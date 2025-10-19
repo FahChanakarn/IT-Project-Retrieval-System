@@ -45,10 +45,9 @@ public class Project {
 
 	@Column(name = "keyword_th")
 	private String keywordTh;
-	
+
 	@Column(name = "keyword_en")
 	private String keywordEn;
-
 
 	@ManyToOne
 	@JoinColumn(name = "advisor_id", nullable = false)
@@ -57,9 +56,11 @@ public class Project {
 	@OneToMany(mappedBy = "project")
 	private List<Student496> student496s;
 
-	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-	private Set<ProjectLangDetail> projectLangDetails = new HashSet<>();
-	
+	// ✅ เปลี่ยนจาก ProjectLangDetail เป็น ManyToMany กับ Tools โดยตรง
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "project_tools", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "tools_id"))
+	private Set<Tools> tools = new HashSet<>();
+
 	@OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
 	private List<DocumentFile> documentFiles;
 
@@ -69,8 +70,8 @@ public class Project {
 
 	public Project(int projectId, String proj_NameTh, String proj_NameEn, String semester, String abstractTh,
 			String abstractEn, String projectType, String approveStatus, Date approveDate, String testing_status,
-			String keywordTh, String keywordEn, Advisor advisor, List<Student496> student496s,
-			Set<ProjectLangDetail> projectLangDetails, List<DocumentFile> documentFiles) {
+			String keywordTh, String keywordEn, Advisor advisor, List<Student496> student496s, Set<Tools> tools,
+			List<DocumentFile> documentFiles) {
 		super();
 		this.projectId = projectId;
 		this.proj_NameTh = proj_NameTh;
@@ -86,10 +87,9 @@ public class Project {
 		this.keywordEn = keywordEn;
 		this.advisor = advisor;
 		this.student496s = student496s;
-		this.projectLangDetails = projectLangDetails;
+		this.tools = tools;
 		this.documentFiles = documentFiles;
 	}
-
 
 	// Getter/Setter ทั้งหมด
 	public int getProjectId() {
@@ -195,7 +195,7 @@ public class Project {
 	public void setAdvisor(Advisor advisor) {
 		this.advisor = advisor;
 	}
-	
+
 	public List<Student496> getStudent496s() {
 		return student496s;
 	}
@@ -204,12 +204,13 @@ public class Project {
 		this.student496s = student496s;
 	}
 
-	public Set<ProjectLangDetail> getProjectLangDetails() {
-		return projectLangDetails;
+	// ✅ เปลี่ยน getter/setter สำหรับ Tools
+	public Set<Tools> getTools() {
+		return tools;
 	}
 
-	public void setProjectLangDetails(Set<ProjectLangDetail> projectLangDetails) {
-		this.projectLangDetails = projectLangDetails;
+	public void setTools(Set<Tools> tools) {
+		this.tools = tools;
 	}
 
 	public List<DocumentFile> getDocumentFiles() {
@@ -219,5 +220,5 @@ public class Project {
 	public void setDocumentFiles(List<DocumentFile> documentFiles) {
 		this.documentFiles = documentFiles;
 	}
-	
+
 }

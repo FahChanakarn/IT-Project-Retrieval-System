@@ -82,43 +82,118 @@
 				</select>
 			</div>
 
-			<!-- ซอฟต์แวร์ฐานข้อมูล -->
-			<div class="mb-3" id="dbSoftwareSection">
-				<label class="form-label fw-bold">ซอฟต์แวร์ฐานข้อมูล :</label> <select
-					class="form-select" name="typeDBId">
-					<option value="" disabled selected>เลือกซอฟต์แวร์ฐานข้อมูล</option>
-					<c:forEach var="db" items="${typeDBs}">
-						<option value="${db.langId}"
-							${db.langId == selectedDBId ? 'selected' : ''}>
-							${db.langName}</option>
-					</c:forEach>
-				</select>
-				<div class="text-danger small error-msg" id="typeDBIdError"></div>
-			</div>
-
-			<!-- ภาษาที่ใช้ในการพัฒนา -->
-			<div class="mb-3">
-				<label class="form-label fw-bold">ภาษาที่ใช้ในการพัฒนา :</label><br />
-				<c:forEach var="lang" items="${programmingLangs}">
-					<c:set var="checked" value="" />
-					<c:forEach var="detail" items="${project.projectLangDetails}">
-						<c:if test="${detail.programmingLang.langId == lang.langId}">
-							<c:set var="checked" value="checked" />
+			<!-- เครื่องมือการเขียนโปรแกรม -->
+			<div class="mb-4">
+				<label class="form-label fw-bold"> <i
+					class="bi bi-code-slash"></i> เครื่องมือการเขียนโปรแกรม :
+				</label>
+				<div id="programmingToolsContainer">
+					<!-- แสดง tools ที่เลือกไว้แล้ว (PROGRAMMING) -->
+					<c:set var="hasProgTools" value="false" />
+					<c:forEach var="tool" items="${project.tools}">
+						<c:if test="${tool.toolType == 'PROGRAMMING'}">
+							<c:set var="hasProgTools" value="true" />
+							<div class="tool-item">
+								<select class="form-select" name="programmingToolIds">
+									<option value="">-- เลือกเครื่องมือ --</option>
+									<c:forEach var="t" items="${allTools}">
+										<c:if test="${t.toolType == 'PROGRAMMING'}">
+											<option value="${t.toolsId}"
+												${t.toolsId == tool.toolsId ? 'selected' : ''}>
+												${t.toolsName}</option>
+										</c:if>
+									</c:forEach>
+								</select>
+								<button type="button" class="btn btn-danger btn-sm btn-remove"
+									onclick="removeToolItem(this)">
+									<i class="bi bi-trash"></i>
+								</button>
+							</div>
 						</c:if>
 					</c:forEach>
-					<div class="form-check form-check-inline">
-						<input class="form-check-input" type="checkbox" name="languageIds"
-							value="${lang.langId}" ${checked}> <label
-							class="form-check-label">${lang.langName}</label>
-					</div>
-				</c:forEach>
-				<div class="text-danger small error-msg" id="languageError"></div>
-				<div class="mt-2">
-					<label class="form-label">ภาษาอื่น ๆ:</label> <input type="text"
-						class="form-control" name="otherLanguages"
-						placeholder="ตัวอย่าง: C#, C++, Swift, PHP">
-					<div class="text-danger small error-msg" id="otherLanguagesError"></div>
+
+					<!-- ถ้าไม่มี tool ที่เลือกไว้ ให้แสดง dropdown เปล่า 1 อัน -->
+					<c:if test="${!hasProgTools}">
+						<div class="tool-item">
+							<select class="form-select" name="programmingToolIds">
+								<option value="">-- เลือกเครื่องมือ --</option>
+								<c:forEach var="t" items="${allTools}">
+									<c:if test="${t.toolType == 'PROGRAMMING'}">
+										<option value="${t.toolsId}">${t.toolsName}</option>
+									</c:if>
+								</c:forEach>
+							</select>
+							<button type="button" class="btn btn-danger btn-sm btn-remove"
+								onclick="removeToolItem(this)">
+								<i class="bi bi-trash"></i>
+							</button>
+						</div>
+					</c:if>
 				</div>
+				<div class="add-tool-section">
+					<button type="button" class="btn btn-sm btn-outline-primary"
+						onclick="addProgrammingTool()">
+						<i class="bi bi-plus-circle"></i> เพิ่มเครื่องมือ
+					</button>
+				</div>
+				<div class="text-danger small error-msg" id="programmingToolsError"></div>
+			</div>
+
+			<!-- ระบบจัดการฐานข้อมูล -->
+			<div class="mb-4">
+				<label class="form-label fw-bold"> <i class="bi bi-database"></i>
+					ระบบจัดการฐานข้อมูล :
+				</label>
+				<div id="dbmsToolsContainer">
+					<!-- แสดง tools ที่เลือกไว้แล้ว (DBMS) -->
+					<c:set var="hasDbmsTools" value="false" />
+					<c:forEach var="tool" items="${project.tools}">
+						<c:if test="${tool.toolType == 'DBMS'}">
+							<c:set var="hasDbmsTools" value="true" />
+							<div class="tool-item">
+								<select class="form-select" name="dbmsToolIds">
+									<option value="">-- เลือกฐานข้อมูล --</option>
+									<c:forEach var="t" items="${allTools}">
+										<c:if test="${t.toolType == 'DBMS'}">
+											<option value="${t.toolsId}"
+												${t.toolsId == tool.toolsId ? 'selected' : ''}>
+												${t.toolsName}</option>
+										</c:if>
+									</c:forEach>
+								</select>
+								<button type="button" class="btn btn-danger btn-sm btn-remove"
+									onclick="removeToolItem(this)">
+									<i class="bi bi-trash"></i>
+								</button>
+							</div>
+						</c:if>
+					</c:forEach>
+
+					<!-- ถ้าไม่มี tool ที่เลือกไว้ ให้แสดง dropdown เปล่า 1 อัน -->
+					<c:if test="${!hasDbmsTools}">
+						<div class="tool-item">
+							<select class="form-select" name="dbmsToolIds">
+								<option value="">-- เลือกฐานข้อมูล --</option>
+								<c:forEach var="t" items="${allTools}">
+									<c:if test="${t.toolType == 'DBMS'}">
+										<option value="${t.toolsId}">${t.toolsName}</option>
+									</c:if>
+								</c:forEach>
+							</select>
+							<button type="button" class="btn btn-danger btn-sm btn-remove"
+								onclick="removeToolItem(this)">
+								<i class="bi bi-trash"></i>
+							</button>
+						</div>
+					</c:if>
+				</div>
+				<div class="add-tool-section">
+					<button type="button" class="btn btn-sm btn-outline-primary"
+						onclick="addDbmsTool()">
+						<i class="bi bi-plus-circle"></i> เพิ่มฐานข้อมูล
+					</button>
+				</div>
+				<div class="text-danger small error-msg" id="dbmsToolsError"></div>
 			</div>
 
 			<!-- บทคัดย่อ -->
@@ -163,38 +238,114 @@
 		</form>
 	</div>
 
+	<!-- ✅ Hidden Templates สำหรับ clone -->
+	<select id="programmingToolTemplate" style="display: none;">
+		<option value="">-- เลือกเครื่องมือ --</option>
+		<c:forEach var="t" items="${allTools}">
+			<c:if test="${t.toolType == 'PROGRAMMING'}">
+				<option value="${t.toolsId}">${t.toolsName}</option>
+			</c:if>
+		</c:forEach>
+	</select>
+
+	<select id="dbmsToolTemplate" style="display: none;">
+		<option value="">-- เลือกฐานข้อมูล --</option>
+		<c:forEach var="t" items="${allTools}">
+			<c:if test="${t.toolType == 'DBMS'}">
+				<option value="${t.toolsId}">${t.toolsName}</option>
+			</c:if>
+		</c:forEach>
+	</select>
+
 	<script>
+// ✅ ประกาศตัวแปรก่อนทุกอย่าง
 let thaiEditor, engEditor;
 
 // สร้าง CKEditor
 ClassicEditor
-    .create(document.querySelector('#thaiAbstract'), { toolbar: ['heading', '|', 'bold', 'italic', '|', 'link', '|', 'fontSize'], fontSize: { options: [10, 12, 14, 'default', 18, 20, 24, 28, 32, 36] } })
+    .create(document.querySelector('#thaiAbstract'), { 
+        toolbar: ['heading', '|', 'bold', 'italic', '|', 'link']
+    })
     .then(editor => { thaiEditor = editor; })
-    .catch(error => console.error(error));
+    .catch(error => console.error('CKEditor Thai Error:', error));
 
 ClassicEditor
-    .create(document.querySelector('#engAbstract'), { toolbar: ['heading', '|', 'bold', 'italic', '|', 'link', '|', 'fontSize'], fontSize: { options: [10, 12, 14, 'default', 18, 20, 24, 28, 32, 36] } })
+    .create(document.querySelector('#engAbstract'), { 
+        toolbar: ['heading', '|', 'bold', 'italic', '|', 'link']
+    })
     .then(editor => { engEditor = editor; })
-    .catch(error => console.error(error));
+    .catch(error => console.error('CKEditor English Error:', error));
 
-// ซ่อน/แสดง ซอฟต์แวร์ฐานข้อมูลตาม projectType
-const projectTypeSelect = document.querySelector('select[name="projectType"]');
-const dbSoftwareDiv = document.getElementById('dbSoftwareSection');
-
-function toggleDBSoftware() {
-    const selectedType = projectTypeSelect.value;
-    if (selectedType === 'Testing') {
-        dbSoftwareDiv.style.display = 'none';
-    } else {
-        dbSoftwareDiv.style.display = 'block';
-    }
+// เพิ่มเครื่องมือการเขียนโปรแกรม
+function addProgrammingTool() {
+    console.log('addProgrammingTool called');
+    
+    const container = document.getElementById('programmingToolsContainer');
+    const div = document.createElement('div');
+    div.className = 'tool-item';
+    
+    // ✅ Clone จาก template
+    const templateSelect = document.getElementById('programmingToolTemplate');
+    const newSelect = templateSelect.cloneNode(true);
+    newSelect.removeAttribute('id');
+    newSelect.removeAttribute('style');
+    newSelect.name = 'programmingToolIds';
+    newSelect.className = 'form-select';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn btn-danger btn-sm btn-remove';
+    removeBtn.onclick = function() { removeToolItem(this); };
+    removeBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    
+    div.appendChild(newSelect);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
+    console.log('New programming dropdown added');
 }
 
-// เรียกใช้เมื่อโหลดหน้า
-toggleDBSoftware();
+// เพิ่มระบบจัดการฐานข้อมูล
+function addDbmsTool() {
+    console.log('addDbmsTool called');
+    
+    const container = document.getElementById('dbmsToolsContainer');
+    const div = document.createElement('div');
+    div.className = 'tool-item';
+    
+    // ✅ Clone จาก template
+    const templateSelect = document.getElementById('dbmsToolTemplate');
+    const newSelect = templateSelect.cloneNode(true);
+    newSelect.removeAttribute('id');
+    newSelect.removeAttribute('style');
+    newSelect.name = 'dbmsToolIds';
+    newSelect.className = 'form-select';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn btn-danger btn-sm btn-remove';
+    removeBtn.onclick = function() { removeToolItem(this); };
+    removeBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    
+    div.appendChild(newSelect);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
+    console.log('New DBMS dropdown added');
+}
 
-// เรียกใช้เมื่อเปลี่ยนประเภทโครงงาน
-projectTypeSelect.addEventListener('change', toggleDBSoftware);
+// ลบรายการ tool
+function removeToolItem(btn) {
+    const container = btn.closest('.tool-item').parentElement;
+    btn.closest('.tool-item').remove();
+    
+    // ถ้าไม่มีรายการเหลือเลย ให้เพิ่ม 1 รายการเปล่า
+    if (container.children.length === 0) {
+        if (container.id === 'programmingToolsContainer') {
+            addProgrammingTool();
+        } else {
+            addDbmsTool();
+        }
+    }
+}
 
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -226,34 +377,43 @@ document.querySelector('form').addEventListener('submit', function(e) {
         valid = false; 
     }
 
-    // ซอฟต์แวร์ฐานข้อมูล (ตรวจสอบเฉพาะเมื่อไม่ใช่ Testing)
-    const selectedType = form.projectType.value;
-    if (selectedType !== 'Testing' && !form.typeDBId.value) { 
-        document.getElementById('typeDBIdError').textContent = "*กรุณาเลือกซอฟต์แวร์ฐานข้อมูล"; 
-        valid = false; 
+    // ตรวจสอบเครื่องมือการเขียนโปรแกรม
+    const progTools = Array.from(form.querySelectorAll('select[name="programmingToolIds"]'))
+        .map(s => s.value)
+        .filter(v => v !== "");
+    
+    if (progTools.length === 0) {
+        document.getElementById('programmingToolsError').textContent = "*กรุณาเลือกเครื่องมือการเขียนโปรแกรมอย่างน้อย 1 รายการ";
+        valid = false;
+    } else {
+        // ตรวจสอบการเลือกซ้ำ
+        const uniqueProgTools = new Set(progTools);
+        if (uniqueProgTools.size !== progTools.length) {
+            document.getElementById('programmingToolsError').textContent = "*มีการเลือกเครื่องมือซ้ำกัน กรุณาตรวจสอบ";
+            valid = false;
+        }
     }
 
-    const languages = form.querySelectorAll('input[name="languageIds"]:checked');
-    const otherLang = form.otherLanguages.value.trim();
-    let languageError = document.getElementById('languageError');
-    languageError.textContent = "";
-
-    // ภาษาที่ใช้ในการพัฒนา
-    if (languages.length === 0) {
-        languageError.textContent = "*กรุณาเลือกภาษาที่ใช้ในการพัฒนาอย่างน้อย 1 ภาษา";
+    // ตรวจสอบระบบจัดการฐานข้อมูล
+    const dbmsToolsList = Array.from(form.querySelectorAll('select[name="dbmsToolIds"]'))
+        .map(s => s.value)
+        .filter(v => v !== "");
+    
+    if (dbmsToolsList.length === 0) {
+        document.getElementById('dbmsToolsError').textContent = "*กรุณาเลือกระบบจัดการฐานข้อมูลอย่างน้อย 1 รายการ";
         valid = false;
-    } else if (otherLang) {
-        const langNames = Array.from(form.querySelectorAll('input[name="languageIds"]'))
-            .map(i => i.nextElementSibling.textContent.trim().toLowerCase());
-        if (langNames.includes(otherLang.toLowerCase())) {
-            languageError.textContent = `ภาษาซ้ำกับรายการภาษาที่เลือก`;
+    } else {
+        // ตรวจสอบการเลือกซ้ำ
+        const uniqueDbmsTools = new Set(dbmsToolsList);
+        if (uniqueDbmsTools.size !== dbmsToolsList.length) {
+            document.getElementById('dbmsToolsError').textContent = "*มีการเลือกฐานข้อมูลซ้ำกัน กรุณาตรวจสอบ";
             valid = false;
         }
     }
 
     // บทคัดย่อ
     const abstractTh = thaiEditor.getData().trim();
-    const abstractThPlain = abstractTh.replace(/<[^>]*>/g, ''); // ลบ HTML tags
+    const abstractThPlain = abstractTh.replace(/<[^>]*>/g, '');
     const hasEnglishInThaiAbstract = /[A-Za-z]/.test(abstractThPlain);
     
     if (abstractTh.length < 500 || abstractTh.length > 1500) { 
@@ -266,7 +426,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     }
 
     const abstractEn = engEditor.getData().trim();
-    const abstractEnPlain = abstractEn.replace(/<[^>]*>/g, ''); // ลบ HTML tags
+    const abstractEnPlain = abstractEn.replace(/<[^>]*>/g, '');
     const hasThaiInEngAbstract = /[ก-๙]/.test(abstractEnPlain);
     
     if (abstractEn.length < 500 || abstractEn.length > 1500) { 

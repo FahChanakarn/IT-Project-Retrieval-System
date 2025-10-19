@@ -51,20 +51,9 @@ public class EditAbstractController {
 
 		ToolsManager toolsManager = new ToolsManager();
 
-		mav.addObject("programmingLangs", toolsManager.getToolsByType(Tools.ToolsType.PROGRAMMING));
-		mav.addObject("typeDBs", toolsManager.getToolsByType(Tools.ToolsType.DBMS));
-
-		// ✅ หา DB ที่ถูกเลือกไว้แล้ว (DBMS) - เพิ่มการเช็ค null
-		Integer selectedDBId = null;
-		if (project != null && project.getTools() != null) {
-			for (Tools tool : project.getTools()) {
-				if (tool.getToolType() == Tools.ToolsType.DBMS) {
-					selectedDBId = tool.getToolsId();
-					break;
-				}
-			}
-		}
-		mav.addObject("selectedDBId", selectedDBId);
+		// ✅ ส่ง allTools สำหรับ JSP ใหม่
+		List<Tools> allTools = toolsManager.getAllTools();
+		mav.addObject("allTools", allTools);
 
 		return mav;
 	}
@@ -72,9 +61,8 @@ public class EditAbstractController {
 	@RequestMapping(value = "/updateAbstract", method = RequestMethod.POST)
 	public ModelAndView updateAbstract(@RequestParam("projNameTh") String projNameTh,
 			@RequestParam("projNameEn") String projNameEn, @RequestParam("projectType") String projectType,
-			@RequestParam(value = "typeDBId", required = false, defaultValue = "0") Integer typeDBId,
-			@RequestParam(value = "languageIds", required = false) int[] languageIds,
-			@RequestParam(value = "otherLanguages", required = false) String otherLanguages,
+			@RequestParam(value = "programmingToolIds", required = false) int[] programmingToolIds,
+			@RequestParam(value = "dbmsToolIds", required = false) int[] dbmsToolIds,
 			@RequestParam("abstractTh") String abstractTh, @RequestParam("abstractEn") String abstractEn,
 			@RequestParam("keywordTh") String keywordTh, @RequestParam("keywordEn") String keywordEn,
 			HttpSession session) {
@@ -90,7 +78,6 @@ public class EditAbstractController {
 
 		Project project = projectManager.findProjectForEditAbstract(projectId);
 
-		// ✅ เพิ่มการเช็ค project null
 		if (project == null) {
 			ModelAndView mav = new ModelAndView("editAbstract");
 			mav.addObject("errorMessage", "ไม่พบข้อมูลโครงงาน กรุณาลองใหม่อีกครั้ง");
@@ -101,47 +88,28 @@ public class EditAbstractController {
 		project.setProj_NameEn(projNameEn);
 		project.setProjectType(projectType);
 
-		// ✅ เก็บ toolsId ที่ถูกเลือกไว้
+		// ✅ รวม toolIds ทั้งหมด
 		Set<Integer> selectedToolsIds = new HashSet<>();
 
-		// เพิ่ม DBMS ที่เลือก (เฉพาะเมื่อไม่ใช่ Testing)
-		if (typeDBId != null && typeDBId > 0) {
-			selectedToolsIds.add(typeDBId);
-		}
-
-		// เพิ่มภาษาโปรแกรมที่เลือก
-		if (languageIds != null) {
-			for (int toolsId : languageIds) {
+		if (programmingToolIds != null) {
+			for (int toolsId : programmingToolIds) {
 				selectedToolsIds.add(toolsId);
 			}
 		}
 
-		// ✅ ลบ tools ที่ไม่ได้เลือก (เฉพาะ PROGRAMMING และ DBMS ที่อยู่ในระบบ)
+		if (dbmsToolIds != null) {
+			for (int toolsId : dbmsToolIds) {
+				selectedToolsIds.add(toolsId);
+			}
+		}
+
+		// ลบ tools ที่ไม่ได้เลือก
 		toolsManager.removeUnselectedTools(projectId, selectedToolsIds);
 
-		// ✅ เพิ่ม tools ที่เลือก (ถ้ายังไม่มี)
-		if (typeDBId != null && typeDBId > 0) {
-			if (!toolsManager.existsProjectTools(projectId, typeDBId)) {
-				toolsManager.addToolsToProject(project, typeDBId);
-			}
-		}
-
-		if (languageIds != null) {
-			for (int toolsId : languageIds) {
-				if (!toolsManager.existsProjectTools(projectId, toolsId)) {
-					toolsManager.addToolsToProject(project, toolsId);
-				}
-			}
-		}
-
-		// เพิ่มภาษาที่กรอกเอง
-		if (otherLanguages != null && !otherLanguages.trim().isEmpty()) {
-			String[] otherLangs = otherLanguages.split(",");
-			for (String toolsName : otherLangs) {
-				toolsName = toolsName.trim();
-				if (!toolsName.isEmpty()) {
-					toolsManager.addOtherToolsToProject(project, toolsName);
-				}
+		// เพิ่ม tools ที่เลือก
+		for (Integer toolsId : selectedToolsIds) {
+			if (!toolsManager.existsProjectTools(projectId, toolsId)) {
+				toolsManager.addToolsToProject(project, toolsId);
 			}
 		}
 
@@ -162,20 +130,8 @@ public class EditAbstractController {
 		List<String> projectTypes = Arrays.asList("Web", "Mobile App", "Testing", "Web and Mobile");
 		mav.addObject("projectTypes", projectTypes);
 
-		mav.addObject("programmingLangs", toolsManager.getToolsByType(Tools.ToolsType.PROGRAMMING));
-		mav.addObject("typeDBs", toolsManager.getToolsByType(Tools.ToolsType.DBMS));
-
-		// ✅ ส่ง selectedDBId กลับไป - เพิ่มการเช็ค null
-		Integer selectedDBId = null;
-		if (project != null && project.getTools() != null) {
-			for (Tools tool : project.getTools()) {
-				if (tool.getToolType() == Tools.ToolsType.DBMS) {
-					selectedDBId = tool.getToolsId();
-					break;
-				}
-			}
-		}
-		mav.addObject("selectedDBId", selectedDBId);
+		List<Tools> allTools = toolsManager.getAllTools();
+		mav.addObject("allTools", allTools);
 
 		return mav;
 	}

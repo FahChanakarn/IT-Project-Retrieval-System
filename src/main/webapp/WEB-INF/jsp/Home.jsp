@@ -104,28 +104,33 @@ request.setAttribute("currentYear", thisYear);
 						</div>
 					</div>
 
+					<!-- ✅ เปลี่ยนจาก dbmsLangs เป็น dbmsLangs (ยังใช้ชื่อเดิมได้ แต่ type เป็น Tools) -->
 					<div class="filter-section">
 						<div class="filter-title">ซอฟต์แวร์ฐานข้อมูล</div>
 						<c:forEach var="db" items="${dbmsLangs}">
 							<div class="form-check">
+								<!-- ✅ เปลี่ยน db.langName เป็น db.toolsName และ db.langId เป็น db.toolsId -->
 								<input class="form-check-input" type="checkbox" name="databases"
-									value="${db.langName}" id="db_${db.langId}"
-									<c:if test="${not empty selectedDatabases && selectedDatabases.contains(db.langName)}">checked</c:if>>
-								<label class="form-check-label" for="db_${db.langId}">${db.langName}</label>
+									value="${db.toolsName}" id="db_${db.toolsId}"
+									<c:if test="${not empty selectedDatabases && selectedDatabases.contains(db.toolsName)}">checked</c:if>>
+								<label class="form-check-label" for="db_${db.toolsId}">${db.toolsName}</label>
 							</div>
 						</c:forEach>
 					</div>
 
+					<!-- ✅ เปลี่ยนจาก programmingLangs (ยังใช้ชื่อเดิมได้ แต่ type เป็น Tools) -->
 					<div class="filter-section">
 						<div class="filter-title">ภาษาที่ใช้</div>
 						<c:forEach var="lang" items="${programmingLangs}">
-							<c:if test="${lang.langType.name() == 'PROGRAMMING'}">
+							<!-- ✅ เปลี่ยน lang.langType เป็น lang.toolType -->
+							<c:if test="${lang.toolType.name() == 'PROGRAMMING'}">
 								<div class="form-check">
+									<!-- ✅ เปลี่ยน lang.langName เป็น lang.toolsName และ lang.langId เป็น lang.toolsId -->
 									<input class="form-check-input filter-input" type="checkbox"
-										name="languages" value="${lang.langName}"
-										id="lang_${lang.langId}"
-										<c:if test="${not empty selectedLanguages && selectedLanguages.contains(lang.langName)}">checked</c:if>>
-									<label class="form-check-label" for="lang_${lang.langId}">${lang.langName}</label>
+										name="languages" value="${lang.toolsName}"
+										id="lang_${lang.toolsId}"
+										<c:if test="${not empty selectedLanguages && selectedLanguages.contains(lang.toolsName)}">checked</c:if>>
+									<label class="form-check-label" for="lang_${lang.toolsId}">${lang.toolsName}</label>
 								</div>
 							</c:if>
 						</c:forEach>
@@ -442,3 +447,5 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
+</body>
+</html>

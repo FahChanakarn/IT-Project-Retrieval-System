@@ -91,3 +91,21 @@ a.help-link {
 	margin-top: 5px;
 	font-weight: 500;
 }
+.tool-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.tool-item select {
+	flex: 1;
+}
+
+.tool-item .btn-remove {
+	min-width: 40px;
+}
+
+.add-tool-section {
+	margin-top: 10px;
+}

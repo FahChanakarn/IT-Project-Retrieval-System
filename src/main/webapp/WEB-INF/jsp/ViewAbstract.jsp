@@ -26,7 +26,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">${project.proj_NameTh}/ ดูรายละเอียด</h5>
+		<h5 class="fw-bold">${project.proj_NameTh}/ดูรายละเอียด</h5>
 		<hr>
 
 		<div class="abstract-card">
@@ -64,6 +64,33 @@
 
 			<div class="info-row">
 				<span class="info-label">ภาคเรียน :</span> <span class="info-value">${project.semester}</span>
+			</div>
+
+			<!-- Tools Section -->
+			<div class="info-row">
+				<span class="info-label">เครื่องมือที่ใช้พัฒนา :</span>
+				<div class="info-value">
+					<c:choose>
+						<c:when test="${not empty project.tools}">
+							<div class="tools-list">
+								<c:forEach items="${project.tools}" var="tool"
+									varStatus="status">
+									<span class="badge bg-primary me-1 mb-1">
+										${tool.toolsName} <c:if
+											test="${tool.toolType == 'PROGRAMMING'}">
+											<i class="bi bi-code-slash"></i>
+										</c:if> <c:if test="${tool.toolType == 'DBMS'}">
+											<i class="bi bi-database"></i>
+										</c:if>
+									</span>
+								</c:forEach>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<span class="text-muted">ไม่ระบุ</span>
+						</c:otherwise>
+					</c:choose>
+				</div>
 			</div>
 
 			<div class="mb-3">

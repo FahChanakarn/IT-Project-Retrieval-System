@@ -27,7 +27,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
+		<h5>${project.proj_NameTh} / รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->

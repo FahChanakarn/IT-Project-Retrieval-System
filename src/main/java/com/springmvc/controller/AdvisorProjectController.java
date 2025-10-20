@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,15 +38,21 @@ public class AdvisorProjectController {
 			semester = projectManager.getLatestSemester();
 		}
 
+		// ✅ ดึงข้อมูลแบบ Group by Project
+		List<Map<String, Object>> allProjectGroups = projectManager
+				.getProjectGroupsByAdvisorAndSemester(advisor.getAdvisorId(), semester);
+
+		// Pagination
 		int pageSize = 10;
-		int offset = (page - 1) * pageSize;
+		int totalProjects = allProjectGroups.size();
+		int totalPages = (int) Math.ceil((double) totalProjects / pageSize);
 
-		List<Object[]> projectList = projectManager.getStudentProjectsByAdvisorAndSemester(advisor.getAdvisorId(),
-				semester, offset, pageSize);
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, totalProjects);
 
-		int totalRecords = projectManager.countProjectsByAdvisorAndSemester(advisor.getAdvisorId(), semester);
-		int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+		List<Map<String, Object>> paginatedGroups = allProjectGroups.subList(start, end);
 
+		// สร้าง semester list
 		List<String> semesterList = new ArrayList<>();
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
 		for (int y = currentYear; y >= 2562; y--) {
@@ -55,7 +60,7 @@ public class AdvisorProjectController {
 		}
 
 		ModelAndView mav = new ModelAndView("listProjectStudent");
-		mav.addObject("projects", projectList);
+		mav.addObject("projectGroups", paginatedGroups);
 		mav.addObject("currentPage", page);
 		mav.addObject("totalPages", totalPages);
 		mav.addObject("selectedSemester", semester);
@@ -66,14 +71,26 @@ public class AdvisorProjectController {
 	@PostMapping("/approveUploadAjax")
 	@ResponseBody
 	public String approveUploadAjax(@RequestParam("projectId") int projectId) {
-		Project project = projectManager.findProjectById(projectId);
-		if (project != null) {
-			project.setApproveStatus("approved");
-			project.setApproveDate(new java.util.Date()); // เพิ่มวันที่อนุมัติ
-			projectManager.updateProject(project);
-			return "success"; // ส่งกลับไปให้ JS
+		try {
+			boolean success = projectManager.approveProjectUpload(projectId);
+			return success ? "success" : "fail";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
 		}
-		return "fail";
+	}
+
+	@PostMapping("/updateTestingStatusAjax")
+	@ResponseBody
+	public String updateTestingStatusAjax(@RequestParam("projectId") int projectId,
+			@RequestParam("testingStatus") String testingStatus) {
+		try {
+			boolean success = projectManager.updateTestingStatus(projectId, testingStatus);
+			return success ? "success" : "fail";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
 	}
 
 	@RequestMapping("/viewProjectDetail")
@@ -91,7 +108,6 @@ public class AdvisorProjectController {
 			DocumentFile file = DocumentFileManager.findById(fileId);
 			if (file != null) {
 				file.setPublishStatus(published);
-
 				DocumentFileManager.updateFile(file);
 				return "success";
 			}
@@ -100,12 +116,4 @@ public class AdvisorProjectController {
 		}
 		return "fail";
 	}
-
-	/*
-	 * public List<String> generateSemesterList(int startYear, int endYear) {
-	 * List<String> list = new ArrayList<>(); for (int year = endYear; year >=
-	 * startYear; year--) { list.add("2/" + year); list.add("1/" + year); } return
-	 * list; }
-	 */
-
 }

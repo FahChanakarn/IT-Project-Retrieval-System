@@ -65,17 +65,6 @@
 					</div>
 				</div>
 
-				<!-- ชื่อไฟล์ -->
-				<div class="mb-3">
-					<label for="fileName" class="form-label fw-bold">ชื่อไฟล์ :</label>
-					<input type="text" id="fileName" name="fileName"
-						class="form-control" placeholder="กรอกชื่อไฟล์">
-					<div id="fileNameError" class="text-danger mt-1"
-						style="display: none;">
-						<small>*กรุณากรอกชื่อไฟล์</small>
-					</div>
-				</div>
-
 				<!-- เลือกไฟล์ Excel -->
 				<div class="mb-4">
 					<label class="form-label fw-bold">ไฟล์ที่ต้องการนำเข้า :</label> <input
@@ -144,26 +133,13 @@
 		function changeSemester() {
 			// ล้างค่าไฟล์และชื่อไฟล์
 			document.getElementById('fileInput').value = '';
-			document.getElementById('fileName').value = '';
 
 			// ซ่อน error messages
-			document.getElementById('fileNameError').style.display = 'none';
 			document.getElementById('fileInputError').style.display = 'none';
 
 			// Submit form โดยไม่ต้องตรวจสอบไฟล์
 			document.getElementById('importForm').submit();
 		}
-
-		// ซ่อน error เมื่อผู้ใช้เริ่มกรอก/เลือกไฟล์
-		document
-				.getElementById('fileName')
-				.addEventListener(
-						'input',
-						function() {
-							if (this.value.trim() !== '') {
-								document.getElementById('fileNameError').style.display = 'none';
-							}
-						});
 
 		document
 				.getElementById('fileInput')
@@ -186,21 +162,12 @@
 								return true;
 							}
 
-							const fileName = document
-									.getElementById('fileName').value.trim();
 							const fileInput = document
 									.getElementById('fileInput').value;
 							let hasError = false;
 
 							// ซ่อน error messages ทั้งหมดก่อน
-							document.getElementById('fileNameError').style.display = 'none';
 							document.getElementById('fileInputError').style.display = 'none';
-
-							// ตรวจสอบชื่อไฟล์
-							if (fileName === '') {
-								document.getElementById('fileNameError').style.display = 'block';
-								hasError = true;
-							}
 
 							// ตรวจสอบการเลือกไฟล์
 							if (fileInput === '') {

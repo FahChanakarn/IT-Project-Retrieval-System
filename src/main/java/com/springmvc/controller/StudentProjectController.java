@@ -3,6 +3,7 @@ package com.springmvc.controller;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -24,64 +25,8 @@ public class StudentProjectController {
 
 	private ProjectManager projectManager = new ProjectManager();
 
-	// ============== รายการโครงงานทั้งหมด ==============
-	@RequestMapping("/listProjects")
-	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(value = "semester", required = false) String semester,
-			@RequestParam(value = "success", required = false) String successMessage,
-			@RequestParam(value = "error", required = false) String errorMessage, HttpSession session) {
-
-		Advisor admin = (Advisor) session.getAttribute("admin");
-		if (admin == null) {
-			return new ModelAndView("redirect:/loginAdmin");
-		}
-
-		int pageSize = 10;
-		int offset = (page - 1) * pageSize;
-
-		ProjectManager projectManager = new ProjectManager();
-
-		// ดึงภาคเรียนล่าสุด ถ้าไม่ได้เลือก
-		if (semester == null || semester.isEmpty()) {
-			semester = projectManager.getLatestSemester();
-		}
-
-		// ดึง Project เป็น List<Project>
-		List<Project> projects = projectManager.getProjectsBySemester(semester);
-
-		int totalRecords = projects.size();
-		int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
-		// สร้าง semester list
-		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
-		List<String> semesterList = new ArrayList<>();
-		for (int y = currentYear; y >= 2562; y--) {
-			semesterList.add("2/" + y);
-		}
-
-		// Pagination (ตัด subset ของ project ตามหน้า)
-		int toIndex = Math.min(offset + pageSize, projects.size());
-		List<Project> pageProjects = projects.subList(offset, toIndex);
-
-		ModelAndView mav = new ModelAndView("listStudentProject");
-		mav.addObject("studentProjects", pageProjects);
-		mav.addObject("currentPage", page);
-		mav.addObject("totalPages", totalPages);
-		mav.addObject("selectedSemester", semester);
-		mav.addObject("semesterList", semesterList);
-
-		// เพิ่ม messages
-		if (successMessage != null) {
-			mav.addObject("successMessage", successMessage);
-		}
-		if (errorMessage != null) {
-			mav.addObject("errorMessage", errorMessage);
-		}
-
-		return mav;
-	}
-
-	// ============== รายการโครงงานของนักศึกษาในที่ปรึกษา ==============
+	// ============== รายการโครงงานของนักศึกษาในที่ปรึกษา (Admin View)
+	// ==============
 	@RequestMapping("/myAdviseeProjects")
 	public ModelAndView listMyAdviseeProjects(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "semester", required = false) String semester, HttpSession session) {
@@ -95,16 +40,21 @@ public class StudentProjectController {
 			semester = projectManager.getLatestSemester();
 		}
 
+		// ✅ ดึงข้อมูลแบบ Group by Project
+		List<Map<String, Object>> allProjectGroups = projectManager
+				.getProjectGroupsByAdvisorAndSemester(admin.getAdvisorId(), semester);
+
+		// Pagination
 		int pageSize = 10;
-		int offset = (page - 1) * pageSize;
+		int totalProjects = allProjectGroups.size();
+		int totalPages = (int) Math.ceil((double) totalProjects / pageSize);
 
-		// ดึงโครงงานของนักศึกษาที่ admin เป็นที่ปรึกษา
-		List<Object[]> projectList = projectManager.getStudentProjectsByAdvisorAndSemester(admin.getAdvisorId(),
-				semester, offset, pageSize);
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, totalProjects);
 
-		int totalRecords = projectManager.countProjectsByAdvisorAndSemester(admin.getAdvisorId(), semester);
-		int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+		List<Map<String, Object>> paginatedGroups = allProjectGroups.subList(start, end);
 
+		// สร้าง semester list
 		List<String> semesterList = new ArrayList<>();
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
 		for (int y = currentYear; y >= 2562; y--) {
@@ -112,12 +62,65 @@ public class StudentProjectController {
 		}
 
 		ModelAndView mav = new ModelAndView("listProjectStudent");
-		mav.addObject("projects", projectList);
+		mav.addObject("projectGroups", paginatedGroups);
 		mav.addObject("currentPage", page);
 		mav.addObject("totalPages", totalPages);
 		mav.addObject("selectedSemester", semester);
 		mav.addObject("semesterList", semesterList);
 		mav.addObject("userRole", "admin");
+		return mav;
+	}
+
+	// ============== รายการโครงงานทั้งหมด (Admin) ==============
+	@RequestMapping("/listProjects")
+	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(value = "semester", required = false) String semester,
+			@RequestParam(value = "success", required = false) String successMessage,
+			@RequestParam(value = "error", required = false) String errorMessage, HttpSession session) {
+
+		Advisor admin = (Advisor) session.getAttribute("admin");
+		if (admin == null) {
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		if (semester == null || semester.isEmpty()) {
+			semester = projectManager.getLatestSemester();
+		}
+
+		// ✅ ดึงข้อมูลแบบ Group by Project (ทั้งหมด)
+		List<Map<String, Object>> allProjectGroups = projectManager.getAllProjectGroupsBySemester(semester);
+
+		// Pagination
+		int pageSize = 10;
+		int totalProjects = allProjectGroups.size();
+		int totalPages = (int) Math.ceil((double) totalProjects / pageSize);
+
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, totalProjects);
+
+		List<Map<String, Object>> paginatedGroups = allProjectGroups.subList(start, end);
+
+		// สร้าง semester list
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+		List<String> semesterList = new ArrayList<>();
+		for (int y = currentYear; y >= 2562; y--) {
+			semesterList.add("2/" + y);
+		}
+
+		ModelAndView mav = new ModelAndView("listStudentProject");
+		mav.addObject("projectGroups", paginatedGroups);
+		mav.addObject("currentPage", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("selectedSemester", semester);
+		mav.addObject("semesterList", semesterList);
+
+		if (successMessage != null) {
+			mav.addObject("successMessage", successMessage);
+		}
+		if (errorMessage != null) {
+			mav.addObject("errorMessage", errorMessage);
+		}
+
 		return mav;
 	}
 
@@ -128,14 +131,30 @@ public class StudentProjectController {
 			return "unauthorized";
 		}
 
-		Project project = projectManager.findProjectById(projectId);
-		if (project != null) {
-			project.setApproveStatus("approved");
-			project.setApproveDate(new java.util.Date());
-			projectManager.updateProject(project);
-			return "success";
+		try {
+			boolean success = projectManager.approveProjectUpload(projectId);
+			return success ? "success" : "fail";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
 		}
-		return "fail";
+	}
+
+	@PostMapping("/updateTestingStatusAjax")
+	@ResponseBody
+	public String updateTestingStatusAjax(@RequestParam("projectId") int projectId,
+			@RequestParam("testingStatus") String testingStatus, HttpSession session) {
+		if (session.getAttribute("admin") == null) {
+			return "unauthorized";
+		}
+
+		try {
+			boolean success = projectManager.updateTestingStatus(projectId, testingStatus);
+			return success ? "success" : "fail";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
 	}
 
 	@PostMapping("/document/togglePublish")
@@ -163,8 +182,6 @@ public class StudentProjectController {
 	@RequestMapping("/viewProjectDetail")
 	public ModelAndView viewProjectDetail(@RequestParam("projectId") int projectId, HttpSession session) {
 
-		System.out.println("DEBUG: viewProjectDetail called with projectId = " + projectId);
-
 		Advisor admin = (Advisor) session.getAttribute("admin");
 		if (admin == null) {
 			return new ModelAndView("redirect:/loginAdmin");
@@ -174,13 +191,10 @@ public class StudentProjectController {
 			Project project = projectManager.findProjectForEditAbstract(projectId);
 
 			if (project == null) {
-				System.out.println("DEBUG: Project not found: " + projectId);
 				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
 				mav.addObject("error", "ไม่พบข้อมูลโครงงาน");
 				return mav;
 			}
-
-			System.out.println("DEBUG: Project found: " + project.getProj_NameTh());
 
 			ModelAndView mav = new ModelAndView("viewProjectDetail");
 			mav.addObject("project", project);
@@ -188,7 +202,6 @@ public class StudentProjectController {
 			return mav;
 
 		} catch (Exception e) {
-			System.out.println("DEBUG: Exception in viewProjectDetail: " + e.getMessage());
 			e.printStackTrace();
 			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
 			mav.addObject("error", "เกิดข้อผิดพลาดในการดึงข้อมูล");
@@ -196,61 +209,19 @@ public class StudentProjectController {
 		}
 	}
 
-	public List<String> generateSemesterList(int startYear, int endYear) {
-		List<String> list = new ArrayList<>();
-		for (int year = endYear; year >= startYear; year--) {
-			list.add("2/" + year);
-		}
-		return list;
-	}
-
-	@RequestMapping(value = "/approveUpload", method = RequestMethod.POST)
-	public ModelAndView approveUpload(@RequestParam("projectId") int projectId, HttpSession session) {
-
-		System.out.println("DEBUG: approveUpload called with projectId = " + projectId);
-
-		Advisor admin = (Advisor) session.getAttribute("admin");
-		if (admin == null) {
-			return new ModelAndView("redirect:/loginAdmin");
+	@PostMapping("/deleteProject")
+	@ResponseBody
+	public String deleteProject(@RequestParam("projectId") int projectId, HttpSession session) {
+		if (session.getAttribute("admin") == null) {
+			return "unauthorized";
 		}
 
 		try {
-			ProjectManager projectManager = new ProjectManager();
-			Project project = projectManager.findProjectById(projectId);
-
-			if (project == null) {
-				System.out.println("DEBUG: Project not found for approval: " + projectId);
-				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
-				mav.addObject("error", "ไม่พบข้อมูลโครงงาน");
-				return mav;
-			}
-
-			// ตรวจสอบว่าอนุมัติแล้วหรือยัง
-			if ("1".equals(project.getApproveStatus()) || "approved".equalsIgnoreCase(project.getApproveStatus())) {
-				System.out.println("DEBUG: Project already approved: " + projectId);
-				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
-				mav.addObject("error", "โครงงานนี้ได้รับการอนุมัติแล้ว");
-				return mav;
-			}
-
-			// อนุมัติโครงงาน
-			project.setApproveStatus("1"); // หรือ "approved" ตามที่ระบบใช้
-			project.setApproveDate(new java.util.Date());
-
-			projectManager.updateProject(project);
-
-			System.out.println("DEBUG: Project approved successfully: " + projectId);
-
-			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
-			mav.addObject("success", "อนุมัติโครงงานเรียบร้อยแล้ว");
-			return mav;
-
+			boolean success = projectManager.deleteProjectAndStudents(projectId);
+			return success ? "success" : "fail";
 		} catch (Exception e) {
-			System.out.println("DEBUG: Exception in approveUpload: " + e.getMessage());
 			e.printStackTrace();
-			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
-			mav.addObject("error", "เกิดข้อผิดพลาดในการอนุมัติ");
-			return mav;
+			return "fail";
 		}
 	}
 
@@ -263,9 +234,6 @@ public class StudentProjectController {
 				return new ModelAndView("redirect:/loginAdmin");
 			}
 
-			ProjectManager projectManager = new ProjectManager();
-
-			// ตรวจสอบว่าโครงงานมีอยู่จริง
 			if (!projectManager.projectExists(projectId)) {
 				ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
 				mav.addObject("error", "ไม่พบข้อมูลโครงงาน");
@@ -284,7 +252,6 @@ public class StudentProjectController {
 			return mav;
 
 		} catch (Exception e) {
-			System.out.println("DEBUG: Exception occurred: " + e.getMessage());
 			e.printStackTrace();
 			ModelAndView mav = new ModelAndView("redirect:/admin/listProjects");
 			mav.addObject("error", "เกิดข้อผิดพลาดในระบบ: " + e.getMessage());

@@ -10,6 +10,7 @@ import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ProjectManager {
 
@@ -585,6 +586,214 @@ public class ProjectManager {
 			return new ArrayList<>();
 		} finally {
 			if (session != null) {
+				session.close();
+			}
+		}
+	}
+
+	public List<Map<String, Object>> getProjectGroupsByAdvisorAndSemester(String advisorId, String semester) {
+		Session session = null;
+		List<Map<String, Object>> projectGroups = new ArrayList<>();
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			// Query ดึงโครงงานพร้อมนักศึกษา
+			String hql = "SELECT p.projectId, p.proj_NameTh, p.approveStatus, p.testing_status, "
+					+ "s.stuId, s.stu_prefix, s.stu_firstName, s.stu_lastName " + "FROM Project p "
+					+ "LEFT JOIN p.student496s s " + "WHERE p.advisor.advisorId = :advisorId "
+					+ "AND p.semester = :semester " + "ORDER BY s.stuId ASC";
+
+			Query<Object[]> query = session.createQuery(hql, Object[].class);
+			query.setParameter("advisorId", advisorId);
+			query.setParameter("semester", semester);
+			List<Object[]> results = query.list();
+
+			// จัดกลุ่มข้อมูล
+			Map<Integer, Map<String, Object>> projectMap = new java.util.LinkedHashMap<>();
+
+			for (Object[] row : results) {
+				Integer projectId = (Integer) row[0];
+				String projectName = (String) row[1];
+				String approveStatus = (String) row[2];
+				String testingStatus = (String) row[3];
+				String studentId = (String) row[4];
+				String prefix = (String) row[5];
+				String firstName = (String) row[6];
+				String lastName = (String) row[7];
+
+				// ถ้ายังไม่มี Project นี้ใน Map
+				if (!projectMap.containsKey(projectId)) {
+					Map<String, Object> projectData = new java.util.HashMap<>();
+					projectData.put("projectId", projectId);
+					projectData.put("projectName", projectName);
+					projectData.put("approveStatus", approveStatus);
+					projectData.put("testingStatus", testingStatus != null ? testingStatus : "0");
+					projectData.put("students", new ArrayList<Map<String, String>>());
+
+					projectMap.put(projectId, projectData);
+				}
+
+				// เพิ่มนักศึกษาเข้าไปใน List
+				Map<String, String> studentData = new java.util.HashMap<>();
+				studentData.put("studentId", studentId);
+				studentData.put("prefix", prefix);
+				studentData.put("firstName", firstName);
+				studentData.put("lastName", lastName);
+
+				@SuppressWarnings("unchecked")
+				List<Map<String, String>> students = (List<Map<String, String>>) projectMap.get(projectId)
+						.get("students");
+				students.add(studentData);
+			}
+
+			// แปลง Map เป็น List
+			projectGroups.addAll(projectMap.values());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return projectGroups;
+	}
+
+	/**
+	 * ดึงโครงงานทั้งหมดแบบจัดกลุ่ม (สำหรับ Admin)
+	 */
+	public List<Map<String, Object>> getAllProjectGroupsBySemester(String semester) {
+		Session session = null;
+		List<Map<String, Object>> projectGroups = new ArrayList<>();
+
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			String hql = "SELECT p.projectId, p.proj_NameTh, p.approveStatus, p.testing_status, "
+					+ "s.stuId, s.stu_prefix, s.stu_firstName, s.stu_lastName " + "FROM Project p "
+					+ "JOIN p.student496s s " + "WHERE p.semester = :semester " + "ORDER BY s.stuId ASC";
+
+			Query<Object[]> query = session.createQuery(hql, Object[].class);
+			query.setParameter("semester", semester);
+			List<Object[]> results = query.list();
+
+			// จัดกลุ่มข้อมูล (เหมือนเดิม)
+			Map<Integer, Map<String, Object>> projectMap = new java.util.LinkedHashMap<>();
+
+			for (Object[] row : results) {
+				Integer projectId = (Integer) row[0];
+				String projectName = (String) row[1];
+				String approveStatus = (String) row[2];
+				String testingStatus = (String) row[3];
+				String studentId = (String) row[4];
+				String prefix = (String) row[5];
+				String firstName = (String) row[6];
+				String lastName = (String) row[7];
+
+				if (!projectMap.containsKey(projectId)) {
+					Map<String, Object> projectData = new java.util.HashMap<>();
+					projectData.put("projectId", projectId);
+					projectData.put("projectName", projectName);
+					projectData.put("approveStatus", approveStatus);
+					projectData.put("testingStatus", testingStatus != null ? testingStatus : "0");
+					projectData.put("students", new ArrayList<Map<String, String>>());
+
+					projectMap.put(projectId, projectData);
+				}
+
+				Map<String, String> studentData = new java.util.HashMap<>();
+				studentData.put("studentId", studentId);
+				studentData.put("prefix", prefix);
+				studentData.put("firstName", firstName);
+				studentData.put("lastName", lastName);
+
+				@SuppressWarnings("unchecked")
+				List<Map<String, String>> students = (List<Map<String, String>>) projectMap.get(projectId)
+						.get("students");
+				students.add(studentData);
+			}
+
+			projectGroups.addAll(projectMap.values());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+
+		return projectGroups;
+	}
+
+	/**
+	 * อนุมัติการอัปโหลดไฟล์ (ระดับโครงงาน)
+	 */
+	public boolean approveProjectUpload(int projectId) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			Project project = session.get(Project.class, projectId);
+			if (project != null) {
+				project.setApproveStatus("approved");
+				project.setApproveDate(new java.util.Date());
+				session.update(project);
+				session.getTransaction().commit();
+				return true;
+			}
+
+			session.getTransaction().rollback();
+			return false;
+
+		} catch (Exception e) {
+			if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	/**
+	 * อัปเดตสถานะการทดสอบระบบ (ระดับโครงงาน)
+	 */
+	public boolean updateTestingStatus(int projectId, String testingStatus) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+
+			Project project = session.get(Project.class, projectId);
+			if (project != null) {
+				project.setTesting_status(testingStatus);
+				session.update(project);
+				session.getTransaction().commit();
+				return true;
+			}
+
+			session.getTransaction().rollback();
+			return false;
+
+		} catch (Exception e) {
+			if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (session != null && session.isOpen()) {
 				session.close();
 			}
 		}

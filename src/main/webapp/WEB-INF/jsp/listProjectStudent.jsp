@@ -1,8 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:set var="isAdmin" value="${userRole == 'admin'}" />
-<c:set var="baseUrl" value="${isAdmin ? '/admin' : '/advisor'}" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,23 +26,22 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">จัดการโครงงาน /
-			รายการโครงงานทั้งหมด</h5>
+		<h5 class="fw-bold">จัดการโครงงาน / รายการโครงงานของนักศึกษา</h5>
 		<hr>
 
 		<!-- แสดง Alert Messages -->
-		<c:if test="${not empty param.success}">
+		<c:if test="${not empty successMessage}">
 			<div class="alert alert-success alert-dismissible fade show"
 				role="alert">
-				${param.success}
+				${successMessage}
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 		</c:if>
 
-		<c:if test="${not empty param.error}">
+		<c:if test="${not empty errorMessage}">
 			<div class="alert alert-danger alert-dismissible fade show"
 				role="alert">
-				${param.error}
+				${errorMessage}
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 		</c:if>
@@ -61,7 +58,7 @@
 		</div>
 
 		<c:choose>
-			<c:when test="${empty projects}">
+			<c:when test="${empty projectGroups}">
 				<div class="alert alert-warning text-center mt-4">
 					ไม่พบข้อมูลโครงงานสำหรับภาคเรียนที่เลือก</div>
 			</c:when>
@@ -70,36 +67,84 @@
 					<thead class="table-light">
 						<tr>
 							<th style="width: 10%;">รหัสนักศึกษา</th>
-							<th style="width: 20%;">ชื่อ - สกุล</th>
+							<th style="width: 18%;">ชื่อ - สกุล</th>
 							<th style="width: 30%;">หัวข้อโครงงาน</th>
-							<th style="width: 15%;">รายละเอียด</th>
-							<th style="width: 15%;">อนุมัติการอัปโหลด</th>
+							<th style="width: 14%;">รายละเอียด</th>
+							<th style="width: 14%;">อนุมัติการอัปโหลด</th>
+							<th style="width: 14%;">การทดสอบระบบ</th>
+							<!-- ✅ ลบคอลัมน์ "ลบโครงงาน" ออก -->
 						</tr>
 					</thead>
 					<tbody>
-						<c:forEach var="row" items="${projects}">
-							<tr>
-								<td>${row[0]}</td>
-								<td>${row[1]} ${row[2]}</td>
-								<td>${row[3]}</td>
-								<td><a class="btn btn-primary btn-sm"
-									href="${pageContext.request.contextPath}/viewAbstract?projectId=${row[4]}">
-										รายละเอียด </a></td>
-								<td><c:choose>
-										<c:when test="${row[5] == 'approved'}">
-											<button type="button" class="btn btn-success btn-sm" disabled>
-												<i class="fas fa-check"></i> อนุมัติแล้ว
-											</button>
-										</c:when>
-										<c:otherwise>
-											<button type="button"
-												class="btn btn-success btn-sm approve-btn"
-												data-project-id="${row[4]}" data-project-name="${row[3]}">
-												<i class="fas fa-check-circle"></i> รอดำเนินการอนุมัติ
-											</button>
-										</c:otherwise>
-									</c:choose></td>
-							</tr>
+						<c:forEach var="group" items="${projectGroups}">
+							<c:set var="studentCount" value="${group.students.size()}" />
+							<c:forEach var="student" items="${group.students}"
+								varStatus="status">
+								<tr>
+									<td>${student.studentId}</td>
+									<td>${student.prefix}${student.firstName}
+										${student.lastName}</td>
+
+									<!-- Merge Cell สำหรับหัวข้อโครงงาน -->
+									<c:if test="${status.index == 0}">
+										<td rowspan="${studentCount}">${group.projectName}</td>
+									</c:if>
+
+									<!-- Merge Cell สำหรับปุ่มรายละเอียด -->
+									<c:if test="${status.index == 0}">
+										<td rowspan="${studentCount}"><a
+											class="btn btn-primary btn-sm"
+											href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${group.projectId}">
+												รายละเอียด </a></td>
+									</c:if>
+
+									<!-- Merge Cell สำหรับการอนุมัติ -->
+									<c:if test="${status.index == 0}">
+										<td rowspan="${studentCount}"><c:choose>
+												<c:when test="${group.approveStatus == 'approved'}">
+													<button type="button" class="btn btn-success btn-sm"
+														disabled>
+														<i class="fas fa-check"></i> อนุมัติแล้ว
+													</button>
+												</c:when>
+												<c:otherwise>
+													<button type="button"
+														class="btn btn-warning btn-sm approve-btn"
+														data-project-id="${group.projectId}"
+														data-project-name="${group.projectName}">
+														<i class="fas fa-clock"></i> รออนุมัติ
+													</button>
+												</c:otherwise>
+											</c:choose></td>
+									</c:if>
+
+									<!-- Merge Cell สำหรับการทดสอบระบบ -->
+									<c:if test="${status.index == 0}">
+										<td rowspan="${studentCount}"><c:choose>
+												<c:when test="${group.testingStatus == '1'}">
+													<button type="button"
+														class="btn btn-success btn-sm testing-btn"
+														data-project-id="${group.projectId}"
+														data-project-name="${group.projectName}"
+														data-current-status="1">
+														<i class="fas fa-check-circle"></i> ถูกทดสอบแล้ว
+													</button>
+												</c:when>
+												<c:otherwise>
+													<button type="button"
+														class="btn btn-secondary btn-sm testing-btn"
+														data-project-id="${group.projectId}"
+														data-project-name="${group.projectName}"
+														data-current-status="0">
+														<i class="fas fa-times-circle"></i> ยังไม่ถูกทดสอบ
+													</button>
+												</c:otherwise>
+											</c:choose></td>
+									</c:if>
+
+									<!-- ✅ ลบ Merge Cell สำหรับปุ่มลบโครงงาน ออก -->
+								</tr>
+							</c:forEach>
 						</c:forEach>
 					</tbody>
 				</table>
@@ -120,9 +165,8 @@
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
-		const baseUrl = '${baseUrl}';
-		
 		$(document).ready(function() {
+			// ========== การอนุมัติโครงงาน ==========
 			$(".approve-btn").click(function() {
 				var btn = $(this);
 				var projectId = btn.data("project-id");
@@ -133,14 +177,13 @@
 					html: 'คุณต้องการอนุมัติโครงงาน<br><strong>"' + projectName + '"</strong><br>หรือไม่?',
 					icon: 'warning',
 					showCancelButton: true,
-					confirmButtonColor: '#d33',
+					confirmButtonColor: '#28a745',
 					cancelButtonColor: '#6c757d',
 					confirmButtonText: 'ยืนยัน',
 					cancelButtonText: 'ยกเลิก',
 					reverseButtons: true
 				}).then((result) => {
 					if (result.isConfirmed) {
-						// แสดง loading
 						Swal.fire({
 							title: 'กำลังดำเนินการ...',
 							text: 'โปรดรอสักครู่',
@@ -153,7 +196,7 @@
 						});
 
 						$.ajax({
-							url: "${pageContext.request.contextPath}" + baseUrl + "/approveUploadAjax",
+							url: "${pageContext.request.contextPath}/advisor/approveUploadAjax",
 							method: "POST",
 							data: { projectId: projectId },
 							success: function(response) {
@@ -165,6 +208,7 @@
 										confirmButtonText: 'ตกลง'
 									}).then(() => {
 										btn.html('<i class="fas fa-check"></i> อนุมัติแล้ว');
+										btn.removeClass('btn-warning').addClass('btn-success');
 										btn.prop("disabled", true);
 									});
 								} else {
@@ -188,9 +232,90 @@
 					}
 				});
 			});
+
+			// ========== การทดสอบระบบ ==========
+			$(".testing-btn").click(function() {
+				var btn = $(this);
+				var projectId = btn.data("project-id");
+				var projectName = btn.data("project-name") || 'ไม่ระบุชื่อ';
+				var currentStatus = btn.data("current-status");
+				var newStatus = currentStatus === "1" ? "0" : "1";
+				var actionText = newStatus === "1" ? "ทำเครื่องหมายว่าถูกทดสอบแล้ว" : "ทำเครื่องหมายว่ายังไม่ถูกทดสอบ";
+
+				Swal.fire({
+					title: 'ยืนยันการเปลี่ยนสถานะ',
+					html: 'คุณต้องการ<strong>' + actionText + '</strong><br>สำหรับโครงงาน<br><strong>"' + projectName + '"</strong><br>หรือไม่?',
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#007bff',
+					cancelButtonColor: '#6c757d',
+					confirmButtonText: 'ยืนยัน',
+					cancelButtonText: 'ยกเลิก',
+					reverseButtons: true
+				}).then((result) => {
+					if (result.isConfirmed) {
+						Swal.fire({
+							title: 'กำลังดำเนินการ...',
+							text: 'โปรดรอสักครู่',
+							icon: 'info',
+							allowOutsideClick: false,
+							showConfirmButton: false,
+							willOpen: () => {
+								Swal.showLoading();
+							}
+						});
+
+						$.ajax({
+							url: "${pageContext.request.contextPath}/advisor/updateTestingStatusAjax",
+							method: "POST",
+							data: { 
+								projectId: projectId,
+								testingStatus: newStatus
+							},
+							success: function(response) {
+								if (response === "success") {
+									Swal.fire({
+										title: 'สำเร็จ!',
+										text: 'อัปเดตสถานะการทดสอบเรียบร้อยแล้ว',
+										icon: 'success',
+										confirmButtonText: 'ตกลง'
+									}).then(() => {
+										if (newStatus === "1") {
+											btn.html('<i class="fas fa-check-circle"></i> ถูกทดสอบแล้ว');
+											btn.removeClass('btn-secondary').addClass('btn-success');
+											btn.data("current-status", "1");
+										} else {
+											btn.html('<i class="fas fa-times-circle"></i> ยังไม่ถูกทดสอบ');
+											btn.removeClass('btn-success').addClass('btn-secondary');
+											btn.data("current-status", "0");
+										}
+									});
+								} else {
+									Swal.fire({
+										title: 'เกิดข้อผิดพลาด',
+										text: 'ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่',
+										icon: 'error',
+										confirmButtonText: 'ตกลง'
+									});
+								}
+							},
+							error: function() {
+								Swal.fire({
+									title: 'เกิดข้อผิดพลาด',
+									text: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+									icon: 'error',
+									confirmButtonText: 'ตกลง'
+								});
+							}
+						});
+					}
+				});
+			});
+
+			// ✅ ลบ JavaScript สำหรับปุ่มลบโครงงานออก
 		});
 
-		// แสดง Alert เมื่อกลับมาจากการอนุมัติ
+		// แสดง Alert เมื่อกลับมาจากการดำเนินการ
 		window.addEventListener('DOMContentLoaded', function() {
 			const urlParams = new URLSearchParams(window.location.search);
 			if (urlParams.get('success')) {

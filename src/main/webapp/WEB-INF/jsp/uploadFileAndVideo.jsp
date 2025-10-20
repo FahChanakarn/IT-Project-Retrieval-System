@@ -205,9 +205,9 @@
 		if (fileNameInput) {
 			fileNameInput.addEventListener('input', function(e) {
 				const value = e.target.value.trim();
-				if (value.length > 0 && value.length < 10) {
+				if (value.length > 0 && value.length < 5) {
 					showError(fileNameInput, fileNameError, 
-						'*ชื่อไฟล์ต้องมีความยาวอย่างน้อย 10 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
+						'*ชื่อไฟล์ต้องมีความยาวอย่างน้อย 5 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
 				} else if (value.length > 100) {
 					showError(fileNameInput, fileNameError, 
 						'*ชื่อไฟล์ต้องไม่เกิน 100 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
@@ -229,7 +229,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">จัดการโครงงาน / อัปโหลดไฟล์เอกสาร</h5>
+		<h5 class="fw-bold">${project.proj_NameTh} / จัดการโครงงาน / อัปโหลดไฟล์เอกสาร</h5>
 		<hr>
 
 		<form action="${pageContext.request.contextPath}/student496/upload"

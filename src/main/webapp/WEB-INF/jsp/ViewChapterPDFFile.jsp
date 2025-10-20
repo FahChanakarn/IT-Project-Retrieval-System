@@ -30,7 +30,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw bold">${project.proj_NameTh} / รายละเอียด</h5>
+		<h5 class="fw bold">${project.proj_NameTh} / ดูไฟล์เอกสาร</h5>
 		<hr>
 		
 		<div class="mb-3">

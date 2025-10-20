@@ -20,7 +20,7 @@ public class Tools {
 
 	// Enum ภายใน class
 	public enum ToolsType {
-		PROGRAMMING, DBMS
+		PROGRAMMING, DBMS, Testing
 	}
 
 	@Override

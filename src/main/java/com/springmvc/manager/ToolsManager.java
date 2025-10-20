@@ -21,7 +21,7 @@ public class ToolsManager {
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
-			String hql = "FROM Tools";
+			String hql = "FROM Tools ORDER BY toolType ASC, toolsName ASC";
 			Query<Tools> query = session.createQuery(hql, Tools.class);
 			tools = query.list();
 		} catch (Exception e) {
@@ -73,7 +73,6 @@ public class ToolsManager {
 		return tool;
 	}
 
-	// ✅ เพิ่ม Tools ให้กับ Project (ManyToMany)
 	public void addToolsToProject(Project project, int toolsId) {
 		Session session = null;
 		Transaction tx = null;
@@ -82,12 +81,10 @@ public class ToolsManager {
 			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 
-			// ดึง Project และ Tools
 			Project managedProject = session.get(Project.class, project.getProjectId());
 			Tools tool = session.get(Tools.class, toolsId);
 
 			if (managedProject != null && tool != null) {
-				// เพิ่ม tool ใน project
 				managedProject.getTools().add(tool);
 				session.update(managedProject);
 			}
@@ -105,7 +102,6 @@ public class ToolsManager {
 		}
 	}
 
-	// ✅ เพิ่มภาษาที่กรอกเอง (Other Languages)
 	public void addOtherToolsToProject(Project project, String toolsName) {
 		Session session = null;
 		Transaction tx = null;
@@ -114,12 +110,10 @@ public class ToolsManager {
 			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 
-			// เช็คว่ามี Tools ชื่อนี้หรือยัง
 			Query<Tools> query = session.createQuery("FROM Tools WHERE toolsName = :name", Tools.class);
 			query.setParameter("name", toolsName);
 			Tools tool = query.uniqueResult();
 
-			// ถ้ายังไม่มี ให้สร้างใหม่
 			if (tool == null) {
 				tool = new Tools();
 				tool.setToolsName(toolsName);
@@ -128,7 +122,6 @@ public class ToolsManager {
 				session.flush();
 			}
 
-			// เพิ่ม tool ให้กับ project
 			Project managedProject = session.get(Project.class, project.getProjectId());
 			if (managedProject != null && !managedProject.getTools().contains(tool)) {
 				managedProject.getTools().add(tool);
@@ -148,7 +141,6 @@ public class ToolsManager {
 		}
 	}
 
-	// ✅ เช็คว่า Project มี Tools นี้หรือยัง
 	public boolean existsProjectTools(int projectId, int toolsId) {
 		Session session = null;
 		boolean exists = false;
@@ -175,7 +167,6 @@ public class ToolsManager {
 		return exists;
 	}
 
-	// ✅ ลบ Tools ที่ไม่ได้เลือก
 	public void removeUnselectedTools(int projectId, Set<Integer> selectedToolsIds) {
 		Session session = null;
 		Transaction tx = null;
@@ -184,17 +175,14 @@ public class ToolsManager {
 			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
 
-			// ดึง Project พร้อม Tools
 			String hql = "SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.tools " + "WHERE p.projectId = :pid";
 
 			Project project = session.createQuery(hql, Project.class).setParameter("pid", projectId).uniqueResult();
 
 			if (project != null) {
-				// ลบ tools ที่ไม่ได้อยู่ใน selectedToolsIds (เฉพาะ PROGRAMMING และ DBMS)
-				project.getTools()
-						.removeIf(tool -> (tool.getToolType() == Tools.ToolsType.PROGRAMMING
-								|| tool.getToolType() == Tools.ToolsType.DBMS)
-								&& !selectedToolsIds.contains(tool.getToolsId()));
+				project.getTools().removeIf(tool -> (tool.getToolType() == Tools.ToolsType.PROGRAMMING
+						|| tool.getToolType() == Tools.ToolsType.DBMS || tool.getToolType() == Tools.ToolsType.Testing)
+						&& !selectedToolsIds.contains(tool.getToolsId()));
 
 				session.update(project);
 			}
@@ -205,6 +193,57 @@ public class ToolsManager {
 				tx.rollback();
 			}
 			e.printStackTrace();
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	// ✅ ตรวจสอบว่ามีชื่อ Tools นี้แล้วหรือยัง
+	public boolean isToolNameExists(String toolName) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			String hql = "SELECT COUNT(*) FROM Tools WHERE LOWER(toolsName) = LOWER(:name)";
+			Query<Long> query = session.createQuery(hql, Long.class);
+			query.setParameter("name", toolName.trim());
+
+			Long count = query.uniqueResult();
+			return count != null && count > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	// ✅ บันทึก Tools ใหม่
+	public boolean saveTool(Tools tool) {
+		Session session = null;
+		Transaction tx = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+			tx = session.beginTransaction();
+
+			session.save(tool);
+
+			tx.commit();
+			return true;
+
+		} catch (Exception e) {
+			if (tx != null && tx.isActive()) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+			return false;
 		} finally {
 			if (session != null && session.isOpen()) {
 				session.close();

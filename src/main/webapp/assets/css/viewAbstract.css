@@ -18,11 +18,11 @@ hr {
 }
 
 .abstract-card {
-	background: #f5f5dc;
+	background: #fffbf0;
 	border-radius: 10px;
 	padding: 30px;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-	border: 2px solid #deb887;
+	border: 2px solid #d4a574;
 	margin-bottom: 30px;
 }
 
@@ -51,7 +51,7 @@ hr {
 .abstract-section {
 	margin-top: 30px;
 	padding-top: 20px;
-	border-top: 2px solid #deb887;
+	border-top: 2px solid #d4a574;
 }
 
 .abstract-title {
@@ -67,7 +67,7 @@ hr {
 	color: #444;
 	margin-bottom: 20px;
 	padding: 15px;
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.7);
 	border-radius: 8px;
 	border-left: 4px solid #8B2635;
 }
@@ -75,7 +75,7 @@ hr {
 .keywords-section {
 	margin-top: 20px;
 	padding-top: 15px;
-	border-top: 1px solid #deb887;
+	border-top: 1px solid #d4a574;
 }
 
 .keywords-label {
@@ -88,7 +88,7 @@ hr {
 	color: #666;
 	font-style: italic;
 	padding: 10px;
-	background: rgba(255, 255, 255, 0.3);
+	background: rgba(255, 255, 255, 0.5);
 	border-radius: 5px;
 }
 
@@ -99,11 +99,11 @@ hr {
 }
 
 .author-name {
-	background: rgba(255, 255, 255, 0.8);
+	background: rgba(255, 255, 255, 0.9);
 	padding: 8px 15px;
 	border-radius: 20px;
 	font-size: 14px;
-	border: 1px solid #deb887;
+	border: 1px solid #d4a574;
 	color: #8B2635;
 	font-weight: 500;
 }
@@ -119,6 +119,51 @@ hr {
 
 .breadcrumb-item a:hover {
 	text-decoration: underline;
+}
+
+.tools-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 8px;
+}
+
+.tool-card {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 14px;
+	border-radius: 20px;
+	border: 1px solid #d4a574;
+	background: rgba(255, 255, 255, 0.9);
+	color: #8B2635;
+	font-size: 0.9rem;
+	transition: all 0.2s ease;
+}
+
+.tool-card:hover {
+	border-color: #c49563;
+	background: rgba(255, 255, 255, 1);
+}
+
+.tool-card.programming, .tool-card.database, .tool-card.other {
+	border-color: #d4a574;
+	background: rgba(255, 255, 255, 0.9);
+	color: #8B2635;
+}
+
+.tool-card.programming:hover, .tool-card.database:hover, .tool-card.other:hover
+	{
+	border-color: #c49563;
+	background: rgba(255, 255, 255, 1);
+}
+
+.tool-icon {
+	font-size: 1.1rem;
+}
+
+.tool-name {
+	font-weight: 500;
 }
 
 /* Responsive Design */

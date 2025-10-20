@@ -66,14 +66,14 @@ public class ProjectManager {
 	}
 
 	public List<Project> filterProjects(String projectType, List<String> advisorIds, List<String> semesters,
-			List<String> languages, List<String> databases, String testingStatus, String startYear, String endYear) {
+			List<String> languages, List<String> testingTools, List<String> databases, String testingStatus,
+			String startYear, String endYear) {
 
 		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			// ✅ เปลี่ยนจาก projectLangDetails เป็น tools
 			StringBuilder hql = new StringBuilder("SELECT DISTINCT p FROM Project p " + "LEFT JOIN FETCH p.student496s "
 					+ "LEFT JOIN p.tools t " + "WHERE 1=1");
 
@@ -87,10 +87,17 @@ public class ProjectManager {
 				hql.append(" AND p.semester IN (:semesters)");
 			}
 			if (languages != null && !languages.isEmpty()) {
-				hql.append(" AND t.toolsName IN (:languages) AND t.toolType = 'PROGRAMMING'");
+				hql.append(
+						" AND EXISTS (SELECT 1 FROM Project p2 JOIN p2.tools t2 WHERE p2.projectId = p.projectId AND t2.toolsName IN (:languages) AND t2.toolType = 'PROGRAMMING')");
+			}
+			// ✅ เพิ่มเงื่อนไขสำหรับ testingTools
+			if (testingTools != null && !testingTools.isEmpty()) {
+				hql.append(
+						" AND EXISTS (SELECT 1 FROM Project p3 JOIN p3.tools t3 WHERE p3.projectId = p.projectId AND t3.toolsName IN (:testingTools) AND t3.toolType = 'Testing')");
 			}
 			if (databases != null && !databases.isEmpty()) {
-				hql.append(" AND t.toolsName IN (:databases) AND t.toolType = 'DBMS'");
+				hql.append(
+						" AND EXISTS (SELECT 1 FROM Project p4 JOIN p4.tools t4 WHERE p4.projectId = p.projectId AND t4.toolsName IN (:databases) AND t4.toolType = 'DBMS')");
 			}
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				hql.append(" AND p.testing_status = :testingStatus");
@@ -112,10 +119,14 @@ public class ProjectManager {
 				query.setParameterList("semesters", semesters);
 			}
 			if (languages != null && !languages.isEmpty()) {
-				query.setParameter("languages", languages);
+				query.setParameterList("languages", languages);
+			}
+			// ✅ เพิ่ม parameter binding สำหรับ testingTools
+			if (testingTools != null && !testingTools.isEmpty()) {
+				query.setParameterList("testingTools", testingTools);
 			}
 			if (databases != null && !databases.isEmpty()) {
-				query.setParameter("databases", databases);
+				query.setParameterList("databases", databases);
 			}
 			if (testingStatus != null && !testingStatus.isEmpty()) {
 				query.setParameter("testingStatus", testingStatus);

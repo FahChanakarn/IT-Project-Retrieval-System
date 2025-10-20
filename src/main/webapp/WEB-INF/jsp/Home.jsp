@@ -104,35 +104,44 @@ request.setAttribute("currentYear", thisYear);
 						</div>
 					</div>
 
-					<!-- ✅ เปลี่ยนจาก dbmsLangs เป็น dbmsLangs (ยังใช้ชื่อเดิมได้ แต่ type เป็น Tools) -->
+					<!-- ✅ 1. เครื่องมือการเขียนโปรแกรม -->
 					<div class="filter-section">
-						<div class="filter-title">ซอฟต์แวร์ฐานข้อมูล</div>
-						<c:forEach var="db" items="${dbmsLangs}">
+						<div class="filter-title">เครื่องมือการเขียนโปรแกรม</div>
+						<c:forEach var="lang" items="${programmingLangs}">
 							<div class="form-check">
-								<!-- ✅ เปลี่ยน db.langName เป็น db.toolsName และ db.langId เป็น db.toolsId -->
-								<input class="form-check-input" type="checkbox" name="databases"
-									value="${db.toolsName}" id="db_${db.toolsId}"
-									<c:if test="${not empty selectedDatabases && selectedDatabases.contains(db.toolsName)}">checked</c:if>>
-								<label class="form-check-label" for="db_${db.toolsId}">${db.toolsName}</label>
+								<input class="form-check-input filter-input" type="checkbox"
+									name="languages" value="${lang.toolsName}"
+									id="lang_${lang.toolsId}"
+									<c:if test="${not empty selectedLanguages && selectedLanguages.contains(lang.toolsName)}">checked</c:if>>
+								<label class="form-check-label" for="lang_${lang.toolsId}">${lang.toolsName}</label>
 							</div>
 						</c:forEach>
 					</div>
 
-					<!-- ✅ เปลี่ยนจาก programmingLangs (ยังใช้ชื่อเดิมได้ แต่ type เป็น Tools) -->
+					<!-- ✅ 2. เครื่องมือการทดสอบ (ใหม่) -->
 					<div class="filter-section">
-						<div class="filter-title">ภาษาที่ใช้</div>
-						<c:forEach var="lang" items="${programmingLangs}">
-							<!-- ✅ เปลี่ยน lang.langType เป็น lang.toolType -->
-							<c:if test="${lang.toolType.name() == 'PROGRAMMING'}">
-								<div class="form-check">
-									<!-- ✅ เปลี่ยน lang.langName เป็น lang.toolsName และ lang.langId เป็น lang.toolsId -->
-									<input class="form-check-input filter-input" type="checkbox"
-										name="languages" value="${lang.toolsName}"
-										id="lang_${lang.toolsId}"
-										<c:if test="${not empty selectedLanguages && selectedLanguages.contains(lang.toolsName)}">checked</c:if>>
-									<label class="form-check-label" for="lang_${lang.toolsId}">${lang.toolsName}</label>
-								</div>
-							</c:if>
+						<div class="filter-title">เครื่องมือการทดสอบ</div>
+						<c:forEach var="testTool" items="${testingTools}">
+							<div class="form-check">
+								<input class="form-check-input filter-input" type="checkbox"
+									name="testingTools" value="${testTool.toolsName}"
+									id="test_${testTool.toolsId}"
+									<c:if test="${not empty selectedTestingTools && selectedTestingTools.contains(testTool.toolsName)}">checked</c:if>>
+								<label class="form-check-label" for="test_${testTool.toolsId}">${testTool.toolsName}</label>
+							</div>
+						</c:forEach>
+					</div>
+
+					<!-- ✅ 3. ซอฟต์แวร์ฐานข้อมูล -->
+					<div class="filter-section">
+						<div class="filter-title">ซอฟต์แวร์ฐานข้อมูล</div>
+						<c:forEach var="db" items="${dbmsLangs}">
+							<div class="form-check">
+								<input class="form-check-input filter-input" type="checkbox"
+									name="databases" value="${db.toolsName}" id="db_${db.toolsId}"
+									<c:if test="${not empty selectedDatabases && selectedDatabases.contains(db.toolsName)}">checked</c:if>>
+								<label class="form-check-label" for="db_${db.toolsId}">${db.toolsName}</label>
+							</div>
 						</c:forEach>
 					</div>
 

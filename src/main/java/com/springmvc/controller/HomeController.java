@@ -1,7 +1,9 @@
 package com.springmvc.controller;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,26 +34,21 @@ public class HomeController {
 		List<String> semesters = projectManager.getAllSemesters();
 
 		List<Tools> programmingLangs = toolsManager.getToolsByType(Tools.ToolsType.PROGRAMMING);
+		List<Tools> testingTools = toolsManager.getToolsByType(Tools.ToolsType.Testing);
 		List<Tools> dbmsLangs = toolsManager.getToolsByType(Tools.ToolsType.DBMS);
 
-		// ดึงโปรเจคทั้งหมด
 		List<Project> allProjects = projectManager.getAllProjects();
 
-		// ✅ กรองเฉพาะโครงงานที่มีบทคัดย่อทั้งภาษาไทยและภาษาอังกฤษ
+		// ✅ กรองเฉพาะโครงงานที่มีบทคัดย่อและเรียงลำดับ
 		List<Project> projectsWithAbstract = allProjects.stream().filter(p -> {
-			// Debug: แสดงข้อมูลของแต่ละ project
-			System.out.println("Project ID: " + p.getProjectId());
-			System.out.println("Abstract TH: [" + p.getAbstractTh() + "]");
-			System.out.println("Abstract EN: [" + p.getAbstractEn() + "]");
-
 			boolean hasTh = p.getAbstractTh() != null && !p.getAbstractTh().trim().isEmpty();
 			boolean hasEn = p.getAbstractEn() != null && !p.getAbstractEn().trim().isEmpty();
-
-			System.out.println("Has TH: " + hasTh + ", Has EN: " + hasEn);
-			System.out.println("---");
-
 			return hasTh && hasEn;
-		}).toList();
+		})
+				// ✅ เรียงลำดับ: 1. Semester (ล่าสุดก่อน) 2. ชื่อโครงงานภาษาไทย (ก-ฮ)
+				.sorted(Comparator.comparing(Project::getSemester, Comparator.reverseOrder())
+						.thenComparing(p -> p.getProj_NameTh() != null ? p.getProj_NameTh() : ""))
+				.collect(Collectors.toList());
 
 		int totalProjects = projectsWithAbstract.size();
 		int totalPages = (int) Math.ceil((double) totalProjects / PROJECTS_PER_PAGE);
@@ -66,20 +63,20 @@ public class HomeController {
 
 		List<Project> projects = (projectsWithAbstract != null && !projectsWithAbstract.isEmpty())
 				? projectsWithAbstract.subList(fromIndex, toIndex)
-				: List.of(); // ถ้าไม่มีโปรเจค ให้เป็น empty list
+				: List.of();
 
 		ModelAndView mav = new ModelAndView("Home");
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
 		mav.addObject("semesters", semesters);
 		mav.addObject("programmingLangs", programmingLangs);
+		mav.addObject("testingTools", testingTools);
 		mav.addObject("dbmsLangs", dbmsLangs);
 		mav.addObject("projects", projects);
 		mav.addObject("currentPage", page);
 		mav.addObject("totalPages", totalPages);
 		mav.addObject("totalProjects", totalProjects);
 
-		// ✅ แสดง popup ถ้าต้องการ
 		Boolean showPopup = (Boolean) session.getAttribute("showWelcomePopup");
 		if (showPopup != null && showPopup) {
 			mav.addObject("showWelcomePopup", true);

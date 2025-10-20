@@ -27,14 +27,11 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5>${project.proj_NameTh}/รายละเอียด</h5>
+		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->
 		<div class="mb-3">
-			<p>
-				<strong>ชื่อโครงงาน :</strong> ${project.proj_NameTh}
-			</p>
 			<p>
 				<strong>ผู้จัดทำ :</strong>
 				<c:forEach var="s" items="${project.student496s}" varStatus="loop">
@@ -45,6 +42,15 @@
 			<p>
 				<strong>ภาคเรียน :</strong> ${project.semester}
 			</p>
+		</div>
+
+		<!-- ปุ่มดูบทคัดย่อ -->
+		<div class="mb-3">
+			<a
+				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
+				class="btn btn-primary"> <i class="bi bi-file-text"></i>
+				ดูบทคัดย่อ
+			</a>
 		</div>
 
 		<!-- ตารางไฟล์เอกสาร -->
@@ -104,10 +110,11 @@
 		</table>
 	</div>
 
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
 (function () {
     const base = '${pageContext.request.contextPath}';
+    
+    // Toggle publish status
     document.querySelectorAll('.toggle-publish').forEach(btn => {
         btn.addEventListener('click', async function () {
             const fileId = Number(this.dataset.fileId);
@@ -140,25 +147,15 @@
                 }
                 this.dataset.published = nextPublish;
 
-                Swal.fire({
-                    icon: 'success',
-                    title: nextPublish ? 'เผยแพร่สำเร็จ' : 'ปิดเผยแพร่สำเร็จ',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-
             } catch (e) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: 'อัปเดตสถานะเผยแพร่ไม่สำเร็จ'
-                });
-                console.error(e);
+                console.error('เกิดข้อผิดพลาด:', e);
+                alert('อัปเดตสถานะเผยแพร่ไม่สำเร็จ');
             } finally {
                 this.disabled = false;
             }
         });
     });
+
 })();
 </script>
 

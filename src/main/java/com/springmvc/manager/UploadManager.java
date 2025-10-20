@@ -47,7 +47,7 @@ public class UploadManager {
 	}
 
 	public void saveFile(int projectId, String fileType, String fileName, MultipartFile file, String videoLink,
-			ServletContext context) {
+			String uploadedByStudentId, ServletContext context) {
 
 		Session session = null;
 		try {
@@ -70,7 +70,15 @@ public class UploadManager {
 
 			if ("file".equals(fileType) && file != null && !file.isEmpty()) {
 				try {
-					String safeFilename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+					// ดึง extension จาก original file
+					String originalFilename = file.getOriginalFilename();
+					String extension = "";
+					if (originalFilename != null && originalFilename.contains(".")) {
+						extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+					}
+
+					// สร้างชื่อไฟล์: รหัสนศ.ของคนอัปโหลด + ชื่อที่กรอก + extension
+					String safeFilename = uploadedByStudentId + "_" + fileName + extension;
 					String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
 
 					System.out.println("📂 Saving file to: " + fullPath);
@@ -124,7 +132,7 @@ public class UploadManager {
 	}
 
 	public void updateFileOrVideo(int id, String filename, String videoLink, MultipartFile newFile,
-			HttpServletRequest request) {
+			String uploadedByStudentId, HttpServletRequest request) {
 		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
@@ -159,7 +167,15 @@ public class UploadManager {
 					}
 				}
 
-				String safeFilename = System.currentTimeMillis() + "_" + newFile.getOriginalFilename();
+				// ดึง extension จาก original file
+				String originalFilename = newFile.getOriginalFilename();
+				String extension = "";
+				if (originalFilename != null && originalFilename.contains(".")) {
+					extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+				}
+
+				// สร้างชื่อไฟล์: รหัสนศ.ของคนอัปโหลด + ชื่อที่กรอก + extension
+				String safeFilename = uploadedByStudentId + "_" + filename + extension;
 				String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
 
 				try {

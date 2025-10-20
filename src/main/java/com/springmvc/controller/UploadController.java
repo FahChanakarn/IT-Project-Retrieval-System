@@ -65,10 +65,13 @@ public class UploadController {
 		}
 
 		Integer projectId = (Integer) session.getAttribute("projectId");
+		Student496 student = (Student496) session.getAttribute("student");
+		String uploadedByStudentId = student.getStuId(); // ✅ ดึงรหัสนักศึกษา
 
 		try {
 			UploadManager manager = new UploadManager();
-			manager.saveFile(projectId, fileType, fileName, file, videoLink, servletContext);
+			// ✅ ส่ง parameter ตามที่ manager ต้องการ
+			manager.saveFile(projectId, fileType, fileName, file, videoLink, uploadedByStudentId, servletContext);
 			return "redirect:/student496/upload?upload=true";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -92,7 +95,7 @@ public class UploadController {
 		return mav;
 	}
 
-	// ✅ ลบ method ซ้ำ
+	// ✅ ลบ method ซ้ำ - รวมเป็น method เดียว
 	@RequestMapping("/editFileAndVideo")
 	public ModelAndView editFileAndVideo(@RequestParam("id") int fileId, HttpSession session) {
 		// ✅ เช็ค session อย่างเข้มงวด
@@ -114,14 +117,18 @@ public class UploadController {
 			@RequestParam("name") String name, @RequestParam(value = "videoLink", required = false) String videoLink,
 			@RequestParam(value = "newFile", required = false) MultipartFile newFile, HttpSession session) {
 
-		// ✅ เช็ค session อย่างเข้มงวด
+		// ✅ เช็ک session อย่างเข้มงวด
 		if (!isSessionValid(session)) {
 			return "redirect:/loginStudent496";
 		}
 
+		Student496 student = (Student496) session.getAttribute("student");
+		String uploadedByStudentId = student.getStuId(); // ✅ ดึงรหัสนักศึกษา
+
 		try {
 			UploadManager fileManager = new UploadManager();
-			fileManager.updateFileOrVideo(id, name, videoLink, newFile, request);
+			// ✅ ส่ง parameter ตามที่ manager ต้องการ
+			fileManager.updateFileOrVideo(id, name, videoLink, newFile, uploadedByStudentId, request);
 			return "redirect:/student496/upload?success=true";
 		} catch (Exception e) {
 			e.printStackTrace();

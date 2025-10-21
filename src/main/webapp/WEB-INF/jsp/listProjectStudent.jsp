@@ -72,7 +72,6 @@
 							<th style="width: 14%;">รายละเอียด</th>
 							<th style="width: 14%;">อนุมัติการอัปโหลด</th>
 							<th style="width: 14%;">การทดสอบระบบ</th>
-							<!-- ✅ ลบคอลัมน์ "ลบโครงงาน" ออก -->
 						</tr>
 					</thead>
 					<tbody>
@@ -90,12 +89,18 @@
 										<td rowspan="${studentCount}">${group.projectName}</td>
 									</c:if>
 
-									<!-- Merge Cell สำหรับปุ่มรายละเอียด -->
+									<!-- ✅ Merge Cell สำหรับปุ่มรายละเอียด - เปลี่ยนเป็น Form POST -->
 									<c:if test="${status.index == 0}">
-										<td rowspan="${studentCount}"><a
-											class="btn btn-primary btn-sm"
-											href="${pageContext.request.contextPath}/advisor/viewProjectDetail?projectId=${group.projectId}">
-												รายละเอียด </a></td>
+										<td rowspan="${studentCount}">
+											<form
+												action="${pageContext.request.contextPath}/advisor/viewProjectDetail"
+												method="POST" style="display: inline;">
+												<input type="hidden" name="projectId"
+													value="${group.projectId}">
+												<button type="submit" class="btn btn-primary btn-sm">
+													รายละเอียด</button>
+											</form>
+										</td>
 									</c:if>
 
 									<!-- Merge Cell สำหรับการอนุมัติ -->
@@ -141,8 +146,6 @@
 												</c:otherwise>
 											</c:choose></td>
 									</c:if>
-
-									<!-- ✅ ลบ Merge Cell สำหรับปุ่มลบโครงงาน ออก -->
 								</tr>
 							</c:forEach>
 						</c:forEach>
@@ -153,8 +156,9 @@
 				<nav aria-label="Page navigation">
 					<ul class="pagination justify-content-center">
 						<c:forEach var="i" begin="1" end="${totalPages}">
-							<li class="page-item ${i == currentPage ? 'active' : ''}"><a
-								class="page-link" href="?page=${i}&semester=${selectedSemester}">${i}</a>
+							<li class="page-item ${i == currentPage ? 'active' : ''}">
+								<a class="page-link"
+								href="?page=${i}&semester=${selectedSemester}">${i}</a>
 							</li>
 						</c:forEach>
 					</ul>
@@ -311,8 +315,6 @@
 					}
 				});
 			});
-
-			// ✅ ลบ JavaScript สำหรับปุ่มลบโครงงานออก
 		});
 
 		// แสดง Alert เมื่อกลับมาจากการดำเนินการ

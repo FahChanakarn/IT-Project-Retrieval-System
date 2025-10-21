@@ -92,12 +92,18 @@
 										<td rowspan="${studentCount}">${group.projectName}</td>
 									</c:if>
 
-									<!-- Merge Cell สำหรับปุ่มรายละเอียด -->
+									<!-- ✅ Merge Cell สำหรับปุ่มรายละเอียด - เปลี่ยนเป็น Form POST -->
 									<c:if test="${status.index == 0}">
-										<td rowspan="${studentCount}"><a
-											class="btn btn-primary btn-sm"
-											href="${pageContext.request.contextPath}/admin/viewProjectDetail?projectId=${group.projectId}">
-												รายละเอียด </a></td>
+										<td rowspan="${studentCount}">
+											<form
+												action="${pageContext.request.contextPath}/admin/viewProjectDetail"
+												method="POST" style="display: inline;">
+												<input type="hidden" name="projectId"
+													value="${group.projectId}">
+												<button type="submit" class="btn btn-primary btn-sm">
+													รายละเอียด</button>
+											</form>
+										</td>
 									</c:if>
 
 									<!-- Merge Cell สำหรับการอนุมัติ -->

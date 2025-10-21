@@ -47,9 +47,10 @@ request.setAttribute("currentYear", thisYear);
 		<div class="row g-0">
 			<!-- Sidebar -->
 			<div class="col-md-3 sidebar-wrapper">
+				<!-- ✅ เปลี่ยนเป็น POST และเอา action ออก (จะใช้ JavaScript submit) -->
 				<form id="filterForm"
 					action="${pageContext.request.contextPath}/filterProjects"
-					method="get">
+					method="post">
 					<!-- Filter sections -->
 					<div class="filter-section">
 						<div class="filter-heading-main">
@@ -72,7 +73,7 @@ request.setAttribute("currentYear", thisYear);
 								<input class="form-check-input filter-input" type="checkbox"
 									name="advisorIds" value="${advisor.advisorId}"
 									id="advisor_${advisor.advisorId}"
-									<c:if test="${not empty selectedAdvisorIds && selectedAdvisorIds.contains(advisor.advisorId)}">checked</c:if>>
+									<c:if test="${not empty selectedAdvisorIds && selectedAdvisorIds.contains(advisor.advisorId.toString())}">checked</c:if>>
 								<label class="form-check-label"
 									for="advisor_${advisor.advisorId}">${advisor.adv_prefix}
 									${advisor.adv_firstName} ${advisor.adv_lastName}</label>
@@ -174,9 +175,9 @@ request.setAttribute("currentYear", thisYear);
 							<div class="position-relative mb-5">
 								<input type="text" id="searchInput"
 									class="form-control search-box"
-									placeholder="ระบุชื่อโครงงาน หรือคำค้นหา" name="keyword">
-								<i class="bi bi-search search-icon" id="searchIcon"
-									style="cursor: pointer;"></i>
+									placeholder="ระบุชื่อโครงงาน หรือคำค้นหา" name="keyword"
+									value="${keyword}"> <i class="bi bi-search search-icon"
+									id="searchIcon" style="cursor: pointer;"></i>
 							</div>
 						</form>
 
@@ -215,9 +216,14 @@ request.setAttribute("currentYear", thisYear);
 										</div>
 
 										<div class="col-md-3 text-end align-self-center">
-											<a
-												href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-												class="btn btn-primary btn-sm">ดูรายละเอียด</a>
+											<!-- ✅ เปลี่ยนเป็น POST -->
+											<form
+												action="${pageContext.request.contextPath}/viewAbstract"
+												method="POST" style="display: inline;">
+												<input type="hidden" name="projectId"
+													value="${project.projectId}">
+												<button type="submit" class="btn btn-primary btn-sm">ดูรายละเอียด</button>
+											</form>
 										</div>
 									</div>
 								</div>
@@ -351,88 +357,50 @@ request.setAttribute("currentYear", thisYear);
 	<jsp:include page="/WEB-INF/jsp/includes/footer.jsp" />
 
 	<script>
-// เก็บค่า keyword สำหรับ search pagination
+// ✅ เก็บค่าสำหรับตรวจสอบว่าเป็นการ search หรือ filter
 const currentKeyword = "${not empty keyword ? keyword : ''}";
+const hasFilter = ${not empty selectedProjectType or not empty selectedAdvisorIds or not empty selectedSemesters or not empty selectedLanguages or not empty selectedTestingTools or not empty selectedDatabases or not empty selectedTestingStatus or not empty selectedStartYear or not empty selectedEndYear};
 const totalPages = ${not empty totalPages ? totalPages : 1};
 
-// ฟังก์ชันสำหรับเปลี่ยนหน้า
+// ✅ ฟังก์ชันสำหรับเปลี่ยนหน้า
 function goToPage(page) {
-  console.log("goToPage called with page:", page);
-  console.log("currentKeyword:", currentKeyword);
-  console.log("totalPages:", totalPages);
-  
   if (page < 1 || page > totalPages) {
-    console.log("Page out of range");
     return;
   }
   
-  // ตรวจสอบว่ามีการ search หรือ filter
+  // ✅ ถ้ามีการ search
   if (currentKeyword && currentKeyword.trim() !== "") {
-    // กรณี search
-    const url = "${pageContext.request.contextPath}/searchProjects?keyword=" + 
-                encodeURIComponent(currentKeyword) + "&page=" + page;
-    console.log("Navigating to search:", url);
-    window.location.href = url;
-  } else {
-    // กรณี filter หรือหน้าปกติ
-    const form = document.getElementById("filterForm");
-    const formData = new FormData(form);
-    const params = new URLSearchParams();
-    
-    // เพิ่มค่าจาก form
-    for (let [key, value] of formData.entries()) {
-      if (value && value.trim() !== "") {
-        params.append(key, value);
-      }
-    }
-    
-    // เพิ่ม page
-    params.append("page", page);
-    
-    // ตรวจสอบว่ามี filter หรือไม่
-    const paramsString = params.toString();
-    console.log("Params:", paramsString);
-    
-    if (paramsString === "page=" + page) {
-      // ไม่มี filter -> ไปหน้าแรก
-      const url = "${pageContext.request.contextPath}/?page=" + page;
-      console.log("Navigating to home:", url);
-      window.location.href = url;
-    } else {
-      // มี filter
-      const url = "${pageContext.request.contextPath}/filterProjects?" + paramsString;
-      console.log("Navigating to filter:", url);
-      window.location.href = url;
-    }
+    window.location.href = "${pageContext.request.contextPath}/searchProjects?keyword=" + 
+                           encodeURIComponent(currentKeyword) + "&page=" + page;
+  } 
+  // ✅ ถ้ามีการ filter
+  else if (hasFilter) {
+    window.location.href = "${pageContext.request.contextPath}/filterProjects?page=" + page;
+  } 
+  // ✅ หน้าปกติ (ไม่มีทั้ง search และ filter)
+  else {
+    window.location.href = "${pageContext.request.contextPath}/searchProjects?page=" + page;
   }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("DOMContentLoaded fired");
-  
-  // ✅ Debug: ตรวจสอบว่ามี showWelcomePopup หรือไม่
-  const showPopup = "${showWelcomePopup}";
-  console.log("showWelcomePopup value:", showPopup);
-  
   // ✅ แสดง popup เมื่อ login เข้ามาใหม่
   <c:if test="${showWelcomePopup}">
-    console.log("Attempting to show welcome modal...");
     const modalElement = document.getElementById('welcomeModal');
     if (modalElement) {
-      console.log("Modal element found, showing modal...");
       var welcomeModal = new bootstrap.Modal(modalElement);
       welcomeModal.show();
-    } else {
-      console.error("Modal element not found!");
     }
   </c:if>
   
-  // Filter form auto submit
+  // ✅ Filter form auto submit (เมื่อเปลี่ยนค่า filter)
   document.querySelectorAll(".form-select, .form-check-input").forEach(el => {
-    el.addEventListener("change", () => document.getElementById("filterForm").submit());
+    el.addEventListener("change", () => {
+      document.getElementById("filterForm").submit();
+    });
   });
 
-  // Search functionality
+  // ✅ Search functionality
   const searchInput = document.getElementById("searchInput");
   const searchIcon = document.getElementById("searchIcon");
 

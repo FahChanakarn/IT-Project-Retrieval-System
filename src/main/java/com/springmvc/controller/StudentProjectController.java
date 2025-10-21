@@ -179,12 +179,35 @@ public class StudentProjectController {
 		return "fail";
 	}
 
-	@RequestMapping("/viewProjectDetail")
-	public ModelAndView viewProjectDetail(@RequestParam("projectId") int projectId, HttpSession session) {
+	// ✅ เพิ่ม POST method สำหรับเก็บ projectId ใน session
+	@RequestMapping(value = "/viewProjectDetail", method = RequestMethod.POST)
+	public ModelAndView viewProjectDetailPost(@RequestParam("projectId") int projectId, HttpSession session) {
+		Advisor admin = (Advisor) session.getAttribute("admin");
+		if (admin == null) {
+			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		// เก็บ projectId ใน session
+		session.setAttribute("adminViewingProjectId", projectId);
+
+		// Redirect ไปยัง GET method (URL จะไม่มี parameter)
+		return new ModelAndView("redirect:/admin/viewProjectDetail");
+	}
+
+	// ✅ แก้ GET method ให้ใช้ projectId จาก session
+	@RequestMapping(value = "/viewProjectDetail", method = RequestMethod.GET)
+	public ModelAndView viewProjectDetail(HttpSession session) {
 
 		Advisor admin = (Advisor) session.getAttribute("admin");
 		if (admin == null) {
 			return new ModelAndView("redirect:/loginAdmin");
+		}
+
+		// ✅ ดึง projectId จาก session
+		Integer projectId = (Integer) session.getAttribute("adminViewingProjectId");
+
+		if (projectId == null) {
+			return new ModelAndView("redirect:/admin/listProjects");
 		}
 
 		try {

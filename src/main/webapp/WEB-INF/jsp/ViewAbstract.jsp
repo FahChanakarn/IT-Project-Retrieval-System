@@ -130,7 +130,7 @@
 
 							<c:if test="${hasApprovedVideo}">
 								<a
-									href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+									href="${pageContext.request.contextPath}/project/video"
 									class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
 									วิดีโอตัวอย่างการใช้งานโปรแกรม
 								</a>
@@ -140,7 +140,7 @@
 						<c:otherwise>
 							<!-- แสดงปุ่มสำหรับนักศึกษาเท่านั้น -->
 							<a
-								href="${pageContext.request.contextPath}/student/viewChapter?projectId=${project.projectId}"
+								href="${pageContext.request.contextPath}/student/viewChapter"
 								class="btn btn-primary me-2"> <i
 								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
 							</a>
@@ -156,7 +156,7 @@
 
 							<c:if test="${hasApprovedVideo}">
 								<a
-									href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+									href="${pageContext.request.contextPath}/project/video"
 									class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
 									วิดีโอตัวอย่างการใช้งานโปรแกรม
 								</a>

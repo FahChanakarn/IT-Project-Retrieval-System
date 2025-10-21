@@ -65,11 +65,11 @@
 		<!-- ปุ่มบทคัดย่อ + ปุ่มวิดีโอ -->
 		<div class="mb-4">
 			<a
-				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
+				href="${pageContext.request.contextPath}/viewAbstract"
 				class="btn btn-primary me-2"> <i class="bi bi-file-earmark-text me-1"></i>
 				บทคัดย่อ
 			</a> <a
-				href="${pageContext.request.contextPath}/project/video?projectId=${project.projectId}"
+				href="${pageContext.request.contextPath}/project/video"
 				class="btn btn-success"> <i
 				class="bi bi-play-circle me-1"></i> วิดีโอตัวอย่างการใช้งานโปรแกรม
 			</a>

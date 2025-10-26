@@ -79,7 +79,7 @@ public class UploadController {
 		}
 	}
 
-	// 3. ไปหน้าแก้ไขไฟล์
+	// 3. ✅ ไปหน้าแก้ไขไฟล์ - เพิ่ม allFiles สำหรับตรวจสอบชื่อซ้ำ
 	@RequestMapping(value = "/editFileAndVideo/{fileId}", method = RequestMethod.GET)
 	public ModelAndView editFile(@PathVariable("fileId") int fileId, HttpSession session) {
 		// ✅ เช็ค session อย่างเข้มงวด
@@ -87,15 +87,23 @@ public class UploadController {
 			return new ModelAndView("redirect:/loginStudent496");
 		}
 
+		Integer projectId = (Integer) session.getAttribute("projectId");
 		UploadManager manager = new UploadManager();
+
+		// ✅ ดึงไฟล์ที่ต้องการแก้ไข
 		DocumentFile file = manager.getFileById(fileId);
+
+		// ✅ ดึงไฟล์ทั้งหมดของโครงงานเพื่อตรวจสอบชื่อซ้ำ
+		List<DocumentFile> allFiles = manager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("editFileAndVideo");
 		mav.addObject("file", file);
+		mav.addObject("allFiles", allFiles); // ✅ ส่งไปให้ JSP
 		return mav;
 	}
 
-	// ✅ ลบ method ซ้ำ - รวมเป็น method เดียว
+	// ✅ ลบ method ซ้ำ - รวมเป็น method เดียว (ใช้ editFileAndVideo สำหรับ query
+	// parameter)
 	@RequestMapping("/editFileAndVideo")
 	public ModelAndView editFileAndVideo(@RequestParam("id") int fileId, HttpSession session) {
 		// ✅ เช็ค session อย่างเข้มงวด
@@ -103,11 +111,18 @@ public class UploadController {
 			return new ModelAndView("redirect:/loginStudent496");
 		}
 
-		UploadManager fileManager = new UploadManager();
-		DocumentFile file = fileManager.getFileById(fileId);
+		Integer projectId = (Integer) session.getAttribute("projectId");
+		UploadManager manager = new UploadManager();
+
+		// ✅ ดึงไฟล์ที่ต้องการแก้ไข
+		DocumentFile file = manager.getFileById(fileId);
+
+		// ✅ ดึงไฟล์ทั้งหมดของโครงงานเพื่อตรวจสอบชื่อซ้ำ
+		List<DocumentFile> allFiles = manager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("editFileAndVideo");
 		mav.addObject("file", file);
+		mav.addObject("allFiles", allFiles); // ✅ ส่งไปให้ JSP
 		return mav;
 	}
 
@@ -117,7 +132,7 @@ public class UploadController {
 			@RequestParam("name") String name, @RequestParam(value = "videoLink", required = false) String videoLink,
 			@RequestParam(value = "newFile", required = false) MultipartFile newFile, HttpSession session) {
 
-		// ✅ เช็ک session อย่างเข้มงวด
+		// ✅ เช็ค session อย่างเข้มงวด
 		if (!isSessionValid(session)) {
 			return "redirect:/loginStudent496";
 		}

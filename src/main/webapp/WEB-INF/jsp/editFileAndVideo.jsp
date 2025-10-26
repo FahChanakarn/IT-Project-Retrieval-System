@@ -21,6 +21,43 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+	// ✅ เก็บรายชื่อไฟล์ที่มีอยู่แล้วในระบบ (ยกเว้นไฟล์ปัจจุบัน)
+	const existingFileNames = [
+		<c:forEach var="item" items="${allFiles}" varStatus="status">
+			<c:if test="${item.fileId != file.fileId}">
+				"${item.filename}"<c:if test="${!status.last}">,</c:if>
+			</c:if>
+		</c:forEach>
+	];
+
+	// ✅ ฟังก์ชันตรวจสอบชื่อซ้ำ
+	function isDuplicateFileName(fileName) {
+		const trimmedName = fileName.trim();
+		return existingFileNames.some(existing => 
+			existing.trim().toLowerCase() === trimmedName.toLowerCase()
+		);
+	}
+
+	// ✅ ฟังก์ชันแสดง/ซ่อนช่องอัปโหลดไฟล์ใหม่
+	function toggleFileUpload() {
+		const fileUploadSection = document.getElementById('fileUploadSection');
+		const editBtn = document.getElementById('editFileBtn');
+		const cancelBtn = document.getElementById('cancelEditBtn');
+		
+		if (fileUploadSection.style.display === 'none') {
+			fileUploadSection.style.display = 'block';
+			editBtn.style.display = 'none';
+			cancelBtn.style.display = 'inline-block';
+		} else {
+			fileUploadSection.style.display = 'none';
+			editBtn.style.display = 'inline-block';
+			cancelBtn.style.display = 'none';
+			// ล้างไฟล์ที่เลือก
+			document.querySelector('input[name="newFile"]').value = '';
+			clearError(document.querySelector('input[name="newFile"]'), 'fileError');
+		}
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		const form = document.querySelector('form');
 		const filenameInput = document.getElementById('filename');
@@ -29,7 +66,7 @@
 		const fileType = '${file.filetype}';
 
 		// ฟังก์ชันแสดง error message
-		function showError(input, errorId, message) {
+		window.showError = function(input, errorId, message) {
 			input.classList.add('is-invalid');
 			input.classList.remove('is-valid');
 			const errorElement = document.getElementById(errorId);
@@ -40,7 +77,7 @@
 		}
 
 		// ฟังก์ชันล้าง error message
-		function clearError(input, errorId) {
+		window.clearError = function(input, errorId) {
 			input.classList.remove('is-invalid');
 			input.classList.add('is-valid');
 			const errorElement = document.getElementById(errorId);
@@ -97,7 +134,13 @@
 					if (!namePattern.test(value)) {
 						showError(filenameInput, 'filenameError', 
 							'*ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
-					} else {
+					} 
+					// ✅ ตรวจสอบชื่อซ้ำแบบ Real-time
+					else if (isDuplicateFileName(value)) {
+						showError(filenameInput, 'filenameError', 
+							'*ชื่อไฟล์นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น');
+					}
+					else {
 						clearError(filenameInput, 'filenameError');
 					}
 				}
@@ -143,7 +186,14 @@
 					showError(filenameInput, 'filenameError', 
 						'*ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
 					isValid = false;
-				} else {
+				} 
+				// ✅ ตรวจสอบชื่อซ้ำ
+				else if (isDuplicateFileName(filename)) {
+					showError(filenameInput, 'filenameError', 
+						'*ชื่อไฟล์นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น');
+					isValid = false;
+				}
+				else {
 					clearError(filenameInput, 'filenameError');
 				}
 			}
@@ -173,6 +223,65 @@
 		});
 	});
 </script>
+<style>
+.current-file-display {
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	border-radius: 0.375rem;
+	padding: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.file-name-clickable {
+	color: #0d6efd;
+	text-decoration: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 500;
+}
+
+.file-name-clickable:hover {
+	text-decoration: underline;
+	color: #0a58ca;
+}
+
+.file-name-clickable i {
+	font-size: 1.5rem;
+	color: #dc3545;
+}
+
+#fileUploadSection {
+	display: none;
+	margin-top: 1rem;
+	padding: 1rem;
+	background-color: #fff3cd;
+	border: 1px dashed #ffc107;
+	border-radius: 0.375rem;
+}
+
+.error-message {
+	color: #dc3545;
+	font-size: 0.875rem;
+	margin-top: 0.25rem;
+	display: none;
+}
+
+.error-message.show {
+	display: block;
+}
+
+.form-control.is-invalid {
+	border-color: #dc3545;
+}
+
+.form-control.is-valid {
+	border-color: #198754;
+}
+</style>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
@@ -212,41 +321,50 @@
 					</div>
 				</c:when>
 				<c:otherwise>
-					<!-- แสดงไฟล์ปัจจุบัน -->
+					<!-- ✅ แสดงไฟล์ปัจจุบัน - คลิกดูได้โดยตรง -->
 					<div class="mb-3">
-						<label class="form-label">ไฟล์ปัจจุบัน</label>
-						<div
-							class="current-file-info d-flex justify-content-between align-items-center">
-							<div>
-								<i class="bi bi-file-earmark-pdf-fill"></i> <span
-									class="current-file-name">${file.filepath}</span>
-							</div>
-							<a class="btn btn-primary btn-sm"
+						<label class="form-label">ไฟล์ปัจจุบัน :</label>
+						<div class="current-file-display">
+							<a class="file-name-clickable"
 								href="${pageContext.request.contextPath}/download/file/${file.fileId}/${file.filename}"
-								target="_blank"> <i class="bi bi-eye"></i> ดูไฟล์
+								target="_blank"> <i class="bi bi-file-earmark-pdf-fill"></i>
+								<span>${file.filepath}</span>
 							</a>
+							<div>
+								<button type="button" class="btn btn-primary"
+									id="editFileBtn" onclick="toggleFileUpload()">
+									<i class="bi bi-pencil-square"></i> แก้ไขไฟล์
+								</button>
+								<button type="button" class="btn btn-secondary"
+									id="cancelEditBtn" onclick="toggleFileUpload()"
+									style="display: none;">
+									<i class="bi bi-x-circle"></i> ยกเลิก
+								</button>
+							</div>
 						</div>
 					</div>
 
-					<!-- อัปโหลดไฟล์ใหม่ -->
-					<div class="mb-3">
-						<label class="form-label">เลือกไฟล์ใหม่
-							(ถ้าต้องการเปลี่ยน) :</label> <input type="file" class="form-control"
-							name="newFile" accept=".pdf">
+					<!-- ✅ ส่วนอัปโหลดไฟล์ใหม่ (ซ่อนไว้) -->
+					<div id="fileUploadSection">
+						<label class="form-label"> <i class="bi bi-upload"></i>
+							เลือกไฟล์ใหม่ :
+						</label> <input type="file" class="form-control" name="newFile"
+							accept=".pdf">
 						<div id="fileError" class="error-message"></div>
-						<small class="text-muted">*เฉพาะไฟล์ .pdf (ไม่เกิน 10 MB)*</small>
-						<div class="file-size-note">
-							<i class="bi bi-info-circle"></i> หากไม่เลือกไฟล์ใหม่
-							ระบบจะใช้ไฟล์เดิม
-						</div>
+						<small class="text-muted d-block mt-1"> <i
+							class="bi bi-info-circle"></i> *เฉพาะไฟล์ .pdf (ไม่เกิน 10 MB)*
+						</small>
 					</div>
 				</c:otherwise>
 			</c:choose>
 
-			<div class="d-flex gap-2">
-				<button type="submit" class="btn btn-success">บันทึก</button>
+			<div class="d-flex gap-2 mt-4">
+				<button type="submit" class="btn btn-success">
+					<i class="bi bi-save"></i> บันทึก
+				</button>
 				<a href="${pageContext.request.contextPath}/student496/upload"
-					class="btn btn-danger">ยกเลิก</a>
+					class="btn btn-danger"> <i class="bi bi-x-circle"></i> ยกเลิก
+				</a>
 			</div>
 		</form>
 	</div>

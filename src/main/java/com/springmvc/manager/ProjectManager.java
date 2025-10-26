@@ -629,8 +629,8 @@ public class ProjectManager {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			// Query ดึงโครงงานพร้อมนักศึกษา
-			String hql = "SELECT p.projectId, p.proj_NameTh, p.approveStatus, p.testing_status, "
+			// Query ดึงโครงงานพร้อมนักศึกษา - เพิ่ม projectType
+			String hql = "SELECT p.projectId, p.proj_NameTh, p.approveStatus, p.testing_status, p.projectType, "
 					+ "s.stuId, s.stu_prefix, s.stu_firstName, s.stu_lastName " + "FROM Project p "
 					+ "LEFT JOIN p.student496s s " + "WHERE p.advisor.advisorId = :advisorId "
 					+ "AND p.semester = :semester " + "ORDER BY s.stuId ASC";
@@ -648,10 +648,11 @@ public class ProjectManager {
 				String projectName = (String) row[1];
 				String approveStatus = (String) row[2];
 				String testingStatus = (String) row[3];
-				String studentId = (String) row[4];
-				String prefix = (String) row[5];
-				String firstName = (String) row[6];
-				String lastName = (String) row[7];
+				String projectType = (String) row[4]; // เพิ่มตัวนี้
+				String studentId = (String) row[5];
+				String prefix = (String) row[6];
+				String firstName = (String) row[7];
+				String lastName = (String) row[8];
 
 				// ถ้ายังไม่มี Project นี้ใน Map
 				if (!projectMap.containsKey(projectId)) {
@@ -660,6 +661,7 @@ public class ProjectManager {
 					projectData.put("projectName", projectName);
 					projectData.put("approveStatus", approveStatus);
 					projectData.put("testingStatus", testingStatus != null ? testingStatus : "0");
+					projectData.put("projectType", projectType); // เพิ่มตัวนี้
 					projectData.put("students", new ArrayList<Map<String, String>>());
 
 					projectMap.put(projectId, projectData);
@@ -692,9 +694,6 @@ public class ProjectManager {
 		return projectGroups;
 	}
 
-	/**
-	 * ดึงโครงงานทั้งหมดแบบจัดกลุ่ม (สำหรับ Admin)
-	 */
 	public List<Map<String, Object>> getAllProjectGroupsBySemester(String semester) {
 		Session session = null;
 		List<Map<String, Object>> projectGroups = new ArrayList<>();

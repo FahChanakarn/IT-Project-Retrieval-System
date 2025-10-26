@@ -21,6 +21,15 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.testing-select {
+	width: 65px;
+	padding: 0.25rem 0.5rem;
+	font-size: 0.875rem;
+	margin: 0 auto;
+	text-align: center;
+}
+</style>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
@@ -67,11 +76,11 @@
 					<thead class="table-light">
 						<tr>
 							<th style="width: 10%;">รหัสนักศึกษา</th>
-							<th style="width: 18%;">ชื่อ - สกุล</th>
-							<th style="width: 30%;">หัวข้อโครงงาน</th>
-							<th style="width: 14%;">รายละเอียด</th>
-							<th style="width: 14%;">อนุมัติการอัปโหลด</th>
-							<th style="width: 14%;">การทดสอบระบบ</th>
+							<th style="width: 20%;">ชื่อ - สกุล</th>
+							<th style="width: 32%;">หัวข้อโครงงาน</th>
+							<th style="width: 10%;">รายละเอียด</th>
+							<th style="width: 13%;">อนุมัติการอัปโหลด</th>
+							<th style="width: 9%;">การทดสอบระบบ</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -89,7 +98,7 @@
 										<td rowspan="${studentCount}">${group.projectName}</td>
 									</c:if>
 
-									<!-- ✅ Merge Cell สำหรับปุ่มรายละเอียด - เปลี่ยนเป็น Form POST -->
+									<!-- Merge Cell สำหรับปุ่มรายละเอียด -->
 									<c:if test="${status.index == 0}">
 										<td rowspan="${studentCount}">
 											<form
@@ -108,7 +117,7 @@
 										<td rowspan="${studentCount}"><c:choose>
 												<c:when test="${group.approveStatus == 'approved'}">
 													<button type="button" class="btn btn-success btn-sm"
-														disabled>
+														style="pointer-events: none; cursor: not-allowed;">
 														<i class="fas fa-check"></i> อนุมัติแล้ว
 													</button>
 												</c:when>
@@ -126,23 +135,18 @@
 									<!-- Merge Cell สำหรับการทดสอบระบบ -->
 									<c:if test="${status.index == 0}">
 										<td rowspan="${studentCount}"><c:choose>
-												<c:when test="${group.testingStatus == '1'}">
-													<button type="button"
-														class="btn btn-success btn-sm testing-btn"
-														data-project-id="${group.projectId}"
-														data-project-name="${group.projectName}"
-														data-current-status="1">
-														<i class="fas fa-check-circle"></i> ถูกทดสอบแล้ว
-													</button>
+												<c:when test="${group.projectType eq 'Testing'}">
+													<span class="text-muted">-</span>
 												</c:when>
 												<c:otherwise>
-													<button type="button"
-														class="btn btn-secondary btn-sm testing-btn"
+													<select class="form-select form-select-sm testing-select"
 														data-project-id="${group.projectId}"
-														data-project-name="${group.projectName}"
-														data-current-status="0">
-														<i class="fas fa-times-circle"></i> ยังไม่ถูกทดสอบ
-													</button>
+														data-project-name="${group.projectName}">
+														<option value="0"
+															${group.testingStatus != '1' ? 'selected' : ''}>No</option>
+														<option value="1"
+															${group.testingStatus == '1' ? 'selected' : ''}>Yes</option>
+													</select>
 												</c:otherwise>
 											</c:choose></td>
 									</c:if>
@@ -156,9 +160,8 @@
 				<nav aria-label="Page navigation">
 					<ul class="pagination justify-content-center">
 						<c:forEach var="i" begin="1" end="${totalPages}">
-							<li class="page-item ${i == currentPage ? 'active' : ''}">
-								<a class="page-link"
-								href="?page=${i}&semester=${selectedSemester}">${i}</a>
+							<li class="page-item ${i == currentPage ? 'active' : ''}"><a
+								class="page-link" href="?page=${i}&semester=${selectedSemester}">${i}</a>
 							</li>
 						</c:forEach>
 					</ul>
@@ -213,7 +216,11 @@
 									}).then(() => {
 										btn.html('<i class="fas fa-check"></i> อนุมัติแล้ว');
 										btn.removeClass('btn-warning').addClass('btn-success');
-										btn.prop("disabled", true);
+										btn.prop("disabled", false);
+										btn.css({
+											'pointer-events': 'none',
+											'cursor': 'not-allowed'
+										});
 									});
 								} else {
 									Swal.fire({
@@ -238,17 +245,17 @@
 			});
 
 			// ========== การทดสอบระบบ ==========
-			$(".testing-btn").click(function() {
-				var btn = $(this);
-				var projectId = btn.data("project-id");
-				var projectName = btn.data("project-name") || 'ไม่ระบุชื่อ';
-				var currentStatus = btn.data("current-status");
-				var newStatus = currentStatus === "1" ? "0" : "1";
-				var actionText = newStatus === "1" ? "ทำเครื่องหมายว่าถูกทดสอบแล้ว" : "ทำเครื่องหมายว่ายังไม่ถูกทดสอบ";
+			$(".testing-select").on("change", function() {
+				var select = $(this);
+				var projectId = select.data("project-id");
+				var projectName = select.data("project-name") || 'ไม่ระบุชื่อ';
+				var newStatus = select.val();
+				var oldStatus = select.find("option:not(:selected)").val();
+				var actionText = newStatus === "1" ? "ทำเครื่องหมายว่าถูกทดสอบแล้ว (Yes)" : "ทำเครื่องหมายว่ายังไม่ถูกทดสอบ (No)";
 
 				Swal.fire({
 					title: 'ยืนยันการเปลี่ยนสถานะ',
-					html: 'คุณต้องการ<strong>' + actionText + '</strong><br>สำหรับโครงงาน<br><strong>"' + projectName + '"</strong><br>หรือไม่?',
+					html: 'คุณต้องการ<strong> ' + actionText + '</strong><br>สำหรับโครงงาน<br><strong>"' + projectName + '"</strong><br>หรือไม่?',
 					icon: 'question',
 					showCancelButton: true,
 					confirmButtonColor: '#007bff',
@@ -282,19 +289,11 @@
 										title: 'สำเร็จ!',
 										text: 'อัปเดตสถานะการทดสอบเรียบร้อยแล้ว',
 										icon: 'success',
-										confirmButtonText: 'ตกลง'
-									}).then(() => {
-										if (newStatus === "1") {
-											btn.html('<i class="fas fa-check-circle"></i> ถูกทดสอบแล้ว');
-											btn.removeClass('btn-secondary').addClass('btn-success');
-											btn.data("current-status", "1");
-										} else {
-											btn.html('<i class="fas fa-times-circle"></i> ยังไม่ถูกทดสอบ');
-											btn.removeClass('btn-success').addClass('btn-secondary');
-											btn.data("current-status", "0");
-										}
+										confirmButtonText: 'ตกลง',
+										timer: 2000
 									});
 								} else {
+									select.val(oldStatus);
 									Swal.fire({
 										title: 'เกิดข้อผิดพลาด',
 										text: 'ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่',
@@ -304,6 +303,7 @@
 								}
 							},
 							error: function() {
+								select.val(oldStatus);
 								Swal.fire({
 									title: 'เกิดข้อผิดพลาด',
 									text: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
@@ -312,6 +312,8 @@
 								});
 							}
 						});
+					} else {
+						select.val(oldStatus);
 					}
 				});
 			});

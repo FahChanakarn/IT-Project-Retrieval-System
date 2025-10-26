@@ -29,7 +29,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<div class="path-title">${projectName}/แก้ไขข้อมูลส่วนตัว</div>
+		<div class="path-title">${projectName} / แก้ไขข้อมูลส่วนตัว</div>
 
 		<div class="edit-profile-box">
 			<form id="editProfileForm"

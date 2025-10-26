@@ -61,9 +61,9 @@ public class EditAbstractController {
 	@RequestMapping(value = "/updateAbstract", method = RequestMethod.POST)
 	public String updateAbstract(@RequestParam("projNameTh") String projNameTh,
 			@RequestParam("projNameEn") String projNameEn, @RequestParam("projectType") String projectType,
-			@RequestParam(value = "programmingToolIds", required = false) int[] programmingToolIds,
-			@RequestParam(value = "dbmsToolIds", required = false) int[] dbmsToolIds,
-			@RequestParam(value = "testingToolIds", required = false) int[] testingToolIds,
+			@RequestParam(value = "programmingToolIds", required = false) String[] programmingToolIds,
+			@RequestParam(value = "dbmsToolIds", required = false) String[] dbmsToolIds,
+			@RequestParam(value = "testingToolIds", required = false) String[] testingToolIds,
 			@RequestParam("abstractTh") String abstractTh, @RequestParam("abstractEn") String abstractEn,
 			@RequestParam("keywordTh") String keywordTh, @RequestParam("keywordEn") String keywordEn,
 			HttpSession session) {
@@ -80,7 +80,6 @@ public class EditAbstractController {
 		Project project = projectManager.findProjectForEditAbstract(projectId);
 
 		if (project == null) {
-			// ✅ ส่ง error parameter
 			return "redirect:/editAbstract?error=true";
 		}
 
@@ -92,21 +91,40 @@ public class EditAbstractController {
 			// รวม toolIds ทั้งหมด
 			Set<Integer> selectedToolsIds = new HashSet<>();
 
+			// ✅ แปลง String[] เป็น Integer และกรองค่าว่าง
 			if (programmingToolIds != null) {
-				for (int toolsId : programmingToolIds) {
-					selectedToolsIds.add(toolsId);
+				for (String toolIdStr : programmingToolIds) {
+					if (toolIdStr != null && !toolIdStr.trim().isEmpty()) {
+						try {
+							selectedToolsIds.add(Integer.parseInt(toolIdStr));
+						} catch (NumberFormatException e) {
+							// ข้าม ID ที่แปลงไม่ได้
+						}
+					}
 				}
 			}
 
 			if (dbmsToolIds != null) {
-				for (int toolsId : dbmsToolIds) {
-					selectedToolsIds.add(toolsId);
+				for (String toolIdStr : dbmsToolIds) {
+					if (toolIdStr != null && !toolIdStr.trim().isEmpty()) {
+						try {
+							selectedToolsIds.add(Integer.parseInt(toolIdStr));
+						} catch (NumberFormatException e) {
+							// ข้าม ID ที่แปลงไม่ได้
+						}
+					}
 				}
 			}
 
 			if (testingToolIds != null) {
-				for (int toolsId : testingToolIds) {
-					selectedToolsIds.add(toolsId);
+				for (String toolIdStr : testingToolIds) {
+					if (toolIdStr != null && !toolIdStr.trim().isEmpty()) {
+						try {
+							selectedToolsIds.add(Integer.parseInt(toolIdStr));
+						} catch (NumberFormatException e) {
+							// ข้าม ID ที่แปลงไม่ได้
+						}
+					}
 				}
 			}
 
@@ -127,12 +145,10 @@ public class EditAbstractController {
 
 			projectManager.updateProject(project);
 
-			// ✅ Redirect พร้อม success parameter
 			return "redirect:/editAbstract?success=true";
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			// ✅ Redirect พร้อม error parameter
 			return "redirect:/editAbstract?error=true";
 		}
 	}
@@ -174,6 +190,7 @@ public class EditAbstractController {
 
 			if (success) {
 				response.put("success", true);
+				response.put("toolId", newTool.getToolsId());
 				response.put("message", "เพิ่ม Tools สำเร็จ");
 			} else {
 				response.put("success", false);

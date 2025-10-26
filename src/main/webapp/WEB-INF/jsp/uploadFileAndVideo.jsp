@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,6 +44,13 @@
 }
 </style>
 <script>
+	// ✅ เก็บรายชื่อไฟล์ที่มีอยู่แล้วในระบบ
+	const existingFileNames = [
+		<c:forEach var="item" items="${uploadList}" varStatus="status">
+			"${item.filename}"<c:if test="${!status.last}">,</c:if>
+		</c:forEach>
+	];
+
 	function toggleUploadType() {
 		const type = document.getElementById("fileType").value;
 		const fileGroup = document.getElementById("fileGroup");
@@ -88,6 +96,14 @@
 		});
 	}
 
+	// ✅ ฟังก์ชันตรวจสอบชื่อซ้ำ
+	function isDuplicateFileName(fileName) {
+		const trimmedName = fileName.trim();
+		return existingFileNames.some(existing => 
+			existing.trim().toLowerCase() === trimmedName.toLowerCase()
+		);
+	}
+
 	function validateForm(event) {
 		event.preventDefault();
 		clearAllErrors();
@@ -118,7 +134,14 @@
 				showError(fileNameInput, fileNameError, 
 					'*ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
 				isValid = false;
-			} else {
+			} 
+			// ✅ ตรวจสอบชื่อซ้ำ
+			else if (isDuplicateFileName(fileName)) {
+				showError(fileNameInput, fileNameError, 
+					'*ชื่อไฟล์นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น');
+				isValid = false;
+			} 
+			else {
 				clearError(fileNameInput, fileNameError);
 			}
 		}
@@ -198,16 +221,16 @@
 			});
 		}
 
-		// Real-time validation สำหรับชื่อไฟล์
+		// ✅ Real-time validation สำหรับชื่อไฟล์ (รวมการตรวจสอบชื่อซ้ำ)
 		const fileNameInput = document.querySelector('input[name="fileName"]');
 		const fileNameError = document.getElementById("fileNameError");
 		
 		if (fileNameInput) {
 			fileNameInput.addEventListener('input', function(e) {
 				const value = e.target.value.trim();
-				if (value.length > 0 && value.length < 5) {
+				if (value.length > 0 && value.length < 10) {
 					showError(fileNameInput, fileNameError, 
-						'*ชื่อไฟล์ต้องมีความยาวอย่างน้อย 5 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
+						'*ชื่อไฟล์ต้องมีความยาวอย่างน้อย 10 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
 				} else if (value.length > 100) {
 					showError(fileNameInput, fileNameError, 
 						'*ชื่อไฟล์ต้องไม่เกิน 100 ตัวอักษร (ปัจจุบัน: ' + value.length + ' ตัวอักษร)');
@@ -216,7 +239,13 @@
 					if (!namePattern.test(value)) {
 						showError(fileNameInput, fileNameError, 
 							'*ชื่อไฟล์สามารถมีได้เฉพาะภาษาไทย อังกฤษ ตัวเลข วงเล็บ () และจุด (.) เท่านั้น');
-					} else {
+					} 
+					// ✅ ตรวจสอบชื่อซ้ำแบบ Real-time
+					else if (isDuplicateFileName(value)) {
+						showError(fileNameInput, fileNameError, 
+							'*ชื่อไฟล์นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น');
+					} 
+					else {
 						clearError(fileNameInput, fileNameError);
 					}
 				}
@@ -229,7 +258,8 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">${project.proj_NameTh} / จัดการโครงงาน / อัปโหลดไฟล์เอกสาร</h5>
+		<h5 class="fw-bold">${project.proj_NameTh}/จัดการโครงงาน /
+			อัปโหลดไฟล์เอกสาร</h5>
 		<hr>
 
 		<form action="${pageContext.request.contextPath}/student496/upload"
@@ -314,8 +344,14 @@
 												target="_blank">ดูวิดีโอ</a>
 										</c:otherwise>
 									</c:choose></td>
-								<td><fmt:formatDate value="${item.sendDate}"
-										pattern="dd-MM-yyyy HH:mm" /></td>
+								<td>
+									<%-- ✅ แปลงวันที่เป็น พ.ศ. --%> <fmt:formatDate
+										value="${item.sendDate}" pattern="dd-MM-yyyy HH:mm"
+										var="formattedDate" /> <c:set var="year"
+										value="${fn:substring(formattedDate, 6, 10)}" /> <c:set
+										var="buddhistYear" value="${year + 543}" />
+									${fn:substring(formattedDate, 0, 6)}${buddhistYear}${fn:substring(formattedDate, 10, 16)}
+								</td>
 								<td><a
 									href="${pageContext.request.contextPath}/student496/editFileAndVideo/${item.fileId}"
 									class="btn btn-success btn-sm"> <i

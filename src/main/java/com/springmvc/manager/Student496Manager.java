@@ -1,5 +1,6 @@
 package com.springmvc.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -100,6 +101,32 @@ public class Student496Manager {
 			}
 			e.printStackTrace();
 			return false;
+		} finally {
+			if (session != null && session.isOpen()) {
+				session.close();
+			}
+		}
+	}
+
+	public List<Student496> getStudentsBySemester(String semester) {
+		Session session = null;
+		try {
+			session = HibernateConnection.doHibernateConnection().openSession();
+
+			// Query นักศึกษาที่มี project ในภาคเรียนที่ระบุ
+			Query<Student496> query = session.createQuery(
+					"FROM Student496 s JOIN FETCH s.project p WHERE p.semester = :semester", Student496.class);
+			query.setParameter("semester", semester);
+
+			List<Student496> list = query.list();
+
+			System.out.println("getStudentsBySemester - Semester: " + semester + ", Found: " + list.size());
+
+			return list;
+		} catch (Exception e) {
+			System.err.println("Error in getStudentsBySemester: " + e.getMessage());
+			e.printStackTrace();
+			return new ArrayList<>();
 		} finally {
 			if (session != null && session.isOpen()) {
 				session.close();

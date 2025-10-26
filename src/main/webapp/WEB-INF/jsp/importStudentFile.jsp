@@ -14,8 +14,6 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap"
 	rel="stylesheet">
@@ -26,6 +24,52 @@
 
 <!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+.duplicate-list {
+	max-height: 300px;
+	overflow-y: auto;
+	text-align: left;
+	padding: 1rem;
+	background-color: #fff3cd;
+	border-radius: 0.375rem;
+	margin-top: 1rem;
+}
+
+.duplicate-item {
+	padding: 0.5rem;
+	margin-bottom: 0.5rem;
+	background-color: white;
+	border-left: 4px solid #dc3545;
+	border-radius: 0.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.duplicate-item i {
+	color: #dc3545;
+	font-size: 1.2rem;
+}
+
+.import-table {
+	font-size: 0.9rem;
+}
+
+.import-table thead {
+	position: sticky;
+	top: 0;
+	background-color: #d1ecf1;
+	z-index: 10;
+}
+
+.table-container {
+	max-height: 500px;
+	overflow-y: auto;
+	border: 1px solid #dee2e6;
+	border-radius: 0.375rem;
+}
+</style>
 </head>
 
 <body>
@@ -78,14 +122,129 @@
 
 				<!-- ปุ่ม -->
 				<div class="text-center">
-					<button type="submit" class="btn btn-success me-2">นำเข้า</button>
+					<button type="submit" class="btn btn-success me-2">
+						<i class="bi bi-upload me-1"></i>นำเข้า
+					</button>
 					<button type="button"
 						onclick="location.href='${pageContext.request.contextPath}/'"
-						class="btn btn-danger">ยกเลิก</button>
+						class="btn btn-danger">
+						<i class="bi bi-x-circle me-1"></i>ยกเลิก
+					</button>
 				</div>
 			</form>
+
+			<!-- ✅ แสดงรายการนักศึกษาที่ Import แล้ว -->
+			<c:if test="${not empty importedStudents}">
+				<div class="mt-5">
+					<h5 class="fw-bold text-success">
+						<i class="bi bi-list-check"></i> รายการที่นำเข้าแล้ว
+						(${selectedSemester})
+					</h5>
+					<hr class="mb-3">
+
+					<div class="table-container">
+						<table class="table table-bordered">
+							<thead style="background-color: #F4A460; color: white;">
+								<tr>
+									<th>รหัส น.ศ.</th>
+									<th>ชื่อ - นามสกุล</th>
+									<th>ที่ปรึกษา</th>
+									<th>หัวข้อโครงงาน</th>
+									<th>ประเภท</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:choose>
+									<c:when test="${empty importedStudents}">
+										<tr>
+											<td colspan="5" class="text-center">ไม่มีข้อมูลนักศึกษาในภาคเรียนนี้</td>
+										</tr>
+									</c:when>
+									<c:otherwise>
+										<c:forEach var="student" items="${importedStudents}">
+											<tr>
+												<!-- ✅ ใช้ fn:contains() กับ List -->
+												<c:set var="isDuplicate" value="false" />
+												<c:forEach var="dupId" items="${duplicateStudents}">
+													<c:if test="${dupId eq student.stuId}">
+														<c:set var="isDuplicate" value="true" />
+													</c:if>
+												</c:forEach>
+
+												<td
+													style="${isDuplicate ? 'color: red; font-weight: bold;' : ''}">
+													${student.stuId}</td>
+												<td>${student.stu_prefix}${student.stu_firstName}
+													${student.stu_lastName}</td>
+												<td>${student.project.advisor.adv_prefix}
+													${student.project.advisor.adv_firstName}
+													${student.project.advisor.adv_lastName}</td>
+												<td>${student.project.proj_NameTh}</td>
+												<td>${student.project.projectType}</td>
+											</tr>
+										</c:forEach>
+									</c:otherwise>
+								</c:choose>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="mt-2 text-muted">
+						<small> <i class="bi bi-info-circle"></i>
+							แสดงข้อมูลทั้งหมด ${importedStudents.size()} รายการ
+						</small>
+					</div>
+				</div>
+			</c:if>
 		</div>
 	</div>
+
+	<!-- ✅ ย้าย JavaScript มาไว้ก่อน SweetAlert -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+		// ฟังก์ชันสำหรับเปลี่ยนภาคเรียน
+		function changeSemester() {
+			document.getElementById('fileInput').value = '';
+			document.getElementById('fileInputError').style.display = 'none';
+			document.getElementById('importForm').submit();
+		}
+
+		// ตรวจสอบไฟล์
+		document
+				.getElementById('fileInput')
+				.addEventListener(
+						'change',
+						function() {
+							if (this.value !== '') {
+								document.getElementById('fileInputError').style.display = 'none';
+							}
+						});
+
+		// ตรวจสอบก่อน submit
+		document
+				.getElementById('importForm')
+				.addEventListener(
+						'submit',
+						function(e) {
+							if (e.submitter && e.submitter.type !== 'submit') {
+								return true;
+							}
+
+							const fileInput = document
+									.getElementById('fileInput').value;
+							document.getElementById('fileInputError').style.display = 'none';
+
+							if (fileInput === '') {
+								document.getElementById('fileInputError').style.display = 'block';
+								e.preventDefault();
+								return false;
+							}
+
+							return true;
+						});
+	</script>
 
 	<!-- SweetAlert สำหรับข้อผิดพลาด -->
 	<c:if test="${not empty error}">
@@ -109,79 +268,66 @@
 				text : '${success}',
 				confirmButtonText : 'ตกลง',
 				confirmButtonColor : '#28a745'
+			}).then(function() {
+				window.scrollTo({
+					top : document.body.scrollHeight,
+					behavior : 'smooth'
+				});
 			});
 		</script>
 	</c:if>
 
-	<!-- SweetAlert สำหรับพบรหัสนักศึกษาซ้ำ -->
+	<!-- ✅ SweetAlert สำหรับพบรหัสนักศึกษาซ้ำ (แก้ไขใหม่) -->
 	<c:if test="${not empty duplicateStudents}">
 		<script>
-			Swal
-					.fire({
+			console.log('Duplicate students detected');
+
+			// ✅ ใช้ JSTL สร้าง array โดยตรง
+			var duplicates = [];
+			<c:forEach var="dupId" items="${duplicateStudents}">
+			duplicates.push('${dupId}'.trim());
+			</c:forEach>
+
+			console.log('Parsed duplicates:', duplicates);
+
+			// สร้าง HTML
+			var duplicateHTML = '<div class="duplicate-list">';
+			for (var i = 0; i < duplicates.length; i++) {
+				if (duplicates[i]) {
+					duplicateHTML += '<div class="duplicate-item">';
+					duplicateHTML += '<i class="bi bi-exclamation-triangle-fill"></i>';
+					duplicateHTML += '<span><strong>รหัส:</strong> '
+							+ duplicates[i] + '</span>';
+					duplicateHTML += '</div>';
+				}
+			}
+			duplicateHTML += '</div>';
+
+			Swal.fire(
+					{
 						icon : 'warning',
 						title : 'พบรหัสนักศึกษาซ้ำ',
-						html : '<p>${success}</p><hr><p class="text-danger"><strong>รหัสนักศึกษาที่ซ้ำ:</strong></p><p>${duplicateStudents}</p>',
+						html : '<p class="mb-2">${success}</p>' + '<hr>'
+								+ '<p class="text-danger mb-2"><strong>'
+								+ '<i class="bi bi-exclamation-circle"></i> '
+								+ 'พบรหัสนักศึกษาซ้ำ ' + duplicates.length
+								+ ' รายการ:' + '</strong></p>' + duplicateHTML
+								+ '<p class="text-muted mt-3 small">'
+								+ '<i class="bi bi-info-circle"></i> '
+								+ 'รายการที่ซ้ำจะไม่ถูกนำเข้าในระบบ' + '</p>',
 						confirmButtonText : 'ตกลง',
 						confirmButtonColor : '#ffc107',
-						width : '600px'
-					});
+						width : '600px',
+						customClass : {
+							htmlContainer : 'text-start'
+						}
+					}).then(function() {
+				window.scrollTo({
+					top : document.body.scrollHeight,
+					behavior : 'smooth'
+				});
+			});
 		</script>
 	</c:if>
-
-	<script>
-		// ฟังก์ชันสำหรับเปลี่ยนภาคเรียน (ไม่ส่งไฟล์)
-		function changeSemester() {
-			// ล้างค่าไฟล์และชื่อไฟล์
-			document.getElementById('fileInput').value = '';
-
-			// ซ่อน error messages
-			document.getElementById('fileInputError').style.display = 'none';
-
-			// Submit form โดยไม่ต้องตรวจสอบไฟล์
-			document.getElementById('importForm').submit();
-		}
-
-		document
-				.getElementById('fileInput')
-				.addEventListener(
-						'change',
-						function() {
-							if (this.value !== '') {
-								document.getElementById('fileInputError').style.display = 'none';
-							}
-						});
-
-		// ตรวจสอบก่อน submit form
-		document
-				.getElementById('importForm')
-				.addEventListener(
-						'submit',
-						function(e) {
-							// ถ้ามาจากการเปลี่ยน semester ให้ผ่านไปเลย
-							if (e.submitter && e.submitter.type !== 'submit') {
-								return true;
-							}
-
-							const fileInput = document
-									.getElementById('fileInput').value;
-							let hasError = false;
-
-							// ซ่อน error messages ทั้งหมดก่อน
-							document.getElementById('fileInputError').style.display = 'none';
-
-							// ตรวจสอบการเลือกไฟล์
-							if (fileInput === '') {
-								document.getElementById('fileInputError').style.display = 'block';
-								hasError = true;
-							}
-
-							if (hasError) {
-								e.preventDefault();
-								return false;
-							}
-
-							return true;
-						});
-	</script>
 </body>
 </html>

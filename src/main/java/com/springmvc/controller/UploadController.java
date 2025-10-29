@@ -2,6 +2,7 @@ package com.springmvc.controller;
 
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.manager.UploadManager;
+import com.springmvc.manager.UploadManager.FileWithUploader;
 import com.springmvc.model.DocumentFile;
 import com.springmvc.model.Project;
 import com.springmvc.model.Student496;
@@ -12,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -45,7 +45,9 @@ public class UploadController {
 		UploadManager manager = new UploadManager();
 		ProjectManager proj = new ProjectManager();
 		Project project = proj.findProjectById(projectId);
-		List<DocumentFile> files = manager.getFilesByProject(projectId);
+
+		// ✅ เปลี่ยนเป็น List<FileWithUploader>
+		List<FileWithUploader> files = manager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("uploadFileAndVideo");
 		mav.addObject("uploadList", files);
@@ -66,11 +68,10 @@ public class UploadController {
 
 		Integer projectId = (Integer) session.getAttribute("projectId");
 		Student496 student = (Student496) session.getAttribute("student");
-		String uploadedByStudentId = student.getStuId(); // ✅ ดึงรหัสนักศึกษา
+		String uploadedByStudentId = student.getStuId();
 
 		try {
 			UploadManager manager = new UploadManager();
-			// ✅ ส่ง parameter ตามที่ manager ต้องการ
 			manager.saveFile(projectId, fileType, fileName, file, videoLink, uploadedByStudentId, servletContext);
 			return "redirect:/student496/upload?upload=true";
 		} catch (Exception e) {
@@ -79,75 +80,21 @@ public class UploadController {
 		}
 	}
 
-	// 3. ✅ ไปหน้าแก้ไขไฟล์ - เพิ่ม allFiles สำหรับตรวจสอบชื่อซ้ำ
-	@RequestMapping(value = "/editFileAndVideo/{fileId}", method = RequestMethod.GET)
-	public ModelAndView editFile(@PathVariable("fileId") int fileId, HttpSession session) {
-		// ✅ เช็ค session อย่างเข้มงวด
-		if (!isSessionValid(session)) {
-			return new ModelAndView("redirect:/loginStudent496");
-		}
-
-		Integer projectId = (Integer) session.getAttribute("projectId");
-		UploadManager manager = new UploadManager();
-
-		// ✅ ดึงไฟล์ที่ต้องการแก้ไข
-		DocumentFile file = manager.getFileById(fileId);
-
-		// ✅ ดึงไฟล์ทั้งหมดของโครงงานเพื่อตรวจสอบชื่อซ้ำ
-		List<DocumentFile> allFiles = manager.getFilesByProject(projectId);
-
-		ModelAndView mav = new ModelAndView("editFileAndVideo");
-		mav.addObject("file", file);
-		mav.addObject("allFiles", allFiles); // ✅ ส่งไปให้ JSP
-		return mav;
-	}
-
-	// ✅ ลบ method ซ้ำ - รวมเป็น method เดียว (ใช้ editFileAndVideo สำหรับ query
-	// parameter)
-	@RequestMapping("/editFileAndVideo")
-	public ModelAndView editFileAndVideo(@RequestParam("id") int fileId, HttpSession session) {
-		// ✅ เช็ค session อย่างเข้มงวด
-		if (!isSessionValid(session)) {
-			return new ModelAndView("redirect:/loginStudent496");
-		}
-
-		Integer projectId = (Integer) session.getAttribute("projectId");
-		UploadManager manager = new UploadManager();
-
-		// ✅ ดึงไฟล์ที่ต้องการแก้ไข
-		DocumentFile file = manager.getFileById(fileId);
-
-		// ✅ ดึงไฟล์ทั้งหมดของโครงงานเพื่อตรวจสอบชื่อซ้ำ
-		List<DocumentFile> allFiles = manager.getFilesByProject(projectId);
-
-		ModelAndView mav = new ModelAndView("editFileAndVideo");
-		mav.addObject("file", file);
-		mav.addObject("allFiles", allFiles); // ✅ ส่งไปให้ JSP
-		return mav;
-	}
-
-	// 4. อัปเดตไฟล์หรือวิดีโอ
-	@RequestMapping(value = "/updateFileAndVideo", method = RequestMethod.POST)
-	public String updateFileAndVideo(HttpServletRequest request, @RequestParam("id") int id,
-			@RequestParam("name") String name, @RequestParam(value = "videoLink", required = false) String videoLink,
-			@RequestParam(value = "newFile", required = false) MultipartFile newFile, HttpSession session) {
-
+	// 3. ลบไฟล์หรือวิดีโอ
+	@RequestMapping(value = "/deleteFile/{fileId}", method = RequestMethod.GET)
+	public String deleteFile(@PathVariable("fileId") int fileId, HttpSession session) {
 		// ✅ เช็ค session อย่างเข้มงวด
 		if (!isSessionValid(session)) {
 			return "redirect:/loginStudent496";
 		}
 
-		Student496 student = (Student496) session.getAttribute("student");
-		String uploadedByStudentId = student.getStuId(); // ✅ ดึงรหัสนักศึกษา
-
 		try {
-			UploadManager fileManager = new UploadManager();
-			// ✅ ส่ง parameter ตามที่ manager ต้องการ
-			fileManager.updateFileOrVideo(id, name, videoLink, newFile, uploadedByStudentId, request);
-			return "redirect:/student496/upload?success=true";
+			UploadManager manager = new UploadManager();
+			manager.deleteFile(fileId, servletContext);
+			return "redirect:/student496/upload?delete=true";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "redirect:/student496/upload?error=true";
+			return "redirect:/student496/upload?deleteError=true";
 		}
 	}
 }

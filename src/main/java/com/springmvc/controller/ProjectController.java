@@ -316,7 +316,8 @@ public class ProjectController {
 			return mv;
 		}
 
-		List<DocumentFile> uploadList = uploadManager.getFilesByProject(projectId);
+		// ✅ เปลี่ยนเป็น List<FileWithUploader>
+		List<UploadManager.FileWithUploader> uploadList = uploadManager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("ViewAbstract");
 		mav.addObject("project", project);

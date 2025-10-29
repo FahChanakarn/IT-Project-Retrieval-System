@@ -5,38 +5,41 @@ import java.util.Date;
 import javax.persistence.*;
 
 @Entity
-@Table(name="document_file")
+@Table(name = "document_file")
 public class DocumentFile {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "file_id")
-    private int fileId;
-	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "file_id")
+	private int fileId;
+
 	@Column(name = "file_no")
-    private int fileno;
+	private int fileno;
 
-    @Column(name = "filename", length = 255)
-    private String filename;
-    
-    @Column(name = "file_path", length = 255)
-    private String filepath;
+	@Column(name = "filename", length = 255)
+	private String filename;
 
-    @Column(name = "send_date")
-    private Date sendDate;
+	@Column(name = "file_path", length = 255)
+	private String filepath;
 
-    @Column(name = "file_status", length = 50)
-    private String status;
-    
-    @Column(name = "file_type", length = 255)
-    private String filetype;
-   
-    @Column(name = "publish_status")
-    private boolean publishStatus;
+	@Column(name = "send_date")
+	private Date sendDate;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+	@Column(name = "file_status", length = 50)
+	private String status;
+
+	@Column(name = "file_type", length = 255)
+	private String filetype;
+
+	@Column(name = "publish_status")
+	private boolean publishStatus;
+
+	@Column(name = "uploaded_by", length = 10)
+	private String uploadedBy;
+
+	@ManyToOne
+	@JoinColumn(name = "project_id", nullable = false)
+	private Project project;
 
 	public DocumentFile() {
 		super();
@@ -44,7 +47,7 @@ public class DocumentFile {
 	}
 
 	public DocumentFile(int fileId, int fileno, String filename, String filepath, Date sendDate, String status,
-			String filetype, Project project) {
+			String filetype, boolean publishStatus, String uploadedBy, Project project) {
 		super();
 		this.fileId = fileId;
 		this.fileno = fileno;
@@ -53,6 +56,8 @@ public class DocumentFile {
 		this.sendDate = sendDate;
 		this.status = status;
 		this.filetype = filetype;
+		this.publishStatus = publishStatus;
+		this.uploadedBy = uploadedBy;
 		this.project = project;
 	}
 
@@ -118,6 +123,14 @@ public class DocumentFile {
 
 	public void setPublishStatus(boolean publishStatus) {
 		this.publishStatus = publishStatus;
+	}
+
+	public String getUploadedBy() {
+		return uploadedBy;
+	}
+
+	public void setUploadedBy(String uploadedBy) {
+		this.uploadedBy = uploadedBy;
 	}
 
 	public Project getProject() {

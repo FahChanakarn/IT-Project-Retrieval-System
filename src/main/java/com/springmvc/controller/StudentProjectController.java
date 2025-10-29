@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-import com.springmvc.manager.ProjectManager;
+import com.springmvc.manager.StudentProjectManager;
 import com.springmvc.manager.DocumentFileManager;
 import com.springmvc.model.Advisor;
 import com.springmvc.model.Project;
@@ -23,10 +23,9 @@ import com.springmvc.model.DocumentFile;
 @RequestMapping("/admin")
 public class StudentProjectController {
 
-	private ProjectManager projectManager = new ProjectManager();
+	// ✅ เปลี่ยนจาก ProjectManager เป็น StudentProjectManager
+	private StudentProjectManager projectManager = new StudentProjectManager();
 
-	// ============== รายการโครงงานของนักศึกษาในที่ปรึกษา (Admin View)
-	// ==============
 	@RequestMapping("/myAdviseeProjects")
 	public ModelAndView listMyAdviseeProjects(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "semester", required = false) String semester, HttpSession session) {
@@ -40,11 +39,9 @@ public class StudentProjectController {
 			semester = projectManager.getLatestSemester();
 		}
 
-		// ✅ ดึงข้อมูลแบบ Group by Project
 		List<Map<String, Object>> allProjectGroups = projectManager
 				.getProjectGroupsByAdvisorAndSemester(admin.getAdvisorId(), semester);
 
-		// Pagination
 		int pageSize = 10;
 		int totalProjects = allProjectGroups.size();
 		int totalPages = (int) Math.ceil((double) totalProjects / pageSize);
@@ -54,7 +51,6 @@ public class StudentProjectController {
 
 		List<Map<String, Object>> paginatedGroups = allProjectGroups.subList(start, end);
 
-		// สร้าง semester list
 		List<String> semesterList = new ArrayList<>();
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
 		for (int y = currentYear; y >= 2562; y--) {
@@ -71,7 +67,6 @@ public class StudentProjectController {
 		return mav;
 	}
 
-	// ============== รายการโครงงานทั้งหมด (Admin) ==============
 	@RequestMapping("/listProjects")
 	public ModelAndView listStudentProjects(@RequestParam(defaultValue = "1") int page,
 			@RequestParam(value = "semester", required = false) String semester,
@@ -87,10 +82,8 @@ public class StudentProjectController {
 			semester = projectManager.getLatestSemester();
 		}
 
-		// ✅ ดึงข้อมูลแบบ Group by Project (ทั้งหมด)
 		List<Map<String, Object>> allProjectGroups = projectManager.getAllProjectGroupsBySemester(semester);
 
-		// Pagination
 		int pageSize = 10;
 		int totalProjects = allProjectGroups.size();
 		int totalPages = (int) Math.ceil((double) totalProjects / pageSize);
@@ -100,7 +93,6 @@ public class StudentProjectController {
 
 		List<Map<String, Object>> paginatedGroups = allProjectGroups.subList(start, end);
 
-		// สร้าง semester list
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
 		List<String> semesterList = new ArrayList<>();
 		for (int y = currentYear; y >= 2562; y--) {
@@ -179,7 +171,6 @@ public class StudentProjectController {
 		return "fail";
 	}
 
-	// ✅ เพิ่ม POST method สำหรับเก็บ projectId ใน session
 	@RequestMapping(value = "/viewProjectDetail", method = RequestMethod.POST)
 	public ModelAndView viewProjectDetailPost(@RequestParam("projectId") int projectId, HttpSession session) {
 		Advisor admin = (Advisor) session.getAttribute("admin");
@@ -187,14 +178,10 @@ public class StudentProjectController {
 			return new ModelAndView("redirect:/loginAdmin");
 		}
 
-		// เก็บ projectId ใน session
 		session.setAttribute("adminViewingProjectId", projectId);
-
-		// Redirect ไปยัง GET method (URL จะไม่มี parameter)
 		return new ModelAndView("redirect:/admin/viewProjectDetail");
 	}
 
-	// ✅ แก้ GET method ให้ใช้ projectId จาก session
 	@RequestMapping(value = "/viewProjectDetail", method = RequestMethod.GET)
 	public ModelAndView viewProjectDetail(HttpSession session) {
 
@@ -203,7 +190,6 @@ public class StudentProjectController {
 			return new ModelAndView("redirect:/loginAdmin");
 		}
 
-		// ✅ ดึง projectId จาก session
 		Integer projectId = (Integer) session.getAttribute("adminViewingProjectId");
 
 		if (projectId == null) {

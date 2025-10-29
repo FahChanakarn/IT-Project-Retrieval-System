@@ -27,7 +27,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5>${project.proj_NameTh} / รายละเอียด</h5>
+		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->
@@ -46,11 +46,11 @@
 
 		<!-- ปุ่มดูบทคัดย่อ -->
 		<div class="mb-3">
-			<a
-				href="${pageContext.request.contextPath}/viewAbstract?projectId=${project.projectId}"
-				class="btn btn-primary"> <i class="bi bi-file-text"></i>
-				ดูบทคัดย่อ
-			</a>
+			<form action="${pageContext.request.contextPath}/viewAbstract"
+				method="POST" style="display: inline;">
+				<input type="hidden" name="projectId" value="${project.projectId}">
+				<button type="submit" class="btn btn-primary btn-sm">ดูบทคัดย่อ</button>
+			</form>
 		</div>
 
 		<!-- ตารางไฟล์เอกสาร -->

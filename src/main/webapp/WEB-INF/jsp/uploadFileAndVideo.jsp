@@ -44,12 +44,11 @@
 }
 </style>
 <script>
-	// ✅ เก็บรายชื่อไฟล์ที่มีอยู่แล้วในระบบ
-	const existingFileNames = [
-		<c:forEach var="item" items="${uploadList}" varStatus="status">
-			"${item.filename}"<c:if test="${!status.last}">,</c:if>
-		</c:forEach>
-	];
+const existingFileNames = [
+    <c:forEach var="item" items="${uploadList}" varStatus="status">
+        "${item.file.filename}"<c:if test="${!status.last}">,</c:if>
+    </c:forEach>
+];
 
 	function toggleUploadType() {
 		const type = document.getElementById("fileType").value;
@@ -252,13 +251,33 @@
 			});
 		}
 	});
+	
+	function confirmDeleteSafe(button) {
+	    const fileId = button.getAttribute('data-file-id');
+	    const fileName = button.getAttribute('data-file-name');
+	    
+	    Swal.fire({
+	        title: 'ยืนยันการลบ?',
+	        html: 'คุณต้องการลบไฟล์ <strong>"' + fileName + '"</strong> หรือไม่?',
+	        icon: 'warning',
+	        showCancelButton: true,
+	        confirmButtonColor: '#d33',
+	        cancelButtonColor: '#6c757d',
+	        confirmButtonText: 'ยืนยัน',
+	        cancelButtonText: 'ยกเลิก'
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            window.location.href = '${pageContext.request.contextPath}/student496/deleteFile/' + fileId;
+	        }
+	    });
+	}
 </script>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">${project.proj_NameTh}/จัดการโครงงาน /
+		<h5 class="fw-bold">${project.proj_NameTh}/จัดการโครงงาน/
 			อัปโหลดไฟล์เอกสาร</h5>
 		<hr>
 
@@ -314,16 +333,17 @@
 				<tr>
 					<th>ลำดับ</th>
 					<th>ชื่อไฟล์</th>
+					<th>ผู้อัปโหลด</th>
 					<th>เอกสาร</th>
 					<th>วันที่อัปโหลด</th>
-					<th>แก้ไข</th>
+					<th>ลบ</th>
 				</tr>
 			</thead>
 			<tbody>
 				<c:choose>
 					<c:when test="${empty uploadList}">
 						<tr>
-							<td colspan="5" class="text-center text-muted py-4"><i
+							<td colspan="6" class="text-center text-muted py-4"><i
 								class="bi bi-file-earmark-x fs-1 d-block mb-2"></i>
 								ยังไม่มีไฟล์ที่อัปโหลด</td>
 						</tr>
@@ -332,31 +352,33 @@
 						<c:forEach var="item" items="${uploadList}" varStatus="loop">
 							<tr>
 								<td>${loop.index + 1}</td>
-								<td>${item.filename}</td>
+								<td>${item.file.filename}</td>
+								<td>${item.uploaderName}</td>
 								<td><c:choose>
-										<c:when test="${item.filetype == 'file'}">
+										<c:when test="${item.file.filetype == 'file'}">
 											<a class="btn btn-primary btn-sm"
-												href="${pageContext.request.contextPath}/download/file/${item.fileId}/${item.filename}"
+												href="${pageContext.request.contextPath}/download/file/${item.file.fileId}/${item.file.filename}"
 												target="_blank">ดูเอกสาร</a>
 										</c:when>
 										<c:otherwise>
-											<a class="btn btn-primary btn-sm" href="${item.filepath}"
-												target="_blank">ดูวิดีโอ</a>
+											<a class="btn btn-primary btn-sm"
+												href="${item.file.filepath}" target="_blank">ดูวิดีโอ</a>
 										</c:otherwise>
 									</c:choose></td>
-								<td>
-									<%-- ✅ แปลงวันที่เป็น พ.ศ. --%> <fmt:formatDate
-										value="${item.sendDate}" pattern="dd-MM-yyyy HH:mm"
-										var="formattedDate" /> <c:set var="year"
-										value="${fn:substring(formattedDate, 6, 10)}" /> <c:set
+								<td><fmt:formatDate value="${item.file.sendDate}"
+										pattern="dd-MM-yyyy HH:mm" var="formattedDate" /> <c:set
+										var="year" value="${fn:substring(formattedDate, 6, 10)}" /> <c:set
 										var="buddhistYear" value="${year + 543}" />
 									${fn:substring(formattedDate, 0, 6)}${buddhistYear}${fn:substring(formattedDate, 10, 16)}
 								</td>
-								<td><a
-									href="${pageContext.request.contextPath}/student496/editFileAndVideo/${item.fileId}"
-									class="btn btn-success btn-sm"> <i
-										class="bi bi-pencil-square"></i>
-								</a></td>
+								<td>
+									<button class="btn btn-danger btn-sm"
+										data-file-id="${item.file.fileId}"
+										data-file-name="${item.file.filename}"
+										onclick="confirmDeleteSafe(this)">
+										<i class="bi bi-trash"></i>
+									</button>
+								</td>
 							</tr>
 						</c:forEach>
 					</c:otherwise>
@@ -365,18 +387,6 @@
 		</table>
 
 	</div>
-
-	<!-- แสดง popup หากมีพารามิเตอร์ success -->
-	<c:if test="${not empty param.success}">
-		<script>
-			Swal.fire({
-				icon : 'success',
-				title : 'ไฟล์ของคุณถูกแก้ไขเรียบร้อย !',
-				showConfirmButton : false,
-				timer : 2000
-			})
-		</script>
-	</c:if>
 
 	<!-- แสดง popup หากอัปโหลดสำเร็จ -->
 	<c:if test="${not empty param.upload}">
@@ -401,6 +411,30 @@
 				showConfirmButton : true
 			})
 		</script>
+	</c:if>
+	<!-- แสดง popup หากลบสำเร็จ -->
+	<c:if test="${not empty param.delete}">
+		<script>
+        Swal.fire({
+            icon: 'success',
+            title: 'ลบไฟล์สำเร็จ!',
+            text: 'ไฟล์ถูกลบออกจากระบบเรียบร้อยแล้ว',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+	</c:if>
+
+	<!-- แสดง popup หากลบไม่สำเร็จ -->
+	<c:if test="${not empty param.deleteError}">
+		<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'ไม่สามารถลบไฟล์ได้!',
+            text: 'กรุณาลองใหม่อีกครั้ง',
+            showConfirmButton: true
+        });
+    </script>
 	</c:if>
 </body>
 </html>

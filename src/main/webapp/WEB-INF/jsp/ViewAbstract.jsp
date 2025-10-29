@@ -26,7 +26,7 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw-bold">${project.proj_NameTh}/ ดูรายละเอียด</h5>
+		<h5 class="fw-bold">${project.proj_NameTh}/ บทคัดย่อ</h5>
 		<hr>
 
 		<div class="abstract-card">
@@ -119,18 +119,18 @@
 					<c:choose>
 						<c:when
 							test="${empty sessionScope.itstudent and empty sessionScope.student}">
-							<!-- ตรวจสอบว่ามีวิดีโอที่ได้รับอนุมัติให้เผยแพร่หรือไม่ -->
+							<!-- ✅ ตรวจสอบว่ามีวิดีโอที่ได้รับอนุมัติให้เผยแพร่หรือไม่ -->
 							<c:set var="hasApprovedVideo" value="false" />
-							<c:forEach items="${uploadList}" var="file">
+							<c:forEach items="${uploadList}" var="item">
 								<c:if
-									test="${file.filetype == 'video' and file.publishStatus == true}">
+									test="${item.file.filetype == 'video' and item.file.publishStatus == true}">
 									<c:set var="hasApprovedVideo" value="true" />
 								</c:if>
 							</c:forEach>
 
 							<c:if test="${hasApprovedVideo}">
-								<a
-									href="${pageContext.request.contextPath}/project/video"
+								
+									<a href="${pageContext.request.contextPath}/project/video"
 									class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
 									วิดีโอตัวอย่างการใช้งานโปรแกรม
 								</a>
@@ -139,24 +139,24 @@
 
 						<c:otherwise>
 							<!-- แสดงปุ่มสำหรับนักศึกษาเท่านั้น -->
-							<a
-								href="${pageContext.request.contextPath}/student/viewChapter"
+							
+								<a href="${pageContext.request.contextPath}/student/viewChapter"
 								class="btn btn-primary me-2"> <i
 								class="bi bi-file-earmark-text me-1"></i> ดูไฟล์เอกสาร
 							</a>
 
-							<!-- ตรวจสอบว่ามีวิดีโอที่ได้รับอนุมัติให้เผยแพร่หรือไม่ -->
+							<!-- ✅ ตรวจสอบว่ามีวิดีโอที่ได้รับอนุมัติให้เผยแพร่หรือไม่ -->
 							<c:set var="hasApprovedVideo" value="false" />
-							<c:forEach items="${uploadList}" var="file">
+							<c:forEach items="${uploadList}" var="item">
 								<c:if
-									test="${file.filetype == 'video' and file.publishStatus == true}">
+									test="${item.file.filetype == 'video' and item.file.publishStatus == true}">
 									<c:set var="hasApprovedVideo" value="true" />
 								</c:if>
 							</c:forEach>
 
 							<c:if test="${hasApprovedVideo}">
-								<a
-									href="${pageContext.request.contextPath}/project/video"
+								
+									<a href="${pageContext.request.contextPath}/project/video"
 									class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
 									วิดีโอตัวอย่างการใช้งานโปรแกรม
 								</a>

@@ -91,7 +91,7 @@
 								varStatus="status">
 								<tr>
 									<td>${student.studentId}</td>
-									<td>${student.prefix}${student.firstName}
+									<td>${student.prefix} ${student.firstName}
 										${student.lastName}</td>
 
 									<!-- Merge Cell สำหรับหัวข้อโครงงาน -->

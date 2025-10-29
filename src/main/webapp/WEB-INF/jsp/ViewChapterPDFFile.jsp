@@ -30,13 +30,17 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5 class="fw bold">${project.proj_NameTh} / ดูไฟล์เอกสาร</h5>
+		<h5 class="fw bold">${project.proj_NameTh}/ ดูไฟล์เอกสาร</h5>
 		<hr>
-		
+
 		<div class="mb-3">
 			<p>
-				<strong>ชื่อโครงงาน :</strong>
+				<strong>ชื่อโครงงานภาษาไทย :</strong>
 				<c:out value="${project.proj_NameTh}" default="ไม่ระบุ" />
+			</p>
+			<p>
+				<strong>ชื่อโครงงานภาษาอังกฤษ :</strong>
+				<c:out value="${project.proj_NameEn}" default="ไม่ระบุ" />
 			</p>
 			<p>
 				<strong>ผู้จัดทำ :</strong>
@@ -64,14 +68,12 @@
 
 		<!-- ปุ่มบทคัดย่อ + ปุ่มวิดีโอ -->
 		<div class="mb-4">
-			<a
-				href="${pageContext.request.contextPath}/viewAbstract"
-				class="btn btn-primary me-2"> <i class="bi bi-file-earmark-text me-1"></i>
-				บทคัดย่อ
-			</a> <a
-				href="${pageContext.request.contextPath}/project/video"
-				class="btn btn-success"> <i
-				class="bi bi-play-circle me-1"></i> วิดีโอตัวอย่างการใช้งานโปรแกรม
+			<a href="${pageContext.request.contextPath}/viewAbstract"
+				class="btn btn-primary me-2"> <i
+				class="bi bi-file-earmark-text me-1"></i> บทคัดย่อ
+			</a> <a href="${pageContext.request.contextPath}/project/video"
+				class="btn btn-success"> <i class="bi bi-play-circle me-1"></i>
+				วิดีโอตัวอย่างการใช้งานโปรแกรม
 			</a>
 		</div>
 
@@ -228,175 +230,163 @@
 	</div>
 
 	<script>
-		// ตัวแปรเก็บ context path
-		const contextPath = '${pageContext.request.contextPath}';
-		let currentFileId = null; // เก็บ fileId ปัจจุบัน
+	// ตัวแปรเก็บ context path
+	const contextPath = '${pageContext.request.contextPath}';
+	let currentFileId = null; // เก็บ fileId ปัจจุบัน
+	
+	// เปิด PDF viewer แบบง่าย (ใช้ browser default)
+	function openPDFViewer(fileId, filename) {
+		const pdfUrl = contextPath + "/download/file/" + fileId + "/" + encodeURIComponent(filename);
 		
-		// เปิด PDF viewer แบบง่าย (ใช้ browser default)
-		function openPDFViewer(fileId, filename) {
-			console.log('📖 Opening PDF viewer for file:', fileId, filename);
-			
-			const pdfUrl = contextPath + "/download/file/" + fileId + "/" + encodeURIComponent(filename);
-			console.log('🔗 PDF URL:', pdfUrl);
-			
-			// ตั้งชื่อ modal
-			document.getElementById('pdfViewerModalLabel').textContent = filename;
-			
-			// ใช้ iframe แทน Adobe API
-			const pdfViewer = document.getElementById('pdf-viewer');
-			pdfViewer.innerHTML = '<iframe src="' + pdfUrl + '" width="100%" height="600px" frameborder="0" style="border-radius: 8px;"></iframe>';
-			
-			// แสดง modal
-			const modal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
-			modal.show();
-		}
+		// ตั้งชื่อ modal
+		document.getElementById('pdfViewerModalLabel').textContent = filename;
+		
+		// ใช้ iframe แทน Adobe API
+		const pdfViewer = document.getElementById('pdf-viewer');
+		pdfViewer.innerHTML = '<iframe src="' + pdfUrl + '" width="100%" height="600px" frameborder="0" style="border-radius: 8px;"></iframe>';
+		
+		// แสดง modal
+		const modal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
+		modal.show();
+	}
 
-		// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
-		function downloadSecurePDF(fileId, filename) {
-		    console.log('🔐 Preparing secure download for file:', fileId, filename);
-		    
-		    currentFileId = fileId;
-		    
-		    // อัปเดตชื่อไฟล์ใน modal
-		    const filenameDisplay = document.getElementById('download-filename');
-		    if (filenameDisplay) {
-		        filenameDisplay.textContent = filename || 'ไฟล์';
-		    }
-		    
-		    // แสดงข้อมูลการหมดอายุ (ทดสอบ 1 นาที)
-		    const today = new Date();
-		    const expiryDate = new Date(today);
-		    expiryDate.setMinutes(expiryDate.getMinutes() + 1); // เปลี่ยนเป็น 1 นาที
-		    
-		    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-		                       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-		    
-		    const expiryDay = expiryDate.getDate();
-		    const expiryMonth = expiryDate.getMonth();
-		    const expiryYear = expiryDate.getFullYear() + 543;
-		    const expiryHour = String(expiryDate.getHours()).padStart(2, '0');
-		    const expiryMinute = String(expiryDate.getMinutes()).padStart(2, '0');
-		    const expirySecond = String(expiryDate.getSeconds()).padStart(2, '0');
-		    
-		    const expiryStr = expiryDay + ' ' + thaiMonths[expiryMonth] + ' ' + expiryYear + 
-		                     ' เวลา ' + expiryHour + ':' + expiryMinute + ':' + expirySecond + ' น.';
-		    
-		    // คำนวณเวลาที่เหลือ
-		    const diffMs = expiryDate - today;
-		    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-		    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-		    const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-		    
-		    let timeLeftStr = '';
-		    if (diffDays > 0) {
-		        timeLeftStr = diffDays + ' วัน ' + diffHours + ' ชั่วโมง ' + diffMinutes + ' นาที';
-		    } else if (diffHours > 0) {
-		        timeLeftStr = diffHours + ' ชั่วโมง ' + diffMinutes + ' นาที ' + diffSeconds + ' วินาที';
-		    } else if (diffMinutes > 0) {
-		        timeLeftStr = diffMinutes + ' นาที ' + diffSeconds + ' วินาที';
-		    } else {
-		        timeLeftStr = diffSeconds + ' วินาที';
-		    }
-		    
-		    // อัปเดตข้อมูลใน modal
-		    const expiryDetailsContainer = document.getElementById('expiry-details-container');
-		    if (expiryDetailsContainer) {
-		        expiryDetailsContainer.innerHTML = 
-		            '<div class="mb-1">📅 <strong>วันหมดอายุ:</strong> ' + expiryStr + '</div>' +
-		            '<div class="mb-1">⏰ <strong>เหลืออีก:</strong> ' + timeLeftStr + '</div>';
-		    }
-		    
-		    // แสดง modal
-		    const modal = new bootstrap.Modal(document.getElementById('downloadInfoModal'));
-		    modal.show();
+	// ฟังก์ชันดาวน์โหลด (แสดง modal ก่อน)
+	function downloadSecurePDF(fileId, filename) {
+	    currentFileId = fileId;
+	    
+	    // อัปเดตชื่อไฟล์ใน modal
+	    const filenameDisplay = document.getElementById('download-filename');
+	    if (filenameDisplay) {
+	        filenameDisplay.textContent = filename || 'ไฟล์';
+	    }
+	    
+	    // แสดงข้อมูลการหมดอายุ (14 วัน)
+	    const today = new Date();
+	    const expiryDate = new Date(today);
+	    expiryDate.setDate(expiryDate.getDate() + 14); // เพิ่ม 14 วัน
+	    
+	    const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+	                       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+	    
+	    const expiryDay = expiryDate.getDate();
+	    const expiryMonth = expiryDate.getMonth();
+	    const expiryYear = expiryDate.getFullYear() + 543;
+	    const expiryHour = String(expiryDate.getHours()).padStart(2, '0');
+	    const expiryMinute = String(expiryDate.getMinutes()).padStart(2, '0');
+	    const expirySecond = String(expiryDate.getSeconds()).padStart(2, '0');
+	    
+	    const expiryStr = expiryDay + ' ' + thaiMonths[expiryMonth] + ' ' + expiryYear + 
+	                     ' เวลา ' + expiryHour + ':' + expiryMinute + ':' + expirySecond + ' น.';
+	    
+	    // คำนวณเวลาที่เหลือ
+	    const diffMs = expiryDate - today;
+	    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+	    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+	    
+	    let timeLeftStr = '';
+	    if (diffDays > 0) {
+	        timeLeftStr = diffDays + ' วัน ' + diffHours + ' ชั่วโมง ' + diffMinutes + ' นาที';
+	    } else if (diffHours > 0) {
+	        timeLeftStr = diffHours + ' ชั่วโมง ' + diffMinutes + ' นาที';
+	    } else {
+	        timeLeftStr = diffMinutes + ' นาที';
+	    }
+	    
+	    // อัปเดตข้อมูลใน modal
+	    const expiryDetailsContainer = document.getElementById('expiry-details-container');
+	    if (expiryDetailsContainer) {
+	        expiryDetailsContainer.innerHTML = 
+	            '<div class="mb-1">📅 <strong>วันหมดอายุ:</strong> ' + expiryStr + '</div>' +
+	            '<div class="mb-1">⏰ <strong>เหลืออีก:</strong> ' + timeLeftStr + '</div>';
+	    }
+	    
+	    // แสดง modal
+	    const modal = new bootstrap.Modal(document.getElementById('downloadInfoModal'));
+	    modal.show();
+	}
+
+	// เริ่มดาวน์โหลดจริง
+	function startSecureDownload() {
+		if (!currentFileId) {
+			alert('ไม่พบข้อมูลไฟล์');
+			return;
 		}
-		// เริ่มดาวน์โหลดจริง
-		function startSecureDownload() {
-			if (!currentFileId) {
-				alert('ไม่พบข้อมูลไฟล์');
-				return;
+		
+		const btn = document.getElementById('start-download-btn');
+		const originalText = btn.innerHTML;
+		
+		// แสดง loading
+		btn.disabled = true;
+		btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>กำลังดาวน์โหลด...';
+		
+		// ดาวน์โหลดไฟล์
+		window.location.href = contextPath + '/download/secure/' + currentFileId;
+		
+		// รีเซ็ตปุ่มหลัง 3 วินาที
+		setTimeout(function() {
+			btn.disabled = false;
+			btn.innerHTML = originalText;
+			
+			// ปิด modal
+			const modal = bootstrap.Modal.getInstance(document.getElementById('downloadInfoModal'));
+			if (modal) {
+				modal.hide();
 			}
 			
-			const btn = document.getElementById('start-download-btn');
-			const originalText = btn.innerHTML;
-			
-			// แสดง loading
-			btn.disabled = true;
-			btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>กำลังดาวน์โหลด...';
-			
-			// ดาวน์โหลดไฟล์
-			window.location.href = contextPath + '/download/secure/' + currentFileId;
-			
-			// รีเซ็ตปุ่มหลัง 3 วินาที
-			setTimeout(function() {
-				btn.disabled = false;
-				btn.innerHTML = originalText;
-				
-				// ปิด modal
-				const modal = bootstrap.Modal.getInstance(document.getElementById('downloadInfoModal'));
-				if (modal) {
-					modal.hide();
-				}
-				
-				// แสดงข้อความสำเร็จ
-				showSuccessToast('ดาวน์โหลดไฟล์สำเร็จ! ไฟล์มีอายุ 14 วัน');
-			}, 3000);
-		}
+			// แสดงข้อความสำเร็จ
+			showSuccessToast('ดาวน์โหลดไฟล์สำเร็จ! ไฟล์มีอายุ 14 วัน');
+		}, 3000);
+	}
 
-		// แสดง toast notification
-		function showSuccessToast(message) {
-			// สร้าง toast element ถ้ายังไม่มี
-			let toastContainer = document.getElementById('toast-container');
-			if (!toastContainer) {
-				toastContainer = document.createElement('div');
-				toastContainer.id = 'toast-container';
-				toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
-				toastContainer.style.zIndex = '11';
-				document.body.appendChild(toastContainer);
-			}
-			
-			const toastId = 'toast-' + Date.now();
-			const toastHTML = `
-				<div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-					<div class="toast-header bg-success text-white">
-						<i class="bi bi-check-circle-fill me-2"></i>
-						<strong class="me-auto">สำเร็จ</strong>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-					</div>
-					<div class="toast-body">
-						${message}
-					</div>
+	// แสดง toast notification
+	function showSuccessToast(message) {
+		// สร้าง toast element ถ้ายังไม่มี
+		let toastContainer = document.getElementById('toast-container');
+		if (!toastContainer) {
+			toastContainer = document.createElement('div');
+			toastContainer.id = 'toast-container';
+			toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+			toastContainer.style.zIndex = '11';
+			document.body.appendChild(toastContainer);
+		}
+		
+		const toastId = 'toast-' + Date.now();
+		const toastHTML = `
+			<div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+				<div class="toast-header bg-success text-white">
+					<i class="bi bi-check-circle-fill me-2"></i>
+					<strong class="me-auto">สำเร็จ</strong>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
 				</div>
-			`;
-			
-			toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-			
-			const toastElement = document.getElementById(toastId);
-			const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
-			toast.show();
-			
-			// ลบ toast หลังจากซ่อน
-			toastElement.addEventListener('hidden.bs.toast', function() {
-				toastElement.remove();
-			});
-		}
+				<div class="toast-body">
+					${message}
+				</div>
+			</div>
+		`;
+		
+		toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+		
+		const toastElement = document.getElementById(toastId);
+		const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+		toast.show();
+		
+		// ลบ toast หลังจากซ่อน
+		toastElement.addEventListener('hidden.bs.toast', function() {
+			toastElement.remove();
+		});
+	}
 
-		// เมื่อปิด PDF modal ให้ล้าง iframe
-		const pdfModal = document.getElementById('pdfViewerModal');
-		if (pdfModal) {
-			pdfModal.addEventListener('hidden.bs.modal', function() {
-				const pdfViewer = document.getElementById('pdf-viewer');
-				if (pdfViewer) {
-					pdfViewer.innerHTML = '';
-				}
-			});
-		}
-
-		// Log สำหรับ debug
-		console.log("✅ PDF Viewer with Secure Expiring Download initialized");
-		console.log("🔧 Context Path:", contextPath);
-		console.log("📅 Expiry Period: 14 days from download");
-	</script>
+	// เมื่อปิด PDF modal ให้ล้าง iframe
+	const pdfModal = document.getElementById('pdfViewerModal');
+	if (pdfModal) {
+		pdfModal.addEventListener('hidden.bs.modal', function() {
+			const pdfViewer = document.getElementById('pdf-viewer');
+			if (pdfViewer) {
+				pdfViewer.innerHTML = '';
+			}
+		});
+	}
+</script>
 </body>
 </html>

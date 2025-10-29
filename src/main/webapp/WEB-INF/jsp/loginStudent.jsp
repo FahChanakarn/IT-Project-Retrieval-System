@@ -53,7 +53,7 @@
 				<div class="mb-3">
 					<label for="password" class="form-label text-danger">รหัสผ่าน</label>
 					<input type="password" name="password" id="password"
-						class="form-control" placeholder="กรอกรหัสผ่าน">
+						class="form-control" placeholder="mju6xxxxxxxxx">
 					<div id="passwordError" class="text-danger mt-1 small"></div>
 				</div>
 

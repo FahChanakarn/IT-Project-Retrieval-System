@@ -27,11 +27,23 @@
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
 
 	<div class="container mt-5">
-		<h5>${project.proj_NameTh}/ รายละเอียด</h5>
+		<h5>${project.proj_NameTh}/รายละเอียด</h5>
 		<hr>
 
 		<!-- ข้อมูลโครงงาน -->
 		<div class="mb-3">
+			<p>
+				<strong>ชื่อโครงงานภาษาไทย :</strong>
+				<c:out value="${project.proj_NameTh}" default="ไม่ระบุ" />
+			</p>
+			<p>
+				<strong>ชื่อโครงงานภาษาอังกฤษ :</strong>
+				<c:out value="${project.proj_NameEn}" default="-" />
+			</p>
+			<p>
+				<strong>ประเภทโครงงาน :</strong>
+				<c:out value="${project.projectType}" default="ไม่ระบุ" />
+			</p>
 			<p>
 				<strong>ผู้จัดทำ :</strong>
 				<c:forEach var="s" items="${project.student496s}" varStatus="loop">

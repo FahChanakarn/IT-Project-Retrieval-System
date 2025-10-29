@@ -227,6 +227,7 @@ public class ProjectManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ArrayList<>();
+
 		} finally {
 			if (session != null) {
 				session.close();
@@ -325,9 +326,6 @@ public class ProjectManager {
 				// Force initialize
 				project.getStudent496s().size();
 				project.getTools().size();
-
-				System.out.println("✅ getProjectDetail: Students=" + project.getStudent496s().size() + ", Tools="
-						+ project.getTools().size());
 			}
 
 			return project;

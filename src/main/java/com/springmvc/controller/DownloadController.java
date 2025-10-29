@@ -25,39 +25,30 @@ public class DownloadController {
 	@RequestMapping(value = "/download/secure/{id}", method = RequestMethod.GET)
 	public void downloadSecureFile(@PathVariable("id") int fileId, HttpServletResponse response) throws IOException {
 
-		System.out.println("Secure download request for file ID: " + fileId);
-
 		try {
 			UploadManager manager = new UploadManager();
 			DocumentFile doc = manager.getFileById(fileId);
 
 			if (doc == null) {
-				System.err.println("Document not found for ID: " + fileId);
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Document not found!");
 				return;
 			}
 
 			if (!"file".equals(doc.getFiletype())) {
-				System.err.println("Document is not a file type: " + doc.getFiletype());
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Document is not a file!");
 				return;
 			}
 
 			File originalFile = new File(BASE_UPLOAD_PATH + doc.getFilepath());
 			if (!originalFile.exists()) {
-				System.err.println("Physical file not found: " + originalFile.getAbsolutePath());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Physical file not found!");
 				return;
 			}
 
-			// คำนวณวันหมดอายุ (ทดสอบ - หมดอายุทันที)
+			// คำนวณวันหมดอายุ (14 วัน)
 			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.MINUTE, 1); // หมดอายุภายใน 1 นาที
+			cal.add(Calendar.DAY_OF_MONTH, EXPIRY_DAYS);
 			Date fileExpiryDate = cal.getTime();
-
-			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", new Locale("th", "TH"));
-			System.out.println("Creating PDF with expiry date: " + sdf.format(fileExpiryDate));
-			System.out.println("Current time: " + sdf.format(new Date()));
 
 			// สร้างไฟล์ temp พร้อม JavaScript
 			File tempFile = File.createTempFile("secured_", ".pdf");
@@ -96,18 +87,10 @@ public class DownloadController {
 				os.flush();
 			}
 
-			System.out.println("Secured PDF downloaded successfully");
-			System.out.println("File: " + downloadFilename);
-			System.out.println("Expires: " + sdf.format(fileExpiryDate));
-			System.out.println("Size: " + tempFile.length() + " bytes");
-
 			// ลบไฟล์ temp
-			if (!tempFile.delete()) {
-				System.err.println("Warning: Could not delete temp file: " + tempFile.getAbsolutePath());
-			}
+			tempFile.delete();
 
 		} catch (Exception e) {
-			System.err.println("Error in secure download: " + e.getMessage());
 			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 					"Error creating secured file: " + e.getMessage());
@@ -123,27 +106,23 @@ public class DownloadController {
 			// คำนวณ timestamp
 			long expiryTimestamp = expiryDate.getTime();
 
-			// คำนวณเวลาแจ้งเตือน (30 วินาทีก่อนหมดอายุ)
+			// คำนวณเวลาแจ้งเตือน (1 วันก่อนหมดอายุ)
 			Calendar warningCal = Calendar.getInstance();
 			warningCal.setTime(expiryDate);
-			warningCal.add(Calendar.SECOND, -30);
+			warningCal.add(Calendar.DAY_OF_MONTH, -1);
 			long warningTimestamp = warningCal.getTime().getTime();
 
-			// สร้าง JavaScript code (ไม่ใช้ภาษาไทยโดยตรง)
-			String javascript = String.format("console.println('PDF Security Check Start');"
-					+ "var expiryTimestamp = %d;" + "var warningTimestamp = %d;" + "try {" + "  var now = new Date();"
-					+ "  var currentTimestamp = now.getTime();" + "  console.println('Current: ' + currentTimestamp);"
-					+ "  console.println('Expiry: ' + expiryTimestamp);"
-					+ "  console.println('Diff seconds: ' + Math.floor((expiryTimestamp - currentTimestamp) / 1000));"
-					+ "  if (currentTimestamp >= expiryTimestamp) {" + "    console.println('STATUS: EXPIRED');"
+			// สร้าง JavaScript code
+			String javascript = String.format("var expiryTimestamp = %d;" + "var warningTimestamp = %d;" + "try {"
+					+ "  var now = new Date();" + "  var currentTimestamp = now.getTime();"
+					+ "  if (currentTimestamp >= expiryTimestamp) {"
 					+ "    app.alert('Document Expired\\n\\nPlease download again', 0, 0);" + "    this.closeDoc(true);"
 					+ "  } else if (currentTimestamp >= warningTimestamp) {"
-					+ "    var secondsLeft = Math.floor((expiryTimestamp - currentTimestamp) / 1000);"
-					+ "    console.println('STATUS: WARNING, seconds left: ' + secondsLeft);"
-					+ "    app.alert('Document will expire soon\\n\\nTime left: ' + secondsLeft + ' seconds', 1, 0);"
-					+ "  } else {" + "    console.println('STATUS: VALID');" + "  }" + "} catch(e) {"
-					+ "  console.println('ERROR: ' + e.message);" + "  app.alert('Error: ' + e.message, 0, 0);" + "}",
-					expiryTimestamp, warningTimestamp);
+					+ "    var daysLeft = Math.floor((expiryTimestamp - currentTimestamp) / (1000 * 60 * 60 * 24));"
+					+ "    var hoursLeft = Math.floor(((expiryTimestamp - currentTimestamp) %% (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));"
+					+ "    app.alert('Document will expire soon\\n\\nTime left: ' + daysLeft + ' days ' + hoursLeft + ' hours', 1, 0);"
+					+ "  }" + "} catch(e) {" + "  app.alert('Error: ' + e.message, 0, 0);" + "}", expiryTimestamp,
+					warningTimestamp);
 
 			// อ่านไฟล์ต้นฉบับ
 			reader = new PdfReader(originalFile);
@@ -159,14 +138,9 @@ public class DownloadController {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			info.setKeywords("Secured, ExpiryTimestamp: " + expiryTimestamp);
 
-			System.out.println("Created PDF with JavaScript protection");
-			System.out.println("Output: " + outputPath);
-			System.out.println("Expiry: " + sdf.format(expiryDate));
-
 			return true;
 
 		} catch (Exception e) {
-			System.err.println("Error creating expiring PDF: " + e.getMessage());
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -175,7 +149,7 @@ public class DownloadController {
 					pdfDoc.close();
 				}
 			} catch (Exception e) {
-				System.err.println("Error closing PDF: " + e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -183,8 +157,6 @@ public class DownloadController {
 	@RequestMapping(value = "/download/file/{id}/{filename}", method = RequestMethod.GET)
 	public void viewFile(@PathVariable("id") int fileId, @PathVariable("filename") String filename,
 			HttpServletResponse response) throws IOException {
-
-		System.out.println("View file request for ID: " + fileId);
 
 		UploadManager manager = new UploadManager();
 		DocumentFile doc = manager.getFileById(fileId);
@@ -214,7 +186,5 @@ public class DownloadController {
 			}
 			os.flush();
 		}
-
-		System.out.println("File viewed successfully");
 	}
 }

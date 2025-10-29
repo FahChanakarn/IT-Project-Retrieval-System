@@ -3,7 +3,6 @@ package com.springmvc.controller;
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.manager.UploadManager;
 import com.springmvc.manager.UploadManager.FileWithUploader;
-import com.springmvc.model.DocumentFile;
 import com.springmvc.model.Project;
 import com.springmvc.model.Student496;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ public class UploadController {
 	@Autowired
 	private ServletContext servletContext;
 
-	// ✅ Method ตรวจสอบ session - ตรวจสอบว่ามี student object หรือไม่
 	private boolean isSessionValid(HttpSession session) {
 		if (session == null) {
 			return false;
@@ -33,10 +31,8 @@ public class UploadController {
 		return student != null && projectId != null;
 	}
 
-	// 1. แสดงหน้าอัปโหลด + ไฟล์ทั้งหมดของโครงงาน
 	@RequestMapping(value = "/upload", method = RequestMethod.GET)
 	public ModelAndView showUploadPage(HttpSession session) {
-		// ✅ เช็ค session อย่างเข้มงวด
 		if (!isSessionValid(session)) {
 			return new ModelAndView("redirect:/loginStudent496");
 		}
@@ -46,7 +42,6 @@ public class UploadController {
 		ProjectManager proj = new ProjectManager();
 		Project project = proj.findProjectById(projectId);
 
-		// ✅ เปลี่ยนเป็น List<FileWithUploader>
 		List<FileWithUploader> files = manager.getFilesByProject(projectId);
 
 		ModelAndView mav = new ModelAndView("uploadFileAndVideo");
@@ -55,13 +50,11 @@ public class UploadController {
 		return mav;
 	}
 
-	// 2. อัปโหลดไฟล์หรือวิดีโอ
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public String uploadFile(@RequestParam("fileType") String fileType, @RequestParam("fileName") String fileName,
 			@RequestParam(value = "file", required = false) MultipartFile file,
 			@RequestParam(value = "videoLink", required = false) String videoLink, HttpSession session) {
 
-		// ✅ เช็ค session อย่างเข้มงวด
 		if (!isSessionValid(session)) {
 			return "redirect:/loginStudent496";
 		}
@@ -80,10 +73,8 @@ public class UploadController {
 		}
 	}
 
-	// 3. ลบไฟล์หรือวิดีโอ
 	@RequestMapping(value = "/deleteFile/{fileId}", method = RequestMethod.GET)
 	public String deleteFile(@PathVariable("fileId") int fileId, HttpSession session) {
-		// ✅ เช็ค session อย่างเข้มงวด
 		if (!isSessionValid(session)) {
 			return "redirect:/loginStudent496";
 		}

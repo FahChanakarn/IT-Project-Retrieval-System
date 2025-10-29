@@ -38,14 +38,11 @@ public class EditAdvisorController {
 			@RequestParam(value = "adv_password", required = false) String password, HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
-		System.out.println("=== updateProfile called ===");
-
 		Advisor sessionAdvisor = (Advisor) session.getAttribute("advisor");
 		if (sessionAdvisor == null) {
 			return new ModelAndView("redirect:/loginAdvisor");
 		}
 
-		// สร้าง Advisor object ใหม่
 		Advisor advisor = new Advisor();
 		advisor.setAdvisorId(sessionAdvisor.getAdvisorId());
 		advisor.setAdv_prefix(prefix);
@@ -53,7 +50,6 @@ public class EditAdvisorController {
 		advisor.setAdv_lastName(lastName);
 		advisor.setAdv_email(email);
 
-		// ถ้า password เว้นว่าง = ไม่เปลี่ยน
 		if (password == null || password.trim().isEmpty()) {
 			advisor.setAdv_password(sessionAdvisor.getAdv_password());
 		} else {
@@ -64,21 +60,16 @@ public class EditAdvisorController {
 			AdvisorManager advisorManager = new AdvisorManager();
 			advisorManager.updateAdvisor(advisor);
 
-			// อัปเดต session ด้วยข้อมูลใหม่
 			Advisor updatedAdvisor = advisorManager.getAdvisorById(advisor.getAdvisorId());
 			session.setAttribute("advisor", updatedAdvisor);
 
-			// เพิ่ม success message
 			redirectAttributes.addFlashAttribute("success", "บันทึกข้อมูลสำเร็จ");
 
-			System.out.println("=== Update successful ===");
 		} catch (Exception e) {
-			System.err.println("Error updating advisor: " + e.getMessage());
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("error", "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
 		}
 
-		// redirect กลับไปหน้าแก้ไขเดิม
 		return new ModelAndView("redirect:/advisor/editProfile");
 	}
 

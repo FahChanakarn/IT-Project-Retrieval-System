@@ -97,6 +97,37 @@ body {
     gap: 1rem;
 }
 
+/* เพิ่มใน CSS file หลัก - Hover สีเหลือง */
+
+/* ให้ทุก nav-link มี hover effect เหมือนกัน */
+.header .nav-link {
+	color: #fff;
+	text-decoration: none;
+	padding: 0.5rem 1rem;
+	border-radius: 5px;
+	transition: all 0.3s ease;
+	white-space: nowrap;
+}
+
+.header .nav-link:hover {
+	color: #e6af30;
+	text-decoration: none;
+}
+
+/* สำหรับ dropdown toggle */
+.header .dropdown-toggle::after {
+	margin-left: 0.5rem;
+	vertical-align: middle;
+}
+
+/* Profile avatar - ใช้ขนาดเดิม 45x45px */
+.profile-avatar {
+	width: 45px;
+	height: 45px;
+	object-fit: cover;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+}
 /* Footer */
 .footer {
     background-color: #aa1818;

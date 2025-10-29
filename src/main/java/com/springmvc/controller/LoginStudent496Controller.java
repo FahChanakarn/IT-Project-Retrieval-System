@@ -13,7 +13,6 @@ public class LoginStudent496Controller {
 
 	@RequestMapping(value = "/loginStudent496", method = RequestMethod.GET)
 	public ModelAndView showLoginPage() {
-		// ไม่ต้องส่ง studentList ไปแล้ว เพราะไม่มี dropdown
 		ModelAndView mav = new ModelAndView("loginStudent496");
 		return mav;
 	}

@@ -23,7 +23,6 @@ public class UploadManager {
 
 	private static final String UPLOAD_BASE_PATH = "D:/Project496Uploads/uploadsFile";
 
-	// DTO class สำหรับ wrap ข้อมูลไฟล์พร้อมชื่อผู้อัปโหลด
 	public static class FileWithUploader {
 		private DocumentFile file;
 		private String uploaderName;
@@ -42,14 +41,12 @@ public class UploadManager {
 		}
 	}
 
-	// ดึงรายการไฟล์พร้อมชื่อผู้อัปโหลด
 	public List<FileWithUploader> getFilesByProject(int projectId) {
 		Session session = null;
 		try {
 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
 			session = sessionFactory.openSession();
 
-			// Query ไฟล์ทั้งหมดของโครงงาน
 			Query<DocumentFile> fileQuery = session.createQuery(
 					"FROM DocumentFile WHERE project.projectId = :pid ORDER BY fileno ASC", DocumentFile.class);
 			fileQuery.setParameter("pid", projectId);
@@ -57,15 +54,11 @@ public class UploadManager {
 
 			List<FileWithUploader> fileList = new ArrayList<>();
 
-			// Query ชื่อผู้อัปโหลดสำหรับแต่ละไฟล์
 			for (DocumentFile file : files) {
 				String uploaderName = "-";
 
-				// ตรวจสอบว่ามี uploaded_by หรือไม่
 				if (file.getUploadedBy() != null && !file.getUploadedBy().trim().isEmpty()) {
 					try {
-						// ✅ Query จากตาราง student (เพราะใช้ JOINED inheritance)
-						// แสดงเฉพาะชื่อ ไม่แสดง prefix
 						String sql = "SELECT stu_firstname FROM student WHERE stu_id = :stuId";
 
 						Query<String> nameQuery = session.createNativeQuery(sql);
@@ -77,9 +70,7 @@ public class UploadManager {
 							uploaderName = result.trim();
 						}
 					} catch (Exception e) {
-						System.out.println("⚠️ Cannot find uploader for file ID: " + file.getFileId()
-								+ " (uploaded_by: " + file.getUploadedBy() + ")");
-						System.out.println("⚠️ Error: " + e.getMessage());
+						// Silent fail - use default "-"
 					}
 				}
 
@@ -88,7 +79,6 @@ public class UploadManager {
 
 			return fileList;
 		} catch (Exception e) {
-			System.err.println("❌ Error fetching files: " + e.getMessage());
 			e.printStackTrace();
 			return new ArrayList<>();
 		} finally {
@@ -98,7 +88,6 @@ public class UploadManager {
 		}
 	}
 
-	// อัปโหลดไฟล์ใหม่
 	public void saveFile(int projectId, String fileType, String fileName, MultipartFile file, String videoLink,
 			String uploadedByStudentId, ServletContext context) {
 
@@ -114,7 +103,6 @@ public class UploadManager {
 			doc.setFiletype(fileType);
 			doc.setFilename(fileName);
 
-			// ตั้งค่า uploadedBy
 			doc.setUploadedBy(uploadedByStudentId);
 
 			LocalDateTime localDateTime = LocalDateTime.now();
@@ -134,8 +122,6 @@ public class UploadManager {
 
 					String safeFilename = uploadedByStudentId + "_" + fileName + extension;
 					String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
-
-					System.out.println("📂 Saving file to: " + fullPath);
 
 					file.transferTo(new File(fullPath));
 					doc.setFilepath(safeFilename);
@@ -157,8 +143,6 @@ public class UploadManager {
 			session.save(doc);
 			session.getTransaction().commit();
 
-			System.out.println("✅ File saved successfully with uploader: " + uploadedByStudentId);
-
 		} catch (Exception e) {
 			if (session != null && session.getTransaction().isActive()) {
 				session.getTransaction().rollback();
@@ -171,7 +155,6 @@ public class UploadManager {
 		}
 	}
 
-	// ดึงไฟล์ตาม ID
 	public DocumentFile getFileById(int fileId) {
 		Session session = null;
 		try {
@@ -188,7 +171,6 @@ public class UploadManager {
 		}
 	}
 
-	// ลบไฟล์
 	public void deleteFile(int fileId, ServletContext context) {
 		Session session = null;
 		try {
@@ -202,27 +184,20 @@ public class UploadManager {
 				throw new RuntimeException("ไม่พบไฟล์ที่ต้องการลบ");
 			}
 
-			// ลบไฟล์จาก storage (เฉพาะไฟล์ PDF)
 			if ("file".equals(file.getFiletype())) {
 				String filePath = file.getFilepath();
 				if (filePath != null && !filePath.isEmpty()) {
 					File physicalFile = new File(UPLOAD_BASE_PATH + File.separator + filePath);
 					if (physicalFile.exists()) {
-						boolean deleted = physicalFile.delete();
-						System.out.println("🗑️ Deleted physical file: " + physicalFile.getAbsolutePath()
-								+ " - Success: " + deleted);
+						physicalFile.delete();
 					}
 				}
 			}
 
-			// ลบข้อมูลจากฐานข้อมูล
 			session.delete(file);
 			session.getTransaction().commit();
 
-			System.out.println("✅ File deleted successfully - ID: " + fileId);
-
 		} catch (Exception e) {
-			System.err.println("❌ Error deleting file: " + e.getMessage());
 			e.printStackTrace();
 			if (session != null && session.getTransaction().isActive()) {
 				session.getTransaction().rollback();

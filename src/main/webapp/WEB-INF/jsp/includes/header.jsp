@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <header class="header">
 	<div class="container-fluid px-4">
@@ -79,82 +79,82 @@
 
 
 					<c:when test="${not empty sessionScope.admin}">
-						<a href="${pageContext.request.contextPath}/"
-							class="nav-link text-white">หน้าหลัก</a>
+						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
 
-						<ul class="nav d-flex flex-wrap align-items-center gap-3 mb-0">
-							<li class="nav-item dropdown"><a
-								class="nav-link dropdown-toggle text-white" href="#"
-								role="button" data-bs-toggle="dropdown">จัดการโครงงาน</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/listProjects">รายการโครงงานทั้งหมด</a></li>
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/myAdviseeProjects">
-											รายการโครงงานของนักศึกษาในที่ปรึกษา </a></li>
-								</ul></li>
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button"
+								data-bs-toggle="dropdown"> จัดการโครงงาน </a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/admin/listProjects">รายการโครงงานทั้งหมด</a></li>
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/admin/myAdviseeProjects">
+										รายการโครงงานของนักศึกษาในที่ปรึกษา </a></li>
+							</ul>
+						</div>
 
-							<li class="nav-item dropdown"><a
-								class="nav-link dropdown-toggle text-white" href="#"
-								role="button" data-bs-toggle="dropdown">ข้อมูลอาจารย์</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/listAdvisors">รายชื่ออาจารย์</a></li>
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/addAdvisorForm">เพิ่มอาจารย์</a></li>
-								</ul></li>
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button"
+								data-bs-toggle="dropdown"> ข้อมูลอาจารย์ </a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/admin/listAdvisors">รายชื่ออาจารย์</a></li>
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/admin/addAdvisorForm">เพิ่มอาจารย์</a></li>
+							</ul>
+						</div>
 
-							<li class="nav-item dropdown"><a
-								class="nav-link dropdown-toggle text-white" href="#"
-								role="button" data-bs-toggle="dropdown">ข้อมูลนักศึกษา</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/admin/importStudentFile">
-											Import ข้อมูลนักศึกษา</a></li>
-								</ul></li>
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button"
+								data-bs-toggle="dropdown"> ข้อมูลนักศึกษา </a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/admin/importStudentFile">
+										Import ข้อมูลนักศึกษา</a></li>
+							</ul>
+						</div>
 
-							<li class="nav-item dropdown"><a
-								class="nav-link dropdown-toggle text-white d-flex align-items-center"
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle d-flex align-items-center"
 								href="#" role="button" data-bs-toggle="dropdown"> <i
-									class="bi bi-person fs-5 me-2"></i>
-									${sessionScope.admin.adv_prefix}
-									${sessionScope.admin.adv_firstName}
+								class="bi bi-person fs-5 me-2"></i>
+								${sessionScope.admin.adv_prefix}
+								${sessionScope.admin.adv_firstName}
 							</a>
-								<ul class="dropdown-menu dropdown-menu-end">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
-								</ul></li>
-						</ul>
+							<ul class="dropdown-menu dropdown-menu-end">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
+							</ul>
+						</div>
 					</c:when>
 
 					<c:when test="${not empty sessionScope.advisor}">
-						<a href="${pageContext.request.contextPath}/"
-							class="nav-link text-white">หน้าหลัก</a>
+						<a href="${pageContext.request.contextPath}/" class="nav-link">หน้าหลัก</a>
 
-						<ul class="nav d-flex flex-wrap align-items-center gap-3 mb-0">
-							<li class="nav-item dropdown"><a
-								class="nav-link dropdown-toggle text-white" href="#"
-								role="button" data-bs-toggle="dropdown"> จัดการโครงงาน </a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/advisor/myAdviseeProjects">
-											รายการโครงงาน</a></li>
-								</ul></li>
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button"
+								data-bs-toggle="dropdown"> จัดการโครงงาน </a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/advisor/myAdviseeProjects">
+										รายการโครงงาน</a></li>
+							</ul>
+						</div>
 
-							<li class="nav-item dropdown"><a
-								class="nav-link dropdown-toggle text-white d-flex align-items-center"
+						<div class="dropdown">
+							<a class="nav-link dropdown-toggle d-flex align-items-center"
 								href="#" role="button" data-bs-toggle="dropdown"> <i
-									class="bi bi-person fs-5 me-2"></i>
-									${sessionScope.advisor.adv_prefix}
-									${sessionScope.advisor.adv_firstName}
+								class="bi bi-person fs-5 me-2"></i>
+								${sessionScope.advisor.adv_prefix}
+								${sessionScope.advisor.adv_firstName}
 							</a>
-								<ul class="dropdown-menu dropdown-menu-end">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/advisor/editProfile">แก้ไขข้อมูลส่วนตัว</a></li>
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
-								</ul></li>
-						</ul>
+							<ul class="dropdown-menu dropdown-menu-end">
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/advisor/editProfile">แก้ไขข้อมูลส่วนตัว</a></li>
+								<li><a class="dropdown-item"
+									href="${pageContext.request.contextPath}/logout">ออกจากระบบ</a></li>
+							</ul>
+						</div>
 					</c:when>
 
 					<c:when test="${not empty sessionScope.itstudent}">

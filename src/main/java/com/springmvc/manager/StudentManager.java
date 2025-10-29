@@ -48,8 +48,6 @@ public class StudentManager {
 	}
 
 	public Student findByStuIdAndPassword(String stuId, String password) {
-		System.out.println("Attempt login: " + stuId + " / " + password);
-
 		try (Session session = HibernateConnection.doHibernateConnection().openSession()) {
 			Query<Student> query = session.createQuery("FROM Student WHERE stuId = :stuId AND stu_password = :password",
 					Student.class);

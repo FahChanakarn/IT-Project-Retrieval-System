@@ -113,18 +113,14 @@ public class Student496Manager {
 		try {
 			session = HibernateConnection.doHibernateConnection().openSession();
 
-			// Query นักศึกษาที่มี project ในภาคเรียนที่ระบุ
 			Query<Student496> query = session.createQuery(
 					"FROM Student496 s JOIN FETCH s.project p WHERE p.semester = :semester", Student496.class);
 			query.setParameter("semester", semester);
 
 			List<Student496> list = query.list();
 
-			System.out.println("getStudentsBySemester - Semester: " + semester + ", Found: " + list.size());
-
 			return list;
 		} catch (Exception e) {
-			System.err.println("Error in getStudentsBySemester: " + e.getMessage());
 			e.printStackTrace();
 			return new ArrayList<>();
 		} finally {

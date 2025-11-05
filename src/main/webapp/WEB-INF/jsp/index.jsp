@@ -32,7 +32,7 @@ request.setAttribute("currentYear", thisYear);
 
 <!-- CSS -->
 <link rel="stylesheet" type="text/css"
-	href="${pageContext.request.contextPath}/assets/css/Home.css">
+	href="${pageContext.request.contextPath}/assets/css/index.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/header.css">
 

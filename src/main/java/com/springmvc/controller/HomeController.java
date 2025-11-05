@@ -65,7 +65,7 @@ public class HomeController {
 				? projectsWithAbstract.subList(fromIndex, toIndex)
 				: List.of();
 
-		ModelAndView mav = new ModelAndView("Home");
+		ModelAndView mav = new ModelAndView("index");
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
 		mav.addObject("semesters", semesters);

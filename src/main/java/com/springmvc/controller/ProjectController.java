@@ -72,7 +72,7 @@ public class ProjectController {
 				? projectsWithAbstract.subList(fromIndex, toIndex)
 				: projectsWithAbstract;
 
-		ModelAndView mav = new ModelAndView("Home");
+		ModelAndView mav = new ModelAndView("index");
 		mav.addObject("projects", projects);
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
@@ -167,7 +167,7 @@ public class ProjectController {
 		List<Tools> testingToolsList = toolsManager.getToolsByType(Tools.ToolsType.Testing);
 		List<Tools> dbmsLangs = toolsManager.getToolsByType(Tools.ToolsType.DBMS);
 
-		ModelAndView mav = new ModelAndView("Home");
+		ModelAndView mav = new ModelAndView("index");
 		mav.addObject("projects", projects);
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
@@ -260,7 +260,7 @@ public class ProjectController {
 		List<Tools> testingToolsList = toolsManager.getToolsByType(Tools.ToolsType.Testing);
 		List<Tools> dbmsLangs = toolsManager.getToolsByType(Tools.ToolsType.DBMS);
 
-		ModelAndView mav = new ModelAndView("Home");
+		ModelAndView mav = new ModelAndView("index");
 		mav.addObject("projects", projects);
 		mav.addObject("advisors", activeAdvisors);
 		mav.addObject("projectTypes", projectTypes);
@@ -301,7 +301,7 @@ public class ProjectController {
 		Integer projectId = (Integer) session.getAttribute("viewingProjectId");
 
 		if (projectId == null) {
-			ModelAndView mv = new ModelAndView("Home");
+			ModelAndView mv = new ModelAndView("index");
 			mv.addObject("projects", projectManager.searchProjects(null));
 			mv.addObject("error", "กรุณาเลือกโครงงานที่ต้องการดู");
 			return mv;
@@ -310,7 +310,7 @@ public class ProjectController {
 		Project project = projectManager.getProjectDetail(projectId);
 
 		if (project == null) {
-			ModelAndView mv = new ModelAndView("Home");
+			ModelAndView mv = new ModelAndView("index");
 			mv.addObject("projects", projectManager.searchProjects(null));
 			mv.addObject("error", "ไม่พบโครงงานที่ต้องการดูรายละเอียด");
 			return mv;

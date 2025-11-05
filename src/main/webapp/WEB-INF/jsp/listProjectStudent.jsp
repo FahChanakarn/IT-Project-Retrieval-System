@@ -23,15 +23,6 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<style>
-.testing-select {
-	width: 65px;
-	padding: 0.25rem 0.5rem;
-	font-size: 0.875rem;
-	margin: 0 auto;
-	text-align: center;
-}
-</style>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/includes/header.jsp" />
@@ -92,7 +83,7 @@
 								varStatus="status">
 								<tr>
 									<td>${student.studentId}</td>
-									<td>${student.prefix}${student.firstName}
+									<td>${student.prefix} ${student.firstName}
 										${student.lastName}</td>
 
 									<!-- Merge Cell สำหรับหัวข้อโครงงาน -->

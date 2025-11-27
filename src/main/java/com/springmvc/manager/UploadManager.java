@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class UploadManager {
+import com.springmvc.controller.UploadController;
 
-	private static final String UPLOAD_BASE_PATH = "D:/Project496Uploads/uploadsFile";
+public class UploadManager {
 
 	public static class FileWithUploader {
 		private DocumentFile file;
@@ -110,7 +110,7 @@ public class UploadManager {
 			doc.setSendDate(date);
 			doc.setStatus("อัปโหลดสำเร็จ");
 
-			new File(UPLOAD_BASE_PATH).mkdirs();
+			new File(UploadController.BASE_UPLOAD_PATH).mkdirs();
 
 			if ("file".equals(fileType) && file != null && !file.isEmpty()) {
 				try {
@@ -121,7 +121,7 @@ public class UploadManager {
 					}
 
 					String safeFilename = uploadedByStudentId + "_" + fileName + extension;
-					String fullPath = UPLOAD_BASE_PATH + File.separator + safeFilename;
+					String fullPath = UploadController.BASE_UPLOAD_PATH + File.separator + safeFilename;
 
 					file.transferTo(new File(fullPath));
 					doc.setFilepath(safeFilename);
@@ -187,7 +187,7 @@ public class UploadManager {
 			if ("file".equals(file.getFiletype())) {
 				String filePath = file.getFilepath();
 				if (filePath != null && !filePath.isEmpty()) {
-					File physicalFile = new File(UPLOAD_BASE_PATH + File.separator + filePath);
+					File physicalFile = new File(UploadController.BASE_UPLOAD_PATH + File.separator + filePath);
 					if (physicalFile.exists()) {
 						physicalFile.delete();
 					}

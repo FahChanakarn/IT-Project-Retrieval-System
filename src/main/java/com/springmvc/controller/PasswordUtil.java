@@ -1,16 +1,18 @@
 package com.springmvc.controller;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordUtil {
 
-    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    // Work with jBCrypt which is Java 8 compatible
+    private static final int WORKLOAD = 12; // cost factor
 
     public static String hashPassword(String plainPassword) {
         if (plainPassword == null || plainPassword.isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
-        return encoder.encode(plainPassword);
+        String salt = BCrypt.gensalt(WORKLOAD);
+        return BCrypt.hashpw(plainPassword, salt);
     }
 
     public static boolean verifyPassword(String plainPassword, String hashedPassword) {
@@ -18,7 +20,7 @@ public class PasswordUtil {
             return false;
         }
         try {
-            return encoder.matches(plainPassword, hashedPassword);
+            return BCrypt.checkpw(plainPassword, hashedPassword);
         } catch (Exception e) {
             System.err.println("Error verifying password: " + e.getMessage());
             return false;
@@ -28,7 +30,7 @@ public class PasswordUtil {
     public static void main(String[] args) {
         String password = "mju6504106307";
         String hashed = hashPassword(password);
-        
+
         System.out.println("Plain Password: " + password);
         System.out.println("Hashed Password: " + hashed);
         System.out.println("Password Length: " + hashed.length());

@@ -19,8 +19,6 @@ import com.springmvc.model.Student496;
 @Controller
 public class EditProfileController {
 
-	private static final String PROFILE_UPLOAD_PATH = "D:/Project496Uploads/profileImages";
-
 	@RequestMapping(value = "/editProfile", method = RequestMethod.GET)
 	public ModelAndView showEditForm(HttpSession session) {
 		Student496 student = (Student496) session.getAttribute("student");
@@ -121,7 +119,7 @@ public class EditProfileController {
 				return "ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB";
 			}
 
-			File uploadDir = new File(PROFILE_UPLOAD_PATH);
+			File uploadDir = new File(UploadController.BASE_UPLOAD_PATH);
 			if (!uploadDir.exists()) {
 				uploadDir.mkdirs();
 			}
@@ -133,7 +131,7 @@ public class EditProfileController {
 					oldFileName = oldImagePath
 							.substring(Math.max(oldImagePath.lastIndexOf('/'), oldImagePath.lastIndexOf('\\')) + 1);
 				}
-				File oldFile = new File(PROFILE_UPLOAD_PATH + File.separator + oldFileName);
+				File oldFile = new File(UploadController.BASE_UPLOAD_PATH + File.separator + oldFileName);
 				if (oldFile.exists()) {
 					oldFile.delete();
 				}
@@ -141,7 +139,7 @@ public class EditProfileController {
 
 			String fileName = student.getStuId() + "_" + System.currentTimeMillis() + "_"
 					+ imageFile.getOriginalFilename();
-			File dest = new File(PROFILE_UPLOAD_PATH + File.separator + fileName);
+			File dest = new File(UploadController.BASE_UPLOAD_PATH + File.separator + fileName);
 			imageFile.transferTo(dest);
 
 			student.setStu_image(fileName);
@@ -170,7 +168,7 @@ public class EditProfileController {
 			return;
 		}
 
-		File imageFile = new File(PROFILE_UPLOAD_PATH + File.separator + filename);
+		File imageFile = new File(UploadController.BASE_UPLOAD_PATH + File.separator + filename);
 
 		if (!imageFile.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Profile image not found");

@@ -18,13 +18,11 @@ import com.springmvc.manager.ToolsManager;
 import com.springmvc.manager.ProjectManager;
 import com.springmvc.manager.UploadManager;
 import com.springmvc.model.Advisor;
-import com.springmvc.model.DocumentFile;
 import com.springmvc.model.Tools;
 import com.springmvc.model.Project;
 
 @Controller
 public class ProjectController {
-
 	private static final int PROJECTS_PER_PAGE = 10;
 
 	@RequestMapping(value = "/searchProjects", method = RequestMethod.GET)

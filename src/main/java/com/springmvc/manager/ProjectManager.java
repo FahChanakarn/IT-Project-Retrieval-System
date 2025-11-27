@@ -51,7 +51,7 @@ public class ProjectManager {
 					+ "OR LOWER(CONCAT(a.adv_prefix, ' ', a.adv_firstName, ' ', a.adv_lastName)) LIKE :kw "
 					+ "OR LOWER(CONCAT(s.stu_prefix, ' ', s.stu_firstName, ' ', s.stu_lastName)) LIKE :kw";
 
-			var query = session.createQuery(hql, Project.class);
+			Query<Project> query = session.createQuery(hql, Project.class);
 			query.setParameter("kw", "%" + keyword + "%");
 
 			return query.getResultList();
@@ -108,7 +108,7 @@ public class ProjectManager {
 						" AND FUNCTION('substring', p.semester, LOCATE('/', p.semester) + 1) BETWEEN :startYear AND :endYear");
 			}
 
-			var query = session.createQuery(hql.toString(), Project.class);
+			Query<Project> query = session.createQuery(hql.toString(), Project.class);
 
 			if (projectType != null && !projectType.isEmpty()) {
 				query.setParameter("projectType", projectType);
@@ -382,7 +382,7 @@ public class ProjectManager {
 
 			hql.append("ORDER BY df.fileno ASC, df.fileId ASC");
 
-			var q = session.createQuery(hql.toString(), DocumentFile.class).setParameter("pid", projectId)
+			Query<DocumentFile> q = session.createQuery(hql.toString(), DocumentFile.class).setParameter("pid", projectId)
 					.setParameter("vtype", "video");
 
 			if (onlyPublished) {

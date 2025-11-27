@@ -4,6 +4,7 @@ import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.kernel.pdf.action.PdfAction;
 import com.springmvc.manager.UploadManager;
 import com.springmvc.model.DocumentFile;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,13 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
 public class DownloadController {
 
-	private static final String BASE_UPLOAD_PATH = "D:/Project496Uploads/uploadsFile/";
 	private static final int EXPIRY_DAYS = 14; // จำนวนวันที่ไฟล์หมดอายุ
 
 	@RequestMapping(value = "/download/secure/{id}", method = RequestMethod.GET)
@@ -39,7 +38,7 @@ public class DownloadController {
 				return;
 			}
 
-			File originalFile = new File(BASE_UPLOAD_PATH + doc.getFilepath());
+			File originalFile = new File(UploadController.BASE_UPLOAD_PATH + doc.getFilepath());
 			if (!originalFile.exists()) {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Physical file not found!");
 				return;
@@ -135,7 +134,6 @@ public class DownloadController {
 			// เพิ่ม Metadata
 			PdfDocumentInfo info = pdfDoc.getDocumentInfo();
 			info.setCreator("Secured Document System");
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			info.setKeywords("Secured, ExpiryTimestamp: " + expiryTimestamp);
 
 			return true;
@@ -166,7 +164,7 @@ public class DownloadController {
 			return;
 		}
 
-		File file = new File(BASE_UPLOAD_PATH + doc.getFilepath());
+		File file = new File(UploadController.BASE_UPLOAD_PATH + doc.getFilepath());
 		if (!file.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found on server!");
 			return;

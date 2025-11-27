@@ -1,0 +1,75 @@
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:9.5.0
+    container_name: retrieval-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: project_retrieval_system
+    volumes:
+      - retrieval_data:/var/lib/mysql
+      - ./dockers/mysql:/tmp
+    networks:
+      - retrieval-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Tomcat Application Server
+  tomcat:
+    image: tomcat:9.0-jdk8
+    container_name: retrieval-tomcat
+    restart: always
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    volumes:
+      - ./target/itsci-mju-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/retrieval.war
+      - ./uploads/attendance:/usr/share/apache-tomcat-9.0.0.M21/webapps/uploads
+    # Environment variables for Tomcat
+    environment:
+      # bind JPDA to all interfaces so host debugger can attach
+      JPDA_ADDRESS: "0.0.0.0:8000"
+      JPDA_TRANSPORT: "dt_socket"
+      # suspend JVM until debugger attaches (useful for diagnosing attach issues)
+      JPDA_SUSPEND: "y"
+      CATALINA_OPTS: "-Dspring.profiles.active=docker -Xmx512m -Xms256m"
+    entrypoint: ["catalina.sh", "jpda", "run"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - retrieval-network
+
+  # phpMyAdmin for Database Management (Optional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: retrieval-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "8082:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - retrieval-network
+
+# Named volumes
+volumes:
+  retrieval_data:
+    driver: local
+
+# Networks
+networks:
+  retrieval-network:
+    driver: bridge

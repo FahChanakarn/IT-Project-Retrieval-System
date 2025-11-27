@@ -19,6 +19,8 @@ import java.util.List;
 @RequestMapping("/student496")
 public class UploadController {
 
+	public static final String BASE_UPLOAD_PATH = "/usr/share/apache-tomcat-9.0.0.M21/webapps/uploads";
+
 	@Autowired
 	private ServletContext servletContext;
 

@@ -29,7 +29,7 @@ public class HibernateConnection {
 
 	private static String getDbPassword() {
 		String dbPassword = System.getenv("DB_PASSWORD");
-		return dbPassword != null ? dbPassword : "lkilogmL2011";
+		return dbPassword != null ? dbPassword : "1234";
 	}
 
 	// ✅ Singleton Pattern - สร้าง SessionFactory ครั้งเดียว
